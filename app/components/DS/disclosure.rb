@@ -39,7 +39,7 @@ class DS::Disclosure < DesignSystemComponent
   end
 
   def details_classes
-    case variant
+    base = case variant
     when :card
       "group bg-container p-4 shadow-border-xs rounded-xl"
     when :card_inset
@@ -47,21 +47,33 @@ class DS::Disclosure < DesignSystemComponent
     else
       "group"
     end
+
+    class_names(base, opts[:class])
+  end
+
+  # `opts` minus the `:class` key, since `details_classes` merges that
+  # separately to avoid duplicate-keyword collisions when forwarding to
+  # `tag.details`.
+  def details_opts
+    opts.except(:class)
   end
 
   def summary_classes
     case variant
     when :card, :card_inset
       # Card variants: no bg on summary — the parent details *is* the
-      # surface. Keep cursor + focus-visible ring + list-none baseline.
-      "list-none cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 theme-dark:focus-visible:outline-white"
+      # surface. Keep cursor + focus-visible ring + flex baseline.
+      # Ring token matches `settings/provider_card.html.erb` (the
+      # established focus pattern on container cards).
+      "list-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alpha-black-300 rounded-xl"
     when :inline
       # Inline variant: no surface, no padding — the summary reads as
       # plain text-link copy. Caller markup (text + optional chevron)
-      # provides the visual. Keep cursor + focus-visible ring.
-      "list-none cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 theme-dark:focus-visible:outline-white rounded-sm"
+      # provides the visual. Keep cursor + focus-visible ring; rounded-sm
+      # matches the tighter surface footprint.
+      "list-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alpha-black-300 rounded-sm"
     else
-      "px-3 py-2 rounded-xl cursor-pointer flex items-center justify-between bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 theme-dark:focus-visible:outline-white"
+      "px-3 py-2 rounded-xl cursor-pointer flex items-center justify-between bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alpha-black-300"
     end
   end
 end
