@@ -37,7 +37,7 @@ class BalanceSheet::ClassificationGroup
                          name: accountable.display_name,
                          color: accountable.color,
                          accountable_type: accountable,
-                         accounts: account_rows,
+                         accounts: account_rows.sort_by { |a| [ a.converted_balance.zero? ? 1 : 0, -a.converted_balance ] },
                          classification_group: self
                        )
                      end
