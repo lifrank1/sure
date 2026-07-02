@@ -5,6 +5,9 @@
       <%= link_to "Privacy Policy", privacy_path, class: "text-secondary", target: "_blank" %>
       <span>&bull;</span>
       <%= link_to "Terms of Service", terms_path, class: "text-secondary", target: "_blank" %>
+      <span>&bull;</span>
+      <%# AGPLv3 §13: users of the hosted service must be offered the source %>
+      <%= link_to "Source", "https://github.com/lifrank1/sure", class: "text-secondary", target: "_blank", rel: "noopener" %>
     </div>
   </div>
 </footer>

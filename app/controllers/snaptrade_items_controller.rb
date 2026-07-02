@@ -542,6 +542,10 @@ class SnaptradeItemsController < ApplicationController
         "Investment" # Standard brokerage accounts
       when "crypto"
         "Crypto"
+      when "creditcard", "credit_card", "credit card"
+        "CreditCard" # Chase and other banks report credit cards via SnapTrade
+      when "depository", "checking", "savings", "chequing"
+        "Depository" # Bank cash accounts (not brokerage cash)
       else
         "Investment" # Default to Investment for brokerage accounts
       end
