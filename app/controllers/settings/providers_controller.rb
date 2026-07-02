@@ -345,7 +345,9 @@ class Settings::ProvidersController < ApplicationController
     # alphabetically by display title. Each entry carries enough data for the
     # view to render either a provider_form or a family panel partial.
     def build_provider_entries
-      configuration_entries = @provider_configurations.map do |config|
+      configuration_entries = @provider_configurations.select do |config|
+        Provider::Visibility.enabled?(config.provider_key)
+      end.map do |config|
         meta = Provider::Metadata.for(config.provider_key)
         {
           provider_key: config.provider_key.to_s,
@@ -356,7 +358,9 @@ class Settings::ProvidersController < ApplicationController
         }
       end
 
-      family_entries = FAMILY_PANELS.map do |panel|
+      family_entries = FAMILY_PANELS.select do |panel|
+        family_panel_visible?(panel[:key])
+      end.map do |panel|
         {
           provider_key: panel[:key],
           title: panel[:title],
@@ -369,5 +373,19 @@ class Settings::ProvidersController < ApplicationController
       end
 
       (configuration_entries + family_entries).sort_by { |entry| entry[:title].downcase }
+    end
+
+    # Whitelisted panels are always visible; others stay visible only when
+    # the family already has a connection of that type, so existing
+    # connections remain manageable after tightening ENABLED_PROVIDERS.
+    def family_panel_visible?(key)
+      return true if Provider::Visibility.enabled?(key)
+
+      syncable_type = PANEL_SYNCABLE_TYPES[key]
+      return false unless syncable_type
+
+      syncable_type.constantize.where(family_id: Current.family.id).exists?
+    rescue NameError
+      false
     end
 end

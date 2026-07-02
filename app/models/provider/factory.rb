@@ -93,7 +93,7 @@ class Provider::Factory
     def connection_configs_for_account_type(account_type:, family:)
       adapters_for_account_type(account_type).flat_map do |adapter_class|
         adapter_class.connection_configs(family: family)
-      end
+      end.select { |config| Provider::Visibility.enabled?(config[:key]) }
     end
 
     # Clear all registered adapters (useful for testing)

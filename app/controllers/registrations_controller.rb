@@ -29,6 +29,7 @@ class RegistrationsController < ApplicationController
     end
 
     if signup_with_invite_claim!
+      create_default_auto_categorize_rule
       redirect_to root_path, notice: t(".success")
     elsif @invite_code_invalid
       redirect_to new_registration_path, alert: t("registrations.create.invalid_invite_code")
@@ -38,6 +39,25 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+    # Every family gets an active AI auto-categorize rule so cashflow is
+    # accurate out of the box. Family syncs apply active rules automatically
+    # (Family::Syncer), and the executor only touches uncategorized
+    # transactions. Failures must never block a signup.
+    def create_default_auto_categorize_rule
+      family = @user.family
+      return if family.nil? || family.rules.exists?
+
+      rule = family.rules.new(
+        name: "Auto-categorize transactions",
+        resource_type: "transaction",
+        active: true
+      )
+      rule.actions.build(action_type: "auto_categorize")
+      rule.save!
+    rescue => e
+      Rails.logger.error("Default auto-categorize rule creation failed for family #{family&.id}: #{e.message}")
+    end
 
     def set_invitation
       token = params[:invitation]
