@@ -92,4 +92,10 @@
   </div>
 
   <%= form.submit t(".submit") %>
+
+  <p class="text-xs text-secondary text-center mt-3">
+    By creating an account, you agree to the
+    <%= link_to "Terms of Service", terms_path, class: "underline", target: "_blank" %> and
+    <%= link_to "Privacy Policy", privacy_path, class: "underline", target: "_blank" %>.
+  </p>
 <% end %>
