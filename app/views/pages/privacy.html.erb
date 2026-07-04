@@ -1,12 +1,62 @@
 <% content_for :title, t(".title") %>
 
-<div class="flex items-center justify-center h-full p-4 sm:p-6 lg:p-8">
-  <div class="w-full max-w-md sm:max-w-lg lg:max-w-2xl">
-    <div class="bg-container border border-primary rounded-xl p-6 sm:p-8 shadow-sm">
-      <div class="text-center">
-        <h1 class="text-xl sm:text-2xl font-bold text-primary mb-4"><%= t(".heading") %></h1>
-        <p class="text-sm sm:text-base text-subdued"><%= t(".placeholder") %></p>
+<div class="flex justify-center p-4 sm:p-6 lg:p-8">
+  <div class="w-full max-w-2xl">
+    <div class="bg-container border border-primary rounded-xl p-6 sm:p-8 shadow-sm space-y-6 text-sm text-primary">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold mb-1"><%= t(".heading") %></h1>
+        <p class="text-subdued">Effective July 4, 2026</p>
       </div>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">Who we are</h2>
+        <p><%= product_name %> is a personal finance dashboard operated by an individual (the "operator"). It is provided as a small, non-commercial service. Questions or requests: <a href="mailto:frank.li.865985@gmail.com" class="underline">frank.li.865985@gmail.com</a>.</p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">What we collect</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><span class="font-medium">Account information:</span> your email address and a hashed password (we never store plaintext passwords).</li>
+          <li><span class="font-medium">Financial data:</span> account balances, holdings, and transactions synced from institutions you choose to connect, plus any accounts or transactions you enter manually.</li>
+          <li><span class="font-medium">Connection tokens:</span> access tokens issued by our data providers (Plaid, SnapTrade) for the institutions you connect. <span class="font-medium">Your bank and brokerage login credentials never touch our servers</span> — you enter them directly with the provider or your institution.</li>
+        </ul>
+        <p>We do not collect advertising identifiers and we do not sell or share your data with advertisers or data brokers. Ever.</p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">Service providers we rely on</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><span class="font-medium">Plaid</span> — connects bank and credit card accounts (<a href="https://plaid.com/legal/#end-user-privacy-policy" class="underline" target="_blank" rel="noopener">Plaid privacy policy</a>).</li>
+          <li><span class="font-medium">SnapTrade</span> — connects brokerage accounts (<a href="https://snaptrade.com/privacy-policy" class="underline" target="_blank" rel="noopener">SnapTrade privacy policy</a>).</li>
+          <li><span class="font-medium">Google Gemini API</span> — transaction descriptions and amounts are sent to Google's API to automatically categorize your transactions.</li>
+          <li><span class="font-medium">Railway</span> — application and database hosting (United States).</li>
+          <li><span class="font-medium">Resend</span> — transactional email (confirmations, password resets).</li>
+        </ul>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">How we protect your data</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>All traffic is encrypted in transit (TLS/HTTPS).</li>
+          <li>Provider access tokens and other sensitive fields are encrypted at rest in the database.</li>
+          <li>Your data is scoped to your household: other users of the service cannot see it.</li>
+        </ul>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">Retention and deletion</h2>
+        <p>Your data is kept while your account is active. When you delete your account, your financial data and provider connections are deleted, and connected institutions are deregistered from our data providers. You may also request deletion or a copy of your data by email at any time.</p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">Open source</h2>
+        <p>This service runs open-source software licensed under AGPLv3. The source code, including our modifications, is available via the "Source" link in the footer.</p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="font-semibold text-base">Changes</h2>
+        <p>If this policy changes materially, the effective date above will be updated. Continued use after a change constitutes acceptance.</p>
+      </section>
     </div>
   </div>
 </div>
