@@ -4,6 +4,10 @@
   # picker remains fully reachable at ?step=manual, and becomes the default
   # when no connect-capable provider is configured.
   plaid_config = @provider_configs.find { |c| c[:key].to_s.start_with?("plaid") && c[:can_connect] }
+  # Brokerages route through SnapTrade when available (broader coverage,
+  # including Fidelity); otherwise fall back to Plaid's investments product.
+  snaptrade_config = @provider_configs.find { |c| c[:key] == "snaptrade" && c[:can_connect] }
+  brokerage_config = snaptrade_config || plaid_config
   manual_step = params[:step] == "manual" || plaid_config.nil?
 %>
 
@@ -69,8 +73,10 @@
         <%= icon("chevron-right", size: "sm", class: "shrink-0 text-subdued transition-colors group-hover:text-secondary") %>
       <% end %>
 
-      <%= link_to plaid_config[:new_account_path].call("Investment", params[:return_to]),
-                  data: { turbo_frame: :modal },
+      <%# SnapTrade redirects to its external connection portal, which cannot
+          render inside a turbo frame — use a full-page visit for it. %>
+      <%= link_to brokerage_config[:new_account_path].call("Investment", params[:return_to]),
+                  data: { turbo_frame: brokerage_config[:key] == "snaptrade" ? "_top" : "modal" },
                   class: "group flex items-center gap-4 w-full text-primary focus:outline-hidden focus:bg-surface-hover border border-secondary px-3 py-3 hover:bg-surface-hover rounded-lg" do %>
         <%= render DS::FilledIcon.new(
           icon: "trending-up",

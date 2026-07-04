@@ -366,6 +366,14 @@ class SnaptradeItemsController < ApplicationController
     @return_to = params[:return_to]
     snaptrade_item = current_snaptrade_item
 
+    # Hosted mode: instance-wide env credentials mean users never configure
+    # SnapTrade themselves, so create the family's item on first connect.
+    if snaptrade_item.nil? && SnaptradeItem.env_credentials?
+      snaptrade_item = Current.family.snaptrade_items.create!(
+        name: t("snaptrade_items.default_name", default: "SnapTrade")
+      )
+    end
+
     unless snaptrade_item
       redirect_to settings_providers_path, alert: t(".not_configured", default: "SnapTrade is not configured.")
       return

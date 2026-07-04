@@ -9,8 +9,8 @@ module SnaptradeItem::Provided
     return nil unless credentials_configured?
 
     Provider::Snaptrade.new(
-      client_id: client_id,
-      consumer_key: consumer_key
+      client_id: effective_client_id,
+      consumer_key: effective_consumer_key
     )
   end
 

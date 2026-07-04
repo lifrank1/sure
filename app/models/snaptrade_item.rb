@@ -23,8 +23,11 @@ class SnaptradeItem < ApplicationRecord
   end
 
   validates :name, presence: true
-  validates :client_id, presence: true, on: :create
-  validates :consumer_key, presence: true, on: :create
+  # Per-family credentials are only required when no instance-wide env
+  # credentials exist (hosted mode: the operator holds one SnapTrade app key
+  # and users never handle credentials).
+  validates :client_id, presence: true, on: :create, unless: -> { self.class.env_credentials? }
+  validates :consumer_key, presence: true, on: :create, unless: -> { self.class.env_credentials? }
   # Note: snaptrade_user_id and snaptrade_user_secret are populated after user registration
   # via ensure_user_registered!, so we don't validate them on create
 
@@ -35,7 +38,17 @@ class SnaptradeItem < ApplicationRecord
   has_many :linked_accounts, through: :snaptrade_accounts
 
   scope :active, -> { where(scheduled_for_deletion: false) }
-  scope :credentials_configured, -> { active.where.not(client_id: [ nil, "" ]).where.not(consumer_key: [ nil, "" ]) }
+  scope :credentials_configured, -> {
+    if env_credentials?
+      active
+    else
+      active.where.not(client_id: [ nil, "" ]).where.not(consumer_key: [ nil, "" ])
+    end
+  }
+
+  def self.env_credentials?
+    ENV["SNAPTRADE_CLIENT_ID"].present? && ENV["SNAPTRADE_CONSUMER_KEY"].present?
+  end
   # Syncable = active + fully configured (user registered with SnapTrade API)
   # Items without user registration will fail sync, so exclude them from auto-sync
   scope :syncable, -> { active.where.not(snaptrade_user_id: [ nil, "" ]).where.not(snaptrade_user_secret: [ nil, "" ]) }
@@ -172,7 +185,17 @@ class SnaptradeItem < ApplicationRecord
   end
 
   def credentials_configured?
-    client_id.present? && consumer_key.present?
+    effective_client_id.present? && effective_consumer_key.present?
+  end
+
+  # Per-family credentials take precedence; instance-wide env credentials
+  # are the fallback so hosted users never enter API keys.
+  def effective_client_id
+    client_id.presence || ENV["SNAPTRADE_CLIENT_ID"]
+  end
+
+  def effective_consumer_key
+    consumer_key.presence || ENV["SNAPTRADE_CONSUMER_KEY"]
   end
 
   # Override Syncable#syncing? to also show syncing state when activities are being
