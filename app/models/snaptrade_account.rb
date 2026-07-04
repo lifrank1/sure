@@ -28,6 +28,27 @@ class SnaptradeAccount < ApplicationRecord
     linked_account
   end
 
+  # Maps SnapTrade account types to app accountable types.
+  # SnapTrade account types: https://docs.snaptrade.com/reference/get_accounts
+  def inferred_accountable_type
+    case account_type&.downcase
+    when "tfsa", "rrsp", "rrif", "resp", "rdsp", "lira", "lrsp", "lif", "rlsp", "prif",
+         "401k", "403b", "457b", "ira", "roth_ira", "roth_401k", "sep_ira", "simple_ira",
+         "pension", "retirement", "registered"
+      "Investment" # Tax-advantaged accounts
+    when "margin", "cash", "non-registered", "individual", "joint"
+      "Investment" # Standard brokerage accounts
+    when "crypto"
+      "Crypto"
+    when "creditcard", "credit_card", "credit card"
+      "CreditCard" # Chase and other banks report credit cards via SnapTrade
+    when "depository", "checking", "savings", "chequing"
+      "Depository" # Bank cash accounts (not brokerage cash)
+    else
+      "Investment" # Default to Investment for brokerage accounts
+    end
+  end
+
   # Ensure there is an AccountProvider link for this SnapTrade account and the given Account.
   # Safe and idempotent; returns the AccountProvider or nil if no account is provided.
   def ensure_account_provider!(account = nil)

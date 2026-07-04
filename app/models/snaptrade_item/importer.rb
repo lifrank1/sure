@@ -31,6 +31,11 @@ class SnaptradeItem::Importer
     # Step 1: Fetch and store all accounts
     import_accounts(credentials)
 
+    # Step 1.5: Hosted mode (instance-wide credentials) links every
+    # discovered account automatically so users skip manual setup. Runs
+    # before holdings/activities so new links get data in this same sync.
+    snaptrade_item.auto_link_accounts! if SnaptradeItem.env_credentials?
+
     # Step 2: For LINKED accounts only, fetch holdings and activities
     # Unlinked accounts just need basic info (name, balance) for the setup modal
     # Query directly to avoid any association caching issues

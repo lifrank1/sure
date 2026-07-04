@@ -198,6 +198,28 @@ class SnaptradeItem < ApplicationRecord
     consumer_key.presence || ENV["SNAPTRADE_CONSUMER_KEY"]
   end
 
+  # Creates and links an app Account for every discovered SnapTrade account
+  # that isn't linked yet, so users skip the manual "accounts need setup"
+  # step. A failure on one account must not block the others or the sync.
+  def auto_link_accounts!
+    snaptrade_accounts.where.missing(:account_provider).find_each do |snaptrade_account|
+      account = family.accounts.create!(
+        name: snaptrade_account.name.presence || "#{snaptrade_account.brokerage_name} account",
+        balance: snaptrade_account.current_balance || 0,
+        cash_balance: snaptrade_account.cash_balance || 0,
+        currency: snaptrade_account.currency.presence || family.currency,
+        accountable: snaptrade_account.inferred_accountable_type.constantize.new
+      )
+      snaptrade_account.ensure_account_provider!(account)
+    rescue => e
+      Rails.logger.error "SnapTrade auto-link failed for snaptrade_account #{snaptrade_account.id}: #{e.message}"
+    end
+
+    if pending_account_setup? && snaptrade_accounts.where.missing(:account_provider).none?
+      update!(pending_account_setup: false)
+    end
+  end
+
   # Override Syncable#syncing? to also show syncing state when activities are being
   # fetched in the background. This ensures the UI shows the spinner until all data
   # is truly imported, not just when the main sync job completes.

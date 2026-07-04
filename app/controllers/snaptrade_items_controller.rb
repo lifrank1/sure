@@ -517,7 +517,7 @@ class SnaptradeItemsController < ApplicationController
 
     def link_snaptrade_account(snaptrade_account)
       # Determine account type based on SnapTrade account type
-      accountable_type = infer_accountable_type(snaptrade_account.account_type)
+      accountable_type = snaptrade_account.inferred_accountable_type
 
       # Create the Sure account
       account = Current.family.accounts.create!(
@@ -539,23 +539,4 @@ class SnaptradeItemsController < ApplicationController
       account
     end
 
-    def infer_accountable_type(snaptrade_type)
-      # SnapTrade account types: https://docs.snaptrade.com/reference/get_accounts
-      case snaptrade_type&.downcase
-      when "tfsa", "rrsp", "rrif", "resp", "rdsp", "lira", "lrsp", "lif", "rlsp", "prif",
-           "401k", "403b", "457b", "ira", "roth_ira", "roth_401k", "sep_ira", "simple_ira",
-           "pension", "retirement", "registered"
-        "Investment" # Tax-advantaged accounts
-      when "margin", "cash", "non-registered", "individual", "joint"
-        "Investment" # Standard brokerage accounts
-      when "crypto"
-        "Crypto"
-      when "creditcard", "credit_card", "credit card"
-        "CreditCard" # Chase and other banks report credit cards via SnapTrade
-      when "depository", "checking", "savings", "chequing"
-        "Depository" # Bank cash accounts (not brokerage cash)
-      else
-        "Investment" # Default to Investment for brokerage accounts
-      end
-    end
 end
