@@ -68,6 +68,10 @@ class Provider::Openai < Provider
     @uri_base.present?
   end
 
+  def gemini_endpoint?
+    @uri_base.to_s.include?("googleapis.com")
+  end
+
   # Token-budget knobs. Precedence: ENV > Setting > default. Defaults match
   # Ollama's historical 2048-token baseline so local small-context models work
   # out of the box. Users on larger-context cloud models can raise via ENV or
@@ -536,7 +540,7 @@ class Provider::Openai < Provider
           arguments = fn_result[:arguments]
           arguments_str = arguments.is_a?(String) ? arguments : arguments.to_json
 
-          {
+          tool_call = {
             id: fn_result[:call_id],
             type: "function",
             function: {
@@ -544,6 +548,17 @@ class Provider::Openai < Provider
               arguments: arguments_str
             }
           }
+
+          # Gemini 3.x models reject replayed function calls without a
+          # thought_signature. The original signature isn't persisted, so
+          # send Google's documented placeholder that skips validation.
+          if gemini_endpoint?
+            tool_call[:extra_content] = {
+              google: { thought_signature: "context_engineering_is_the_way_to_go" }
+            }
+          end
+
+          tool_call
         end
 
         payload << {
