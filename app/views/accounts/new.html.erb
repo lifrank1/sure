@@ -69,6 +69,20 @@
         <%= icon("chevron-right", size: "sm", class: "shrink-0 text-subdued transition-colors group-hover:text-secondary") %>
       <% end %>
 
+      <%= link_to plaid_config[:new_account_path].call("Investment", params[:return_to]),
+                  data: { turbo_frame: :modal },
+                  class: "group flex items-center gap-4 w-full text-primary focus:outline-hidden focus:bg-surface-hover border border-secondary px-3 py-3 hover:bg-surface-hover rounded-lg" do %>
+        <%= render DS::FilledIcon.new(
+          icon: "trending-up",
+          hex_color: "#10B981",
+        ) %>
+        <span class="flex flex-col text-left grow">
+          <span class="font-medium"><%= t(".connect_brokerage", default: "Connect your brokerage") %></span>
+          <span class="text-secondary text-xs"><%= t(".connect_brokerage_description", default: "Link investment accounts — holdings & trades sync automatically") %></span>
+        </span>
+        <%= icon("chevron-right", size: "sm", class: "shrink-0 text-subdued transition-colors group-hover:text-secondary") %>
+      <% end %>
+
       <%= link_to new_account_path(step: "manual", classification: params[:classification], return_to: params[:return_to]),
                   data: { turbo_frame: :modal },
                   class: "group flex items-center gap-4 w-full text-primary focus:outline-hidden focus:bg-surface-hover border border-transparent px-3 py-2 hover:bg-surface-hover rounded-lg" do %>
