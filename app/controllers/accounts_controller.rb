@@ -36,10 +36,11 @@ class AccountsController < ApplicationController
   end
 
   def new
-    # Get all registered providers with any credentials configured
+    # Get all registered providers with any credentials configured,
+    # limited to the ENABLED_PROVIDERS whitelist
     @provider_configs = Provider::Factory.registered_adapters.flat_map do |adapter_class|
       adapter_class.connection_configs(family: family)
-    end
+    end.select { |config| Provider::Visibility.enabled?(config[:key]) }
   end
 
   def sync_all

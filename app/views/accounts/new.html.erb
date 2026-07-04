@@ -1,40 +1,83 @@
-<%= render layout: "accounts/new/container", locals: { title: t(".title") } do %>
-  <div class="text-sm"
-       <% if @provider_configs.any? { |c| c[:key] == "lunchflow" } %>
-         data-controller="lunchflow-preload"
-       <% end %>>
-    <% unless params[:classification] == "liability" %>
-      <%= render "account_type", accountable: Depository.new %>
-      <%= render "account_type", accountable: Investment.new %>
-      <%= render "account_type", accountable: Crypto.new %>
-      <%= render "account_type", accountable: Property.new %>
-      <%= render "account_type", accountable: Vehicle.new %>
-    <% end %>
+<%
+  # Connect-first UX: linking a bank via a data provider (Plaid) is the
+  # primary action; manual entry is the secondary path. The manual type
+  # picker remains fully reachable at ?step=manual, and becomes the default
+  # when no connect-capable provider is configured.
+  plaid_config = @provider_configs.find { |c| c[:key].to_s.start_with?("plaid") && c[:can_connect] }
+  manual_step = params[:step] == "manual" || plaid_config.nil?
+%>
 
-    <% unless params[:classification] == "asset" %>
-      <%= render "account_type", accountable: CreditCard.new %>
-      <%= render "account_type", accountable: Loan.new %>
-    <% end %>
-
-    <% unless params[:classification] == "liability" %>
-      <%= render "account_type", accountable: OtherAsset.new %>
-    <% end %>
-
-    <% unless params[:classification] == "asset" %>
-      <%= render "account_type", accountable: OtherLiability.new %>
-    <% end %>
-
-    <% unless params[:return_to].present? %>
-      <%= button_to imports_path(import: { type: "AccountImport" }),
-              data: { turbo_frame: :_top },
-            class: "flex items-center gap-4 w-full text-center focus:outline-hidden hover:bg-surface-hover focus:bg-surface-hover text-primary border border-transparent block px-2 rounded-lg p-2" do %>
-        <%= render DS::FilledIcon.new(
-          icon: "download",
-          hex_color: "#F79009",
-        ) %>
-
-        <%= t("accounts.new.import_accounts") %>
+<% if manual_step %>
+  <%= render layout: "accounts/new/container",
+             locals: {
+               title: t(".title"),
+               back_path: (plaid_config ? new_account_path(classification: params[:classification], return_to: params[:return_to]) : nil)
+             } do %>
+    <div class="text-sm"
+         <% if @provider_configs.any? { |c| c[:key] == "lunchflow" } %>
+           data-controller="lunchflow-preload"
+         <% end %>>
+      <% unless params[:classification] == "liability" %>
+        <%= render "account_type", accountable: Depository.new %>
+        <%= render "account_type", accountable: Investment.new %>
+        <%= render "account_type", accountable: Crypto.new %>
+        <%= render "account_type", accountable: Property.new %>
+        <%= render "account_type", accountable: Vehicle.new %>
       <% end %>
-    <% end %>
-  </div>
+
+      <% unless params[:classification] == "asset" %>
+        <%= render "account_type", accountable: CreditCard.new %>
+        <%= render "account_type", accountable: Loan.new %>
+      <% end %>
+
+      <% unless params[:classification] == "liability" %>
+        <%= render "account_type", accountable: OtherAsset.new %>
+      <% end %>
+
+      <% unless params[:classification] == "asset" %>
+        <%= render "account_type", accountable: OtherLiability.new %>
+      <% end %>
+
+      <% unless params[:return_to].present? %>
+        <%= button_to imports_path(import: { type: "AccountImport" }),
+                data: { turbo_frame: :_top },
+              class: "flex items-center gap-4 w-full text-center focus:outline-hidden hover:bg-surface-hover focus:bg-surface-hover text-primary border border-transparent block px-2 rounded-lg p-2" do %>
+          <%= render DS::FilledIcon.new(
+            icon: "download",
+            hex_color: "#F79009",
+          ) %>
+
+          <%= t("accounts.new.import_accounts") %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <%= render layout: "accounts/new/container", locals: { title: t(".title") } do %>
+    <div class="text-sm space-y-1">
+      <%= link_to plaid_config[:new_account_path].call("Depository", params[:return_to]),
+                  data: { turbo_frame: :modal },
+                  class: "group flex items-center gap-4 w-full text-primary focus:outline-hidden focus:bg-surface-hover border border-secondary px-3 py-3 hover:bg-surface-hover rounded-lg" do %>
+        <%= render DS::FilledIcon.new(
+          icon: "landmark",
+          hex_color: "#6172F3",
+        ) %>
+        <span class="flex flex-col text-left grow">
+          <span class="font-medium"><%= t(".connect_bank", default: "Connect your bank") %></span>
+          <span class="text-secondary text-xs"><%= t(".connect_bank_description", default: "Securely link checking, savings & credit cards — transactions sync automatically") %></span>
+        </span>
+        <%= icon("chevron-right", size: "sm", class: "shrink-0 text-subdued transition-colors group-hover:text-secondary") %>
+      <% end %>
+
+      <%= link_to new_account_path(step: "manual", classification: params[:classification], return_to: params[:return_to]),
+                  data: { turbo_frame: :modal },
+                  class: "group flex items-center gap-4 w-full text-primary focus:outline-hidden focus:bg-surface-hover border border-transparent px-3 py-2 hover:bg-surface-hover rounded-lg" do %>
+        <span class="flex w-8 h-8 shrink-0 grow-0 items-center justify-center rounded-lg bg-alpha-black-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.02)]">
+          <%= icon("keyboard") %>
+        </span>
+        <span class="text-secondary grow text-left"><%= t(".enter_manually", default: "Track something manually") %></span>
+        <%= icon("chevron-right", size: "sm", class: "shrink-0 text-subdued transition-colors group-hover:text-secondary") %>
+      <% end %>
+    </div>
+  <% end %>
 <% end %>
