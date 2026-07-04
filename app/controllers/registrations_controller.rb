@@ -28,6 +28,11 @@ class RegistrationsController < ApplicationController
       @user.role = User.role_for_new_family_creator
     end
 
+    # Skip the multi-step onboarding flow (name/preferences/goals survey):
+    # family defaults (USD, en) cover everything it collects, and users can
+    # change name/theme/locale in Settings at any time.
+    @user.onboarded_at = Time.current
+
     if signup_with_invite_claim!
       create_default_auto_categorize_rule
       redirect_to root_path, notice: t(".success")
