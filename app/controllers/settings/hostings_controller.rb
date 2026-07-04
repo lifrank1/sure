@@ -12,8 +12,10 @@ class Settings::HostingsController < ApplicationController
 
   guard_feature unless: -> { self_hosted? }
 
-  before_action :ensure_admin, only: [ :update, :clear_cache, :disconnect_external_assistant ]
-  before_action :ensure_super_admin_for_onboarding, only: :update
+  # Instance-wide settings (LLM keys, provider config, sync controls) are
+  # operator-only. Every family creator is an "admin" of their own family,
+  # so family-admin is not a sufficient gate on a multi-tenant instance.
+  before_action :ensure_super_admin
 
   def show
     @breadcrumbs = [
@@ -285,14 +287,10 @@ class Settings::HostingsController < ApplicationController
       Current.family.update!(assistant_type: assistant_type) if Family::ASSISTANT_TYPES.include?(assistant_type)
     end
 
-    def ensure_admin
-      redirect_to settings_hosting_path, alert: t(".not_authorized") unless Current.user.admin?
-    end
-
-    def ensure_super_admin_for_onboarding
-      onboarding_params = %i[onboarding_state invite_only_default_family_id]
-      return unless onboarding_params.any? { |p| hosting_params.key?(p) }
-      redirect_to settings_hosting_path, alert: t(".not_authorized") unless Current.user.super_admin?
+    def ensure_super_admin
+      unless Current.user.super_admin?
+        redirect_to root_path, alert: t("settings.hostings.update.not_authorized", default: "Not authorized")
+      end
     end
 
     def sync_auto_sync_scheduler!

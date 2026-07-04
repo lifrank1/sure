@@ -69,7 +69,7 @@ en:
     rules: Rules
     securities: Security
     security: Security
-    self_hosting: Self-Hosting
+    self_hosting: Instance
     sessions: Sign in
     simplefin_items: SimpleFIN
     snaptrade_items: SnapTrade

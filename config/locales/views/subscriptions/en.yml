@@ -1,6 +1,6 @@
 en:
   subscriptions:
-    self_hosted_alert: "%{product_name} is not available in self-hosted mode."
+    self_hosted_alert: "This feature is not available on %{product_name}."
     upgrade:
       already_contributing: You are already contributing. Thank you!
       page_title: "Upgrade"
