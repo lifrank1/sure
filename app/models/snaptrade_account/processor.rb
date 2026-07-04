@@ -78,21 +78,22 @@ class SnaptradeAccount::Processor
         return snaptrade_account.current_balance || 0
       end
 
-      # Calculate total from holdings + cash for accuracy
-      # SnapTrade's current_balance can sometimes be stale or just the cash value
       holdings_value = calculate_holdings_value
       cash_value = snaptrade_account.cash_balance || 0
+      api_total = snaptrade_account.current_balance
 
-      calculated_total = holdings_value + cash_value
-
-      # Use calculated total if we have holdings, otherwise trust API value
-      if holdings_value > 0
-        Rails.logger.info "SnaptradeAccount::Processor - Using calculated total: holdings=#{holdings_value} + cash=#{cash_value} = #{calculated_total}"
-        calculated_total
-      elsif snaptrade_account.current_balance.present?
-        Rails.logger.info "SnaptradeAccount::Processor - Using API total: #{snaptrade_account.current_balance}"
-        snaptrade_account.current_balance
+      # Trust the brokerage-reported total whenever it accounts for at least
+      # the holdings' value. Some brokerages (e.g. Fidelity) report swept
+      # cash both as a money-market holding AND in cash_balance, so summing
+      # holdings + cash double-counts the cash. The API total is only
+      # distrusted when it falls below the holdings value — the known stale
+      # case where it reflects just the cash portion.
+      if api_total.present? && api_total >= holdings_value * BigDecimal("0.98")
+        Rails.logger.info "SnaptradeAccount::Processor - Using API total: #{api_total} (holdings=#{holdings_value}, cash=#{cash_value})"
+        api_total
       else
+        calculated_total = holdings_value + cash_value
+        Rails.logger.info "SnaptradeAccount::Processor - Using calculated total: holdings=#{holdings_value} + cash=#{cash_value} = #{calculated_total} (api_total=#{api_total.inspect})"
         calculated_total
       end
     end
