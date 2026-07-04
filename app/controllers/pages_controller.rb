@@ -19,7 +19,7 @@ class PagesController < ApplicationController
   DASHBOARD_HEIGHT_PRESETS = { "compact" => 208, "auto" => 288, "tall" => 416 }.freeze
   DEFAULT_HEIGHT_PRESET = "auto"
 
-  skip_authentication only: %i[redis_configuration_error privacy terms]
+  skip_authentication only: %i[redis_configuration_error privacy terms contact]
   before_action :ensure_intro_guest!, only: :intro
 
   def dashboard
@@ -89,6 +89,10 @@ class PagesController < ApplicationController
   end
 
   def terms
+    render layout: "blank"
+  end
+
+  def contact
     render layout: "blank"
   end
 

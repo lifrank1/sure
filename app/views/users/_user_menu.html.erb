@@ -57,10 +57,7 @@
       ) %>
       <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".changelog"), icon: "box", href: changelog_path) %>
 
-      <% if self_hosted? && !intro_mode %>
-        <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".feedback"), icon: "megaphone", href: feedback_path) %>
-      <% end %>
-      <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".contact"), icon: "message-square-more", href: "mailto:lifranksites@gmail.com") %>
+      <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".contact"), icon: "message-square-more", href: contact_path) %>
 
       <%= render DS::MenuItem.new(variant: "divider") %>
 

@@ -94,7 +94,7 @@ end %>
           <%= render DS::Link.new(
             variant: "icon",
             icon: "message-circle-question",
-            href: "mailto:lifranksites@gmail.com"
+            href: contact_path
           ) %>
 
           <%= render "users/user_menu", user: Current.user, intro_mode: intro_mode %>

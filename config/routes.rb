@@ -201,7 +201,8 @@ Rails.application.routes.draw do
   get "exports/archive/:token", to: "archived_exports#show", as: :archived_export
 
   get "changelog", to: "pages#changelog"
-  get "feedback", to: "pages#feedback"
+  get "feedback", to: redirect("/contact")
+  get "contact", to: "pages#contact"
   patch "dashboard/preferences", to: "pages#update_preferences"
 
   resource :current_session, only: %i[update]
