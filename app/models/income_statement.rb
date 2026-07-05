@@ -12,10 +12,21 @@ class IncomeStatement
     @user = user || Current.user
   end
 
+  # Cashflow/budget analytics cover money in SPENDING accounts. Activity inside
+  # investment/crypto accounts (brokerage cash journaling, sweeps, internal
+  # transfers, dividends) is portfolio activity, not budget cashflow — without
+  # this exclusion those entries surface as large uncategorized income/expenses
+  # that swamp real spending. External contributions still count: the outflow
+  # leg lives in the spending account (kind: investment_contribution).
+  def self.cashflow_transactions_scope(family)
+    family.transactions.visible.excluding_pending
+          .where.not(accounts: { accountable_type: %w[Investment Crypto] })
+  end
+
   def totals(transactions_scope: nil, date_range:)
     # Default to excluding pending transactions from budget/analytics calculations
     # Pending transactions shouldn't affect budget totals until they post
-    transactions_scope ||= family.transactions.visible.excluding_pending
+    transactions_scope ||= self.class.cashflow_transactions_scope(family)
 
     result = totals_query(transactions_scope: transactions_scope, date_range: date_range)
 
@@ -190,7 +201,7 @@ class IncomeStatement
       @totals_for_period ||= {}
       @totals_for_period[period_cache_key(period)] ||=
         totals_query(
-          transactions_scope: family.transactions.visible.excluding_pending.in_period(period),
+          transactions_scope: self.class.cashflow_transactions_scope(family).in_period(period),
           date_range: period.date_range
         )
     end

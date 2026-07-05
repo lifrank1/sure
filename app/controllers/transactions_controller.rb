@@ -3,7 +3,6 @@ class TransactionsController < ApplicationController
 
   before_action :set_entry_for_unlock, only: :unlock
   before_action :set_entry_for_tags, only: :update_tags
-  before_action :store_params!, only: :index
 
   def new
     prefill_params_from_duplicate!
@@ -539,33 +538,6 @@ class TransactionsController < ApplicationController
       cleaned_params
     end
 
-    def store_params!
-      if should_restore_params?
-        params_to_restore = {}
-
-        params_to_restore[:q] = stored_params["q"].presence || {}
-        params_to_restore[:page] = stored_params["page"].presence || 1
-        params_to_restore[:per_page] = stored_params["per_page"].presence || 50
-
-        redirect_to transactions_path(params_to_restore)
-      else
-        Current.session.update!(
-          prev_transaction_page_params: {
-            q: search_params,
-            page: params[:page],
-            per_page: params[:per_page]
-          }
-        )
-      end
-    end
-
-    def should_restore_params?
-      request.query_parameters.blank? && (stored_params["q"].present? || stored_params["page"].present? || stored_params["per_page"].present?)
-    end
-
-    def stored_params
-      Current.session.prev_transaction_page_params
-    end
 
     def preferences_params
       params.require(:preferences).permit(collapsed_sections: {})

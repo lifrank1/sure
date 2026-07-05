@@ -29,7 +29,8 @@
 
     <div>
       <% family.balance_sheet.account_groups.each do |group| %>
-        <%= render "accounts/accountable_group", account_group: group, mobile: mobile, all_tab: true %>
+        <%# open: true — balances visible without clicks (Copilot pattern) %>
+        <%= render "accounts/accountable_group", account_group: group, mobile: mobile, all_tab: true, open: true %>
       <% end %>
     </div>
   </div>

@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Frank Finance (hosted instance) work:** read [docs/frank-finance/ROADMAP.md](docs/frank-finance/ROADMAP.md)
+> (progress tracking — update checkboxes as items land) and
+> [docs/frank-finance/CONTEXT.md](docs/frank-finance/CONTEXT.md) (infrastructure,
+> env-var decisions, known gotchas) before making product changes.
+
 ## Common Development Commands
 
 ### Development Server

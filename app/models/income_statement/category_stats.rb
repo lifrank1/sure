@@ -78,6 +78,7 @@ class IncomeStatement::CategoryStats
             er.to_currency = :target_currency
           )
           WHERE a.family_id = :family_id
+            AND a.accountable_type NOT IN ('Investment', 'Crypto')
             AND t.kind NOT IN (#{budget_excluded_kinds_sql})
             AND ae.excluded = false
             #{pending_providers_sql}
