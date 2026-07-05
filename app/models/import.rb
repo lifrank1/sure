@@ -152,6 +152,10 @@ class Import < ApplicationRecord
 
     import!
 
+    # Imported history is user-curated — keep it out of the review queue
+    imported_txn_ids = Transaction.joins(:entry).where(entries: { import_id: id }).select(:id)
+    Transaction.where(id: imported_txn_ids).update_all(needs_review: false)
+
     family.sync_later
 
     update! status: :complete

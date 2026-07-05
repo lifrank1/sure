@@ -6,6 +6,20 @@
     </div>
   <% end %>
   <% dialog.with_body do %>
+    <%# Review-queue confirm %>
+    <% if @entry.transaction.needs_review %>
+      <div id="review_banner_<%= @entry.transaction.id %>" class="mx-4 my-3 p-3 rounded-lg border border-primary bg-container flex items-center justify-between gap-3">
+        <p class="text-sm text-secondary"><%= t(".needs_review_prompt", default: "New from your last sync — does everything look right?") %></p>
+        <%= render DS::Button.new(
+          text: t(".mark_reviewed", default: "Looks good"),
+          href: mark_reviewed_transaction_path(@entry.transaction),
+          variant: :primary,
+          size: :sm,
+          data: { turbo_method: :post }
+        ) %>
+      </div>
+    <% end %>
+
     <%# Potential duplicate alert %>
     <% if @entry.transaction.has_potential_duplicate? %>
       <% potential_match = @entry.transaction.potential_duplicate_entry %>

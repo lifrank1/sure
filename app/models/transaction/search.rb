@@ -15,6 +15,7 @@ class Transaction::Search
   attribute :merchants, array: true
   attribute :tags, array: true
   attribute :active_accounts_only, :boolean, default: true
+  attribute :needs_review, :boolean
 
   attr_reader :family, :accessible_account_ids
 
@@ -33,6 +34,7 @@ class Transaction::Search
       query = query.where(entries: { account_id: accessible_account_ids }) unless accessible_account_ids.nil?
 
       query = apply_active_accounts_filter(query, active_accounts_only)
+      query = query.where(transactions: { needs_review: true }) if needs_review
       query = apply_category_filter(query, categories)
       query = apply_type_filter(query, types)
       query = apply_status_filter(query, status)

@@ -106,6 +106,8 @@ class TransactionsController < ApplicationController
       @entry.lock_saved_attributes!
       @entry.mark_user_modified!
       @entry.transaction.lock_attr!(:tag_ids) if @entry.transaction.tags.any?
+      # User-entered rows don't need review — only synced ones do
+      @entry.transaction.update!(needs_review: false)
 
       flash[:notice] = t(".created")
 
@@ -117,6 +119,29 @@ class TransactionsController < ApplicationController
       set_new_transaction_form_options
       render :new, status: :unprocessable_entity
     end
+  end
+
+  # Review queue: one-click confirm for a synced transaction
+  def mark_reviewed
+    transaction = Current.family.transactions.find(params[:id])
+    transaction.mark_reviewed!
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.remove("review_row_#{transaction.id}"),
+          turbo_stream.remove("review_banner_#{transaction.id}")
+        ]
+      end
+      format.html { redirect_back_or_to transactions_path, notice: t(".success", default: "Marked as reviewed") }
+    end
+  end
+
+  def mark_all_reviewed
+    scope = Current.family.transactions.to_review
+    Transaction.where(id: scope.select(:id)).update_all(needs_review: false, updated_at: Time.current)
+
+    redirect_back_or_to root_path, notice: t(".success", default: "You're all caught up")
   end
 
   def update
@@ -525,7 +550,7 @@ class TransactionsController < ApplicationController
       cleaned_params = params.fetch(:q, {})
               .permit(
                 :start_date, :end_date, :search, :amount,
-                :amount_operator, :active_accounts_only,
+                :amount_operator, :active_accounts_only, :needs_review,
                 accounts: [], account_ids: [],
                 categories: [], merchants: [], types: [], tags: [], status: []
               )

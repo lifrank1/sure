@@ -10,6 +10,7 @@ class PagesController < ApplicationController
   DASHBOARD_SECTION_LAYOUTS = {
     "cashflow_sankey"    => { col_span: "full",   grow: false, min_height: 384, width_toggle: true },
     "outflows_donut"     => { col_span: "single", grow: false, min_height: 0 },
+    "transactions_to_review" => { col_span: "single", grow: false, min_height: 0 },
     "investment_summary" => { col_span: "single", grow: false, min_height: 0, width_toggle: true },
     "net_worth_chart"    => { col_span: "single", grow: true,  min_height: 208, width_toggle: true },
     "balance_sheet"      => { col_span: "single", grow: false, min_height: 0, width_toggle: true }
@@ -41,6 +42,11 @@ class PagesController < ApplicationController
 
     @cashflow_sankey_data = build_cashflow_sankey_data(net_totals, income_totals, expense_totals, family_currency)
     @outflows_data = build_outflows_donut_data(net_totals)
+
+    @transactions_to_review = Current.family.transactions.to_review
+                                     .includes(:category, :merchant, entry: :account)
+                                     .order("entries.date DESC")
+                                     .limit(6)
 
     @dashboard_sections = build_dashboard_sections
 
@@ -124,6 +130,15 @@ class PagesController < ApplicationController
           layout: section_layout("outflows_donut"),
           locals: { outflows_data: @outflows_data, period: @period },
           visible: @accounts.any? && @outflows_data[:categories].present?,
+          collapsible: true
+        },
+        {
+          key: "transactions_to_review",
+          title: "pages.dashboard.transactions_to_review.title",
+          partial: "pages/dashboard/transactions_to_review",
+          layout: section_layout("transactions_to_review"),
+          locals: { transactions_to_review: @transactions_to_review },
+          visible: @accounts.any? && @transactions_to_review.any?,
           collapsible: true
         },
         {

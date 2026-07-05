@@ -21,10 +21,11 @@
 
 ## Phase 2 — The review loop (Copilot's killer pattern)
 
-- [ ] **P2.1 Transaction detail panel** (right side, master-detail) replacing the
-      modal: category, notes, tags, merchant history.
-- [ ] **P2.2 "Needs review" flag** on newly synced transactions + one-click confirm.
-- [ ] **P2.3 Dashboard "Transactions to review" card** feeding the loop.
+- [x] **P2.1 Transaction detail panel.** Existing right-side drawer kept (already
+      master-detail-ish); gained a review-confirm banner. Merchant history in the
+      drawer: still TODO (moved to Later).
+- [x] **P2.2 "Needs review" flag** on newly synced transactions + one-click confirm.
+- [x] **P2.3 Dashboard "Transactions to review" card** feeding the loop.
 
 ## Phase 3 — Dashboard as actionable card grid
 
@@ -40,6 +41,7 @@
 - [ ] Merge icon nav rail + accounts panel into one sidebar (bigger app-shell refactor)
 - [ ] Account sparklines + "last synced X ago" freshness in sidebar
 - [ ] Categories page unifying budget + category management (Copilot-style)
+- [ ] Merchant history section in the transaction drawer
 - [ ] Fix AI chat with Gemini (400 on tool-call round-trip; suspect tool_calls
       message format vs Gemini OpenAI-compat endpoint)
 

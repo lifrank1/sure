@@ -93,6 +93,21 @@ class Transaction < ApplicationRecord
   # Internal movement labels that should be excluded from budget (auto cash management)
   INTERNAL_MOVEMENT_LABELS = [ "Transfer", "Sweep In", "Sweep Out", "Exchange" ].freeze
 
+  # Review queue: recent sync-imported spending rows awaiting a human glance.
+  # Transfer kinds are excluded (auto-matching already resolved them), and the
+  # window keeps deep-history backfills from flooding the queue.
+  REVIEW_WINDOW = 30.days
+  scope :to_review, -> {
+    visible
+      .where(needs_review: true)
+      .where.not(kind: TRANSFER_KINDS)
+      .where(entries: { date: REVIEW_WINDOW.ago.to_date.. })
+  }
+
+  def mark_reviewed!
+    update!(needs_review: false)
+  end
+
   # Providers that support pending transaction flags
   PENDING_PROVIDERS = %w[simplefin plaid lunchflow enable_banking akahu].freeze
 

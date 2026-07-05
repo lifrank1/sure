@@ -1,0 +1,37 @@
+<%# locals: (transactions_to_review:) %>
+
+<div class="space-y-0.5">
+  <% transactions_to_review.each do |transaction| %>
+    <% entry = transaction.entry %>
+    <div id="review_row_<%= transaction.id %>" class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-surface-hover">
+      <%= link_to transaction_path(transaction), data: { turbo_frame: "drawer" }, class: "min-w-0 grow" do %>
+        <p class="text-sm text-primary truncate"><%= entry.name %></p>
+        <p class="text-xs text-secondary truncate">
+          <%= entry.account.name %> · <%= entry.date.strftime("%b %-d") %>
+          <% if transaction.category %>
+            · <%= transaction.category.name %>
+          <% end %>
+        </p>
+      <% end %>
+      <span class="privacy-sensitive text-sm font-medium shrink-0 <%= "text-green-600" if entry.amount.negative? %>">
+        <%= entry.amount_money.abs.format %>
+      </span>
+      <%= button_to mark_reviewed_transaction_path(transaction),
+                    method: :post,
+                    class: "shrink-0 flex items-center justify-center w-7 h-7 rounded-md border border-secondary text-secondary hover:text-primary hover:bg-surface-hover",
+                    title: t(".mark_reviewed", default: "Mark reviewed") do %>
+        <%= icon("check", size: "sm") %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="flex items-center justify-between pt-3 mt-1 border-t border-tertiary">
+    <%= link_to t(".view_all", default: "Review all"),
+                transactions_path(q: { needs_review: true }),
+                class: "text-sm text-secondary hover:text-primary underline" %>
+    <%= button_to t(".mark_all", default: "Mark all reviewed"),
+                  mark_all_reviewed_transactions_path,
+                  method: :post,
+                  class: "text-sm text-secondary hover:text-primary underline" %>
+  </div>
+</div>
