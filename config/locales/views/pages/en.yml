@@ -38,6 +38,10 @@ en:
       heading: Terms of Service
       placeholder: Terms of service content will be displayed here.
     dashboard:
+      monthly_spending:
+        title: Monthly spending
+      upcoming_recurrings:
+        title: Next two weeks
       transactions_to_review:
         title: To review
       welcome: "Welcome back, %{name}"

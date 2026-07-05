@@ -1,0 +1,31 @@
+<%# locals: (monthly_spending:) %>
+
+<div class="space-y-3">
+  <div>
+    <p class="privacy-sensitive text-2xl font-semibold text-primary">
+      <%= monthly_spending[:spent].format %>
+    </p>
+    <p class="text-sm text-secondary"><%= t(".spent_this_month", default: "spent this month") %></p>
+  </div>
+
+  <% if monthly_spending[:budgeted].present? && monthly_spending[:budgeted].amount.positive? %>
+    <% pct = [ (monthly_spending[:spent].amount / monthly_spending[:budgeted].amount * 100).round, 100 ].min %>
+    <div class="space-y-1">
+      <div class="h-2 rounded-full bg-surface-inset overflow-hidden">
+        <div class="h-full rounded-full <%= pct >= 100 ? "bg-red-500" : "bg-green-500" %>" style="width: <%= pct %>%"></div>
+      </div>
+      <p class="text-xs text-secondary">
+        <% if monthly_spending[:left].amount.negative? %>
+          <span class="text-red-500 font-medium"><%= monthly_spending[:left].abs.format %> <%= t(".over_budget", default: "over budget") %></span>
+        <% else %>
+          <span class="privacy-sensitive font-medium text-primary"><%= monthly_spending[:left].format %></span>
+          <%= t(".left_of", default: "left of") %> <%= monthly_spending[:budgeted].format %>
+        <% end %>
+      </p>
+    </div>
+  <% else %>
+    <p class="text-xs text-secondary">
+      <%= link_to t(".set_budget", default: "Set a budget to track what's left →"), budgets_path, class: "underline hover:text-primary" %>
+    </p>
+  <% end %>
+</div>

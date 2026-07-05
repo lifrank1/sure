@@ -452,11 +452,11 @@ class User < ApplicationRecord
     end
 
     def default_dashboard_section_order
-      %w[cashflow_sankey outflows_donut net_worth_chart balance_sheet]
+      %w[monthly_spending net_worth_chart transactions_to_review outflows_donut upcoming_recurrings balance_sheet investment_summary]
     end
 
     def default_reports_section_order
-      %w[trends_insights transactions_breakdown]
+      %w[cashflow_sankey trends_insights transactions_breakdown]
     end
     def ensure_valid_profile_image
       return unless profile_image.attached?

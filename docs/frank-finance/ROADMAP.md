@@ -29,11 +29,11 @@
 
 ## Phase 3 — Dashboard as actionable card grid
 
-- [ ] **P3.1 Card grid dashboard**: Monthly spending ("$X left"), Net worth,
+- [x] **P3.1 Card grid dashboard**: Monthly spending ("$X left"), Net worth,
       Review queue, Top categories vs budget, Next-two-weeks recurrings.
-- [ ] **P3.2 Move the sankey into Reports** (keep it for the curious; stop leading
+- [x] **P3.2 Move the sankey into Reports** (keep it for the curious; stop leading
       with it).
-- [ ] **P3.3 Surface Recurrings** in nav (feature exists at /recurring_transactions,
+- [x] **P3.3 Surface Recurrings** in nav (feature exists at /recurring_transactions,
       just not linked).
 
 ## Later / opportunistic

@@ -1,4 +1,5 @@
 class ReportsController < ApplicationController
+  include CashflowSankeyBuildable
   include Periodable
 
   # Allow API key authentication for exports (for Google Sheets integration)
@@ -10,6 +11,16 @@ class ReportsController < ApplicationController
     setup_report_data(show_flash: true)
 
     # Build reports sections for collapsible/reorderable UI
+    # Cashflow sankey (moved here from the dashboard)
+    income_statement = Current.family.income_statement
+    sankey_period = Period.custom(start_date: @start_date, end_date: @end_date)
+    @cashflow_sankey_data = build_cashflow_sankey_data(
+      income_statement.net_category_totals(period: sankey_period),
+      income_statement.income_totals(period: sankey_period),
+      income_statement.expense_totals(period: sankey_period),
+      Current.family.currency
+    )
+
     @reports_sections = build_reports_sections
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.reports"), nil ] ]
@@ -153,6 +164,14 @@ class ReportsController < ApplicationController
 
     def build_reports_sections
       all_sections = [
+        {
+          key: "cashflow_sankey",
+          title: "pages.dashboard.cashflow_sankey.title",
+          partial: "pages/dashboard/cashflow_sankey",
+          locals: { sankey_data: @cashflow_sankey_data, period: Period.custom(start_date: @start_date, end_date: @end_date) },
+          visible: @has_accounts,
+          collapsible: true
+        },
         {
           key: "net_worth",
           title: "reports.net_worth.title",
