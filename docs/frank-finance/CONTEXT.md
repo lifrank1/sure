@@ -70,9 +70,11 @@ Waiting on Frank (only he can do these):
 1. (optional) Resend: verify root erech.app for a prettier sender — email
    already WORKS via in.erech.app as of 2026-07-07 (test send delivered,
    REQUIRE_EMAIL_CONFIRMATION=true)
-2. Railway dashboard: usage alerts ($8 soft; hard limit STOPS services — use
-   $25-30 or skip) + Postgres Backups tab (Daily). API attempts return
-   Not Authorized for CLI tokens; dashboard-only.
+2. Railway dashboard: usage alerts only ($8 soft; hard limit STOPS services —
+   use $25-30 or skip). Postgres backups are DONE (2026-07-07): nightly
+   pg_dump via the db-backup service (infra/db-backup, postgres:18, own
+   volume at /backups, 14 kept) — verified first dump 1.4MB. Native Railway
+   backups/limits API is dashboard-session-only.
 3. Create a July budget (upgrades the Spending card to "$X left")
 4. SnapTrade is on TEST tier (5 connections) — apply for production before
    sharing publicly (~$1.50/user/mo, ask for Fidelity enablement)
