@@ -1,6 +1,6 @@
 <%# locals: (upcoming_recurrings:) %>
 
-<div class="space-y-0.5">
+<div class="space-y-0.5 px-4">
   <% upcoming_recurrings.each do |recurring| %>
     <% overdue = recurring.next_expected_date < Date.current %>
     <div class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-surface-hover">

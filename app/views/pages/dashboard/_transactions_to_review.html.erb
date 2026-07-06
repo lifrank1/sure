@@ -1,6 +1,6 @@
 <%# locals: (transactions_to_review:) %>
 
-<div class="space-y-0.5">
+<div class="space-y-0.5 px-4">
   <% transactions_to_review.each do |transaction| %>
     <% entry = transaction.entry %>
     <div id="review_row_<%= transaction.id %>" class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-surface-hover">
