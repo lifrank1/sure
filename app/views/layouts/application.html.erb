@@ -56,7 +56,7 @@ end %>
       <% end %>
 
       <%= link_to home_path, class: "block" do %>
-        <span class="w-9 h-9 mx-auto rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm select-none">FF</span>
+        <span class="w-9 h-9 mx-auto block"><%= render "shared/logo_mark", css: "w-9 h-9" %></span>
       <% end %>
 
       <div class="flex items-center gap-1">
@@ -79,7 +79,7 @@ end %>
       <nav class="h-full flex flex-col shrink-0 w-[84px] py-4">
         <div class="pl-2 mb-3">
           <%= link_to home_path, class: "block" do %>
-            <span class="w-9 h-9 mx-auto rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm select-none">FF</span>
+            <span class="w-9 h-9 mx-auto block"><%= render "shared/logo_mark", css: "w-9 h-9" %></span>
           <% end %>
         </div>
 
