@@ -1,12 +1,11 @@
 class RecurringTransactionsController < ApplicationController
-  layout "settings"
-
   def index
     @recurring_transactions = Current.family.recurring_transactions
                                     .accessible_by(Current.user)
                                     .includes(:merchant)
                                     .order(status: :asc, next_expected_date: :asc)
     @family = Current.family
+    @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("recurring_transactions.title"), nil ] ]
   end
 
   def update_settings
