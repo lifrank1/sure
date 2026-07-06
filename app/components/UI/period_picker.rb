@@ -11,14 +11,15 @@ class UI::PeriodPicker < ApplicationComponent
   #
   # NOTE: `url` must be a path without a query string; pass query state via
   # `extra_params` so the picker can compose `?period=…` cleanly.
-  attr_reader :selected_key, :url, :frame, :extra_params, :placement
+  attr_reader :selected_key, :url, :frame, :extra_params, :placement, :param_name
 
-  def initialize(selected:, url:, frame: nil, extra_params: {}, placement: "bottom-end")
+  def initialize(selected:, url:, frame: nil, extra_params: {}, placement: "bottom-end", param_name: :period)
     @selected_key = selected.respond_to?(:key) ? selected.key : selected.to_s
     @url = url
     @frame = frame
     @extra_params = (extra_params || {}).symbolize_keys
     @placement = placement
+    @param_name = param_name.to_sym
   end
 
   def periods
@@ -34,7 +35,7 @@ class UI::PeriodPicker < ApplicationComponent
   end
 
   def href_for(key)
-    "#{url}?#{extra_params.merge(period: key).to_query}"
+    "#{url}?#{extra_params.merge(param_name => key).to_query}"
   end
 
   private

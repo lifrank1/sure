@@ -40,7 +40,13 @@ class PagesController < ApplicationController
     income_statement = Current.family.income_statement
     income_totals = income_statement.income_totals(period: @period)
     expense_totals = income_statement.expense_totals(period: @period)
-    net_totals = income_statement.net_category_totals(period: @period)
+    # Outflows carries its own period selector (defaults to the global one)
+    @outflows_period = if params[:outflows_period].present? && Period.valid_key?(params[:outflows_period])
+      Period.from_key(params[:outflows_period])
+    else
+      @period
+    end
+    net_totals = income_statement.net_category_totals(period: @outflows_period)
 
     @outflows_data = build_outflows_donut_data(net_totals)
 
@@ -158,7 +164,7 @@ class PagesController < ApplicationController
           title: "pages.dashboard.outflows_donut.title",
           partial: "pages/dashboard/outflows_donut",
           layout: section_layout("outflows_donut"),
-          locals: { outflows_data: @outflows_data, period: @period },
+          locals: { outflows_data: @outflows_data, period: @outflows_period },
           visible: @accounts.any? && @outflows_data[:categories].present?,
           collapsible: true
         },
