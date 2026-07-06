@@ -1,25 +1,47 @@
-<%= content_for :page_title, t(".accounts") %>
-<%= content_for :page_actions do %>
-  <%= icon(
-        "refresh-cw",
-        as_button: true,
-        size: "sm",
-        href: sync_all_accounts_path,
-        disabled: Current.family.syncing?,
-        frame: :_top
-      ) %>
-  <%= render DS::Link.new(
-    text: t(".new_account"),
-    href: new_account_path(return_to: accounts_path),
-    variant: "primary",
-    icon: "plus",
-    frame: :modal
-  ) %>
-<% end %>
+<div class="space-y-4 pb-6 lg:pb-12 flex flex-col">
+<header class="flex justify-between items-center text-primary font-medium">
+  <h1 class="text-xl"><%= t(".accounts") %></h1>
+  <div class="flex items-center gap-2">
+    <%= icon(
+          "refresh-cw",
+          as_button: true,
+          size: "sm",
+          href: sync_all_accounts_path,
+          disabled: Current.family.syncing?,
+          frame: :_top
+        ) %>
+    <%= render DS::Link.new(
+      text: t(".new_account"),
+      href: new_account_path(return_to: accounts_path),
+      variant: "primary",
+      icon: "plus",
+      frame: :modal
+    ) %>
+  </div>
+</header>
 
 <% if @manual_accounts.empty? && @plaid_items.empty? && @simplefin_items.empty? && @lunchflow_items.empty? && @akahu_items.empty? && @enable_banking_items.empty? && @coinstats_items.empty? && @coinbase_items.empty? && @mercury_items.empty? && @brex_items.empty? && @ibkr_items.empty? && @snaptrade_items.empty? && @indexa_capital_items.empty? && @sophtron_items.empty? && @binance_items.empty? %>
   <%= render "empty" %>
 <% else %>
+  <%# Assets vs debts at a glance %>
+  <% if @balance_sheet %>
+    <div class="bg-container rounded-xl shadow-border-xs p-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+        <div>
+          <p class="text-2xl font-medium text-primary privacy-sensitive"><%= format_money(Money.new(@balance_sheet.assets.total, Current.family.currency)) %></p>
+          <p class="text-sm text-secondary"><%= t(".assets") %></p>
+        </div>
+        <div>
+          <p class="text-2xl font-medium text-primary privacy-sensitive"><%= format_money(Money.new(@balance_sheet.liabilities.total, Current.family.currency)) %></p>
+          <p class="text-sm text-secondary"><%= t(".debts") %></p>
+        </div>
+        <div>
+          <p class="text-2xl font-medium text-primary privacy-sensitive"><%= format_money(@balance_sheet.net_worth_money) %></p>
+          <p class="text-sm text-secondary"><%= t(".net_worth") %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
   <div class="space-y-2">
     <% if @plaid_items.any? %>
       <%= render @plaid_items.sort_by(&:created_at) %>
@@ -86,3 +108,4 @@
     <% end %>
   </div>
 <% end %>
+</div>

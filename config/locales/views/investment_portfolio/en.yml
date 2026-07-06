@@ -1,0 +1,28 @@
+---
+en:
+  investment_portfolio:
+    title: Investments
+    add_account: Add investment account
+    portfolio_value: Portfolio value
+    total_return: Total return
+    period_return: "%{period} return"
+    holdings: Holdings
+    holding: Holding
+    weight: Weight
+    value: Value
+    return: Return
+    no_cost_basis: Return unknown — no cost basis from provider
+    accounts_count:
+      one: 1 account
+      other: "%{count} accounts"
+    accounts: Accounts
+    updated_ago: updated %{time} ago
+    period_activity: "%{period} activity"
+    contributions: Contributions
+    withdrawals: Withdrawals
+    bought: Bought
+    sold: Sold
+    trades: Trades
+    empty:
+      title: No investment accounts yet
+      description: Connect a brokerage or add an investment account to track your portfolio here.

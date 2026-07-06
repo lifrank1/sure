@@ -49,6 +49,9 @@ en:
       notes_placeholder: Store additional information like account numbers, sort codes, IBAN, routing numbers, etc.
     index:
       accounts: Accounts
+      assets: Assets
+      debts: Debts
+      net_worth: Net worth
       manual_accounts:
         other_accounts: Other accounts
       new_account: New account

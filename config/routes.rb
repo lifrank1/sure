@@ -485,6 +485,9 @@ Rails.application.routes.draw do
   end
 
   resources :depositories, only: %i[new create edit update]
+  # Portfolio overview page (nav "Investments"); distinct from the Investment
+  # accountable CRUD below
+  get "investments", to: "investment_portfolio#show", as: :investment_portfolio
   resources :investments, only: %i[new create edit update]
   resources :properties, only: %i[new create edit update] do
     member do

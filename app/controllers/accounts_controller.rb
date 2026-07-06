@@ -30,9 +30,12 @@ class AccountsController < ApplicationController
     # Build sync stats maps for all providers
     build_sync_stats_maps
 
+    # Assets vs debts summary strip (page is top-level nav, not settings)
+    @balance_sheet = family.balance_sheet
+    @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("accounts.index.accounts"), nil ] ]
+
     # Prevent Turbo Drive from caching this page to ensure fresh account lists
     expires_now
-    render layout: "settings"
   end
 
   def new

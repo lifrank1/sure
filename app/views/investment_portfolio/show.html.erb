@@ -1,0 +1,189 @@
+<div class="space-y-4 pb-6 lg:pb-12 flex flex-col">
+  <header class="flex justify-between items-center text-primary font-medium">
+    <h1 class="text-xl"><%= t("investment_portfolio.title") %></h1>
+    <%= render DS::Link.new(
+      text: t("investment_portfolio.add_account"),
+      icon: "plus",
+      variant: "outline",
+      href: new_investment_path(step: "method_select"),
+      frame: :modal
+    ) %>
+  </header>
+
+  <% if @accounts.empty? %>
+    <div class="bg-container rounded-xl shadow-border-xs p-4">
+      <%= render DS::EmptyState.new(
+        icon: "trending-up",
+        title: t("investment_portfolio.empty.title"),
+        description: t("investment_portfolio.empty.description")
+      ) do |empty| %>
+        <% empty.with_action do %>
+          <%= render DS::Link.new(
+            text: t("investment_portfolio.add_account"),
+            icon: "plus",
+            variant: "primary",
+            href: new_investment_path(step: "method_select"),
+            frame: :modal
+          ) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <%# Portfolio value + balance history %>
+    <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-4">
+      <div class="flex justify-between gap-4">
+        <div class="space-y-1">
+          <p class="text-sm text-secondary"><%= t("investment_portfolio.portfolio_value") %></p>
+          <p class="text-primary text-3xl font-medium privacy-sensitive">
+            <%= format_money(@investment_statement.portfolio_value_money) %>
+          </p>
+          <% trend = @investment_statement.unrealized_gains_trend %>
+          <% if trend %>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-secondary"><%= t("investment_portfolio.total_return") %>:</span>
+              <span class="font-medium privacy-sensitive" style="color: <%= trend.color %>">
+                <%= format_money(Money.new(trend.value, Current.family.currency)) %>
+                <% if trend.percent_meaningful? %>(<%= trend.percent_formatted %>)<% end %>
+              </span>
+            </div>
+          <% end %>
+          <% if @period_return_trend %>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-secondary"><%= t("investment_portfolio.period_return", period: @period.label) %>:</span>
+              <span class="font-medium privacy-sensitive" style="color: <%= @period_return_trend.color %>">
+                <%= format_money(Money.new(@period_return_trend.value, Current.family.currency)) %>
+                <% if @period_return_trend.percent_meaningful? %>(<%= @period_return_trend.percent_formatted %>)<% end %>
+              </span>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="shrink-0">
+          <%= render UI::PeriodPicker.new(
+            selected: @period,
+            url: investment_portfolio_path
+          ) %>
+        </div>
+      </div>
+
+      <% if @balance_series && @balance_series.any? %>
+        <div class="w-full h-64 privacy-sensitive"
+          data-controller="time-series-chart"
+          data-time-series-chart-data-value="<%= @balance_series.to_json %>"></div>
+      <% end %>
+    </div>
+
+    <%# Holdings, aggregated across accounts with portfolio-wide weights %>
+    <% if @allocation.any? %>
+      <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3">
+        <div class="flex items-center gap-1.5 text-xs font-medium text-secondary uppercase">
+          <p><%= t("investment_portfolio.holdings") %></p>
+          <span class="text-subdued">&middot;</span>
+          <p><%= @allocation.size %></p>
+        </div>
+
+        <div class="rounded-lg shadow-border-xs bg-container overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-container-inset">
+              <tr class="uppercase text-xs font-medium text-secondary">
+                <th class="px-4 py-2 text-left font-medium"><%= t("investment_portfolio.holding") %></th>
+                <th class="px-4 py-2 text-right font-medium"><%= t("investment_portfolio.weight") %></th>
+                <th class="px-4 py-2 text-right font-medium"><%= t("investment_portfolio.value") %></th>
+                <th class="px-4 py-2 text-right font-medium"><%= t("investment_portfolio.return") %></th>
+              </tr>
+            </thead>
+            <tbody class="font-medium text-sm">
+              <% @allocation.each_with_index do |holding, idx| %>
+                <tr class="<%= idx < @allocation.size - 1 ? "table-divider" : "" %>">
+                  <td class="p-4">
+                    <div class="flex items-center gap-3">
+                      <% if holding.security.logo_url.present? %>
+                        <img src="<%= holding.security.logo_url %>" alt="<%= holding.ticker %>" class="w-8 h-8 rounded-full">
+                      <% else %>
+                        <div class="w-8 h-8 rounded-full bg-container-inset flex items-center justify-center text-xs font-medium text-secondary">
+                          <%= holding.ticker.to_s.first(2).presence || "—" %>
+                        </div>
+                      <% end %>
+                      <div>
+                        <p class="font-medium"><%= holding.ticker %></p>
+                        <p class="text-xs text-secondary">
+                          <%= truncate(holding.name, length: 40) %><% if holding.accounts_count > 1 %> · <%= t("investment_portfolio.accounts_count", count: holding.accounts_count) %><% end %>
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-4 text-right text-secondary privacy-sensitive"><%= number_to_percentage(holding.weight || 0, precision: 1) %></td>
+                  <td class="p-4 text-right privacy-sensitive"><%= format_money(holding.amount_money) %></td>
+                  <td class="p-4 text-right">
+                    <% if holding.trend %>
+                      <span class="privacy-sensitive" style="color: <%= holding.trend.color %>"><%= holding.trend.percent_formatted %></span>
+                    <% else %>
+                      <span class="text-secondary" title="<%= t("investment_portfolio.no_cost_basis") %>">–</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Investment accounts %>
+    <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3">
+      <div class="flex items-center gap-1.5 text-xs font-medium text-secondary uppercase">
+        <p><%= t("investment_portfolio.accounts") %></p>
+        <span class="text-subdued">&middot;</span>
+        <p><%= @accounts.size %></p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <% @accounts.sort_by { |a| -a.balance }.each do |account| %>
+          <%= link_to account_path(account), class: "bg-container-inset rounded-lg p-4 flex items-center justify-between hover:bg-container-inset-hover transition-colors", data: { turbo_frame: "_top" } do %>
+            <div class="flex items-center gap-3 min-w-0">
+              <%= render "accounts/logo", account: account, size: "sm" %>
+              <div class="min-w-0">
+                <p class="font-medium text-primary text-sm truncate"><%= account.display_name %></p>
+                <p class="text-xs text-secondary">
+                  <%= account.short_subtype_label %><% if account.last_synced_at.present? %> · <%= t("investment_portfolio.updated_ago", time: time_ago_in_words(account.last_synced_at)) %><% end %>
+                </p>
+              </div>
+            </div>
+            <p class="font-medium text-primary privacy-sensitive shrink-0"><%= format_money(account.balance_money) %></p>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Period activity %>
+    <% if @period_totals && (@period_totals.trades_count > 0 || @period_flows&.contributions&.amount.to_f > 0 || @period_flows&.withdrawals&.amount.to_f > 0) %>
+      <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3">
+        <div class="flex items-center gap-1.5 text-xs font-medium text-secondary uppercase">
+          <p><%= t("investment_portfolio.period_activity", period: @period.label) %></p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 text-sm">
+          <div>
+            <p class="text-xs text-secondary"><%= t("investment_portfolio.contributions") %></p>
+            <p class="font-medium text-primary privacy-sensitive"><%= format_money(@period_flows.contributions) %></p>
+          </div>
+          <div>
+            <p class="text-xs text-secondary"><%= t("investment_portfolio.withdrawals") %></p>
+            <p class="font-medium text-primary privacy-sensitive"><%= format_money(@period_flows.withdrawals) %></p>
+          </div>
+          <div>
+            <p class="text-xs text-secondary"><%= t("investment_portfolio.bought") %></p>
+            <p class="font-medium text-primary privacy-sensitive"><%= format_money(@period_totals.contributions) %></p>
+          </div>
+          <div>
+            <p class="text-xs text-secondary"><%= t("investment_portfolio.sold") %></p>
+            <p class="font-medium text-primary privacy-sensitive"><%= format_money(@period_totals.withdrawals) %></p>
+          </div>
+          <div>
+            <p class="text-xs text-secondary"><%= t("investment_portfolio.trades") %></p>
+            <p class="font-medium text-primary"><%= @period_totals.trades_count %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

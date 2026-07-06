@@ -383,8 +383,10 @@ class User < ApplicationRecord
     preferences&.dig("show_split_grouped") != false
   end
 
+  # Two-column dashboard is the default (Copilot-style card grid on xl+
+  # screens); users can opt out in Settings > Appearance.
   def dashboard_two_column?
-    preferences&.dig("dashboard_two_column") == true
+    preferences&.dig("dashboard_two_column") != false
   end
 
   def preview_features_enabled?

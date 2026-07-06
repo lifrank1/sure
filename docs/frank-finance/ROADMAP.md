@@ -114,6 +114,36 @@ NOT verified: mobile layout (browser window wouldn't resize; needs a real
 device/emulator pass — student audience makes this the top follow-up),
 fresh-signup first-run.
 
+## Copilot Money parity pass (2026-07-06, benchmarked in-app side by side)
+
+Shipped:
+
+- [x] Sidebar nav now Copilot-shaped: Home, Transactions, Accounts,
+      Investments, Categories, Recurring, Budgets, Reports (new items are
+      desktop-only; mobile bottom nav unchanged)
+- [x] New /investments page (InvestmentPortfolioController): portfolio value +
+      total/period return, balance chart with period picker
+      (Balance::ChartSeriesBuilder over investment accounts), full holdings
+      allocation table, account cards with freshness, period activity strip
+      (real flows + buys/sells/trades)
+- [x] Categories page is now a Copilot-style overview: month header (spent vs
+      total budget), per-category rows with spent + progress bar against
+      budget (red/amber at 100%/80%) or monthly average when no budget,
+      uncategorized CTA row into the wizard; full management list kept in a
+      disclosure; standalone layout (was settings shell)
+- [x] Recurring: "Paid so far / Left to pay this month" headline stats;
+      status column upgraded from Active/Inactive to Paid ✓ / Overdue /
+      Due <date> / Paused
+- [x] Accounts page standalone (was settings shell) + Assets / Debts /
+      Net worth summary strip
+- [x] Dashboard card grid now kicks in at xl (1280px) instead of 2xl (1536px)
+      and two-column is the default (opt-out in Settings > Appearance)
+
+Deliberately not ported (need real-time quotes the keyless Yahoo provider
+can't do): live balance estimate, "top movers today" carousel, per-security
+intraday price panel. Copilot's paid-checkmark accuracy also depends on
+bill-level matching we approximate with last_occurrence_date.
+
 ## Later / opportunistic
 
 - [x] Merge icon nav rail + accounts panel into one sidebar (nav rows with labels,

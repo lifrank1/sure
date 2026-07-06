@@ -6,8 +6,11 @@ en:
       skip_to_main: Skip to main content
       nav:
         assistant: Assistant
+        accounts: Accounts
         budgets: Budgets
+        categories: Categories
         home: Home
+        investments: Investments
         recurrings: Recurring
         reports: Reports
         goals: Goals

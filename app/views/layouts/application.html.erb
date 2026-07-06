@@ -9,9 +9,12 @@ else
   [
     { name: t(".nav.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
     { name: t(".nav.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
-    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path) },
-    { name: t(".nav.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
+    { name: t(".nav.accounts"), path: accounts_path, icon: "landmark", icon_custom: false, active: page_active?(accounts_path), desktop_only: true },
+    { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true },
+    { name: t(".nav.categories"), path: categories_path, icon: "shapes", icon_custom: false, active: page_active?(categories_path), desktop_only: true },
     { name: t(".nav.recurrings"), path: recurring_transactions_path, icon: "refresh-cw", icon_custom: false, active: page_active?(recurring_transactions_path) },
+    { name: t(".nav.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
+    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path) },
     preview_gated_nav_item({ name: t(".nav.goals"), path: goals_path, icon: "piggy-bank", icon_custom: false, active: page_active?(goals_path) }),
     (ai_chat_ui_enabled? ? { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true } : nil)
   ].compact
@@ -225,7 +228,7 @@ end %>
     <%# MOBILE - Bottom Nav %>
     <%= tag.nav class: "lg:hidden fixed bottom-0 left-0 right-0 bg-surface z-10 border-t border-tertiary flex justify-around pb-[env(safe-area-inset-bottom)]",
       data: { viewport_target: "bottomNav" } do %>
-      <% mobile_nav_items.each do |nav_item| %>
+      <% mobile_nav_items.reject { |item| item[:desktop_only] }.each do |nav_item| %>
         <%= render "layouts/shared/nav_item", **nav_item %>
       <% end %>
     <% end %>

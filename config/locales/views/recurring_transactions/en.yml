@@ -17,6 +17,8 @@ en:
     monthly_total_count:
       one: across 1 active recurring charge
       other: across %{count} active recurring charges
+    paid_so_far: Paid so far this month
+    left_to_pay: Left to pay this month
     settings:
       enable_label: Enable Recurring Transactions
       enable_description: Automatically detect recurring transaction patterns and show upcoming projected transactions.
@@ -52,7 +54,10 @@ en:
       actions: Actions
     status:
       active: Active
-      inactive: Inactive
+      inactive: Paused
+      paid: Paid
+      overdue: Overdue
+      due: Due %{date}
     badges:
       manual: Manual
     transfer_marked_as_recurring: Transfer marked as recurring

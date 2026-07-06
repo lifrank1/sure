@@ -25,12 +25,24 @@
 
 <div class="space-y-4 flex flex-col">
   <% unless @family.recurring_transactions_disabled? %>
-    <%# Data first: the number people come here for %>
+    <%# Data first: the numbers people come here for %>
     <% if @monthly_recurring_count > 0 %>
       <div class="bg-container rounded-xl shadow-border-xs p-4">
-        <p class="text-sm text-secondary"><%= t("recurring_transactions.monthly_total_label") %></p>
-        <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@monthly_recurring_total) %><span class="text-base text-secondary font-normal"> / <%= t("recurring_transactions.per_month") %></span></p>
-        <p class="text-xs text-secondary mt-1"><%= t("recurring_transactions.monthly_total_count", count: @monthly_recurring_count) %></p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <p class="text-sm text-secondary"><%= t("recurring_transactions.monthly_total_label") %></p>
+            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@monthly_recurring_total) %><span class="text-base text-secondary font-normal"> / <%= t("recurring_transactions.per_month") %></span></p>
+            <p class="text-xs text-secondary mt-1"><%= t("recurring_transactions.monthly_total_count", count: @monthly_recurring_count) %></p>
+          </div>
+          <div>
+            <p class="text-sm text-secondary"><%= t("recurring_transactions.paid_so_far") %></p>
+            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@paid_so_far) %></p>
+          </div>
+          <div>
+            <p class="text-sm text-secondary"><%= t("recurring_transactions.left_to_pay") %></p>
+            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@left_to_pay) %></p>
+          </div>
+        </div>
       </div>
     <% end %>
 
@@ -128,13 +140,28 @@
                   <%= l(recurring_transaction.last_occurrence_date, format: :short) %>
                 </td>
                 <td class="py-3 px-2 text-sm">
-                  <% if recurring_transaction.active? %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-success theme-dark:bg-green-tint-10">
-                      <%= t("recurring_transactions.status.active") %>
-                    </span>
-                  <% else %>
+                  <%# This-month status beats a static Active label: paid,
+                      overdue, or due date at a glance %>
+                  <% if !recurring_transaction.active? %>
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-inset text-primary">
                       <%= t("recurring_transactions.status.inactive") %>
+                    </span>
+                  <% elsif recurring_transaction.last_occurrence_date.present? && recurring_transaction.last_occurrence_date >= Date.current.beginning_of_month %>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-success theme-dark:bg-green-tint-10">
+                      <%= icon "check", size: "xs", color: "current" %>
+                      <%= t("recurring_transactions.status.paid") %>
+                    </span>
+                  <% elsif recurring_transaction.next_expected_date.present? && recurring_transaction.next_expected_date < Date.current %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/10 text-red-500">
+                      <%= t("recurring_transactions.status.overdue") %>
+                    </span>
+                  <% elsif recurring_transaction.next_expected_date.present? && recurring_transaction.next_expected_date <= Date.current.end_of_month %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-inset text-secondary">
+                      <%= t("recurring_transactions.status.due", date: l(recurring_transaction.next_expected_date, format: :short)) %>
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-success theme-dark:bg-green-tint-10">
+                      <%= t("recurring_transactions.status.active") %>
                     </span>
                   <% end %>
                 </td>

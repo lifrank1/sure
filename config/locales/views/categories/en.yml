@@ -32,6 +32,15 @@ en:
       empty: No categories found
       merge: Merge categories
       new: New category
+      spent_in: spent in %{month}
+      total_budget: total budget
+      set_budget: Set a budget →
+      category: Category
+      spent: Spent
+      budget: Budget
+      monthly_avg: Monthly avg
+      uncategorized_cta: Uncategorized — review & label
+      manage_all: Manage all categories
     merge:
       title: Merge categories
       description: Select a target category and the categories to merge into it. Matching transactions and budget lines will move to the target.

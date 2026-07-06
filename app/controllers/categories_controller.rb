@@ -8,7 +8,23 @@ class CategoriesController < ApplicationController
     @category_groups = Category::Group.for(@categories)
     @category_ids_with_transactions = category_ids_with_transactions(@categories)
 
-    render layout: "settings"
+    # Copilot-style overview: current-month spending per category against its
+    # budget (or against the monthly average when no budget exists)
+    @period = Period.current_month_for(Current.family)
+    @income_statement = Current.family.income_statement
+    expense_totals = @income_statement.expense_totals(period: @period)
+    @total_spent = Money.new(expense_totals.total, Current.family.currency)
+    @spent_by_category = expense_totals.category_totals.each_with_object({}) do |ct, memo|
+      memo[ct.category.id] = ct.total if ct.category.id.present?
+    end
+    @uncategorized_spent = expense_totals.category_totals.find { |ct| ct.category.uncategorized? }&.total.to_f || 0
+
+    budget = Current.family.budgets.find_by(start_date: Date.current.beginning_of_month)
+    @budget = budget&.initialized? ? budget : nil
+    @budgeted_by_category = @budget ? @budget.budget_categories.index_by(&:category_id) : {}
+    @total_budget = @budget ? Money.new(@budget.allocated_spending, Current.family.currency) : nil
+
+    @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("categories.index.categories"), nil ] ]
   end
 
   def new
