@@ -30,7 +30,10 @@ class ToolCall::Function < ToolCall
       type: "function",
       function: {
         name: function_name,
-        arguments: function_arguments
+        # OpenAI-shaped APIs require arguments as a JSON *string*; the column
+        # is jsonb, so replaying the stored Hash 400s strict providers
+        # (Gemini: "Value is not a string")
+        arguments: function_arguments.is_a?(String) ? function_arguments : function_arguments.to_json
       }
     }
   end

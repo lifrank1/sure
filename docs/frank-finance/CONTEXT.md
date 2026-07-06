@@ -33,10 +33,10 @@ link. Push to BOTH remotes on every change.
   keyless market data.
 - `REQUIRE_EMAIL_CONFIRMATION=false` — TEMPORARY until Resend domain verified
   (erech.app pending DNS records at Namecheap); SMTP vars already set.
-- `AI_CHAT_UI_ENABLED=false` — hides all AI-chat entry points (header toggle,
-  right panel, mobile Assistant tab) while chat 400s on Gemini tool-calls.
-  Flip to true (or unset) once chat is fixed; panel-width + toggle-persistence
-  bugs were fixed 2026-07-06 so the UI works when re-enabled.
+- `AI_CHAT_UI_ENABLED=true` — kill switch for all AI-chat entry points (header
+  toggle, right panel, mobile Assistant tab); set false to hide them. Chat's
+  Gemini tool-call 400 (history replay sent jsonb Hash arguments; Gemini
+  requires JSON strings) fixed 2026-07-06.
 
 ## Product decisions
 
@@ -65,9 +65,6 @@ Waiting on Frank (only he can do these):
 Second user f.li.865985@gmail.com is Frank's own test account (safe to delete).
 
 ## Known issues / gotchas
-
-- AI chat 400s on function-call round-trip with Gemini (works for first call;
-  fails when tool results are sent back). Suspect message format compatibility.
 - SnapTrade balance rule: prefer API total unless it's below holdings value
   (Fidelity sweeps cash into SPAXX → double-count guard in
   SnaptradeAccount::Processor#calculate_total_balance).

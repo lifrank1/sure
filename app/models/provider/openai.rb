@@ -8,6 +8,11 @@ class Provider::Openai < Provider
   SUPPORTED_MODELS = %w[gpt-4 gpt-5 o1 o3].freeze
   VISION_CAPABLE_MODEL_PREFIXES = %w[gpt-4o gpt-4-turbo gpt-4.1 gpt-5 o1 o3].freeze
 
+  # Google's documented placeholder that skips thought-signature validation
+  # when replaying function calls to Gemini 3.x (original signatures aren't
+  # persisted across turns).
+  GEMINI_REPLAY_THOUGHT_SIGNATURE = "context_engineering_is_the_way_to_go".freeze
+
   # Returns the effective model that would be used by the provider.
   # Priority: explicit ENV > Setting > DEFAULT_MODEL.
   def self.effective_model
@@ -527,6 +532,7 @@ class Provider::Openai < Provider
       # preserved atomically by HistoryTrimmer.
       if messages.present?
         trimmed = Assistant::HistoryTrimmer.new(messages, max_tokens: max_history_tokens).call
+        trimmed = decorate_replayed_tool_calls_for_gemini(trimmed) if gemini_endpoint?
         payload.concat(trimmed)
       elsif prompt.present?
         payload << { role: "user", content: prompt }
@@ -555,7 +561,7 @@ class Provider::Openai < Provider
           # send Google's documented placeholder that skips validation.
           if gemini_endpoint?
             tool_call[:extra_content] = {
-              google: { thought_signature: "context_engineering_is_the_way_to_go" }
+              google: { thought_signature: GEMINI_REPLAY_THOUGHT_SIGNATURE }
             }
           end
 
@@ -592,6 +598,26 @@ class Provider::Openai < Provider
       end
 
       payload
+    end
+
+    # Assistant tool_calls replayed from chat history need the same Gemini
+    # treatment as the current turn's function_results: a placeholder
+    # thought_signature (Gemini 3.x rejects unsigned replayed calls). Returns
+    # copies — the caller's history array is not mutated.
+    def decorate_replayed_tool_calls_for_gemini(messages)
+      messages.map do |message|
+        next message unless message[:tool_calls].present?
+
+        message.merge(
+          tool_calls: message[:tool_calls].map do |tool_call|
+            next tool_call if tool_call[:extra_content].present?
+
+            tool_call.merge(
+              extra_content: { google: { thought_signature: GEMINI_REPLAY_THOUGHT_SIGNATURE } }
+            )
+          end
+        )
+      end
     end
 
     def build_generic_tools(functions)

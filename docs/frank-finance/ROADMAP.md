@@ -158,8 +158,14 @@ bill-level matching we approximate with last_occurrence_date.
       hydration on cold cache)
 - [x] Recurring page opens inside the settings shell (Back/ESC chrome) — give it a standalone layout
 - [ ] Merchant history section in the transaction drawer
-- [ ] Fix AI chat with Gemini (400 on tool-call round-trip; suspect tool_calls
-      message format vs Gemini OpenAI-compat endpoint)
+- [x] Fix AI chat with Gemini (2026-07-06). Root cause was NOT the immediate
+      tool round-trip (a prior session's thought_signature placeholder fixed
+      that) — it was history replay: ToolCall::Function#to_tool_call sent the
+      stored jsonb arguments as a Hash, and Gemini 400s "Value is not a
+      string". Arguments now stringified per OpenAI spec; replayed history
+      tool_calls also get the Gemini placeholder signature. Reproduced +
+      verified both shapes against the live endpoint. AI_CHAT_UI_ENABLED=true
+      restored (UI had been hidden while broken).
 
 ## Done (this initiative)
 
