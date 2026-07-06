@@ -27,8 +27,13 @@
       <span class="text-xs text-secondary font-normal"><%= t(".ai_assist_hint", default: "— tell it what it can't guess") %></span>
     </summary>
     <%= form_with url: ai_assist_transactions_categorize_path, method: :post, class: "mt-3 space-y-2" do |form| %>
+      <%# stopPropagation: the wizard binds document-level hotkeys (category
+          assignment) that otherwise swallow keystrokes typed in here %>
       <%= form.text_area :guidance,
             rows: 2,
+            onkeydown: "event.stopPropagation()",
+            onkeypress: "event.stopPropagation()",
+            onkeyup: "event.stopPropagation()",
             class: "w-full rounded-lg border border-secondary bg-container-inset text-sm text-primary p-3 placeholder:text-subdued focus:outline-hidden",
             placeholder: t(".ai_assist_placeholder", default: "e.g. Zelle payments to Abi Murthy are Rent. Venmo payments are usually Food & Drink. FID BKG transfers are my brokerage deposits.") %>
       <div class="flex items-center justify-between">
