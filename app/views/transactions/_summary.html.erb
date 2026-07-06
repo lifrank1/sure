@@ -23,30 +23,36 @@
     <p class="text-sm text-secondary"><%= t("transactions.summary.total_transactions") %> <span class="text-subdued">· <%= period_label %></span></p>
     <p class="text-primary font-medium text-xl privacy-sensitive" id="total-transactions"><%= totals.count.round(0) %></p>
   </div>
-  <div class="p-4 space-y-2">
-    <% if show_transfers %>
+  <% if show_transfers %>
+    <div class="p-4 space-y-2">
       <p class="text-sm text-secondary"><%= t("transactions.summary.inflow") %></p>
       <p class="text-primary font-medium text-xl privacy-sensitive" id="total-income">
         <%= (totals.income_money + totals.transfer_inflow_money).format %>
       </p>
-    <% else %>
-      <p class="text-sm text-secondary"><%= t("transactions.summary.income") %></p>
-      <p class="text-primary font-medium text-xl privacy-sensitive" id="total-income">
-        <%= totals.income_money.format %>
-      </p>
-    <% end %>
-  </div>
-  <div class="p-4 space-y-2">
-    <% if show_transfers %>
+    </div>
+    <div class="p-4 space-y-2">
       <p class="text-sm text-secondary"><%= t("transactions.summary.outflow") %></p>
       <p class="text-primary font-medium text-xl privacy-sensitive" id="total-expense">
         <%= (totals.expense_money + totals.transfer_outflow_money).format %>
       </p>
-    <% else %>
-      <p class="text-sm text-secondary"><%= t("transactions.summary.expenses") %></p>
+    </div>
+  <% else %>
+    <%# Stats double as filters: click income/expenses to scope the list %>
+    <%= link_to transactions_path(q: (search&.attributes&.compact_blank || {}).merge("types" => ["income"])),
+        class: "p-4 space-y-2 block hover:bg-surface-hover transition-colors group",
+        data: { turbo_frame: "_top" } do %>
+      <p class="text-sm text-secondary group-hover:text-primary"><%= t("transactions.summary.income") %> <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span></p>
+      <p class="text-primary font-medium text-xl privacy-sensitive" id="total-income">
+        <%= totals.income_money.format %>
+      </p>
+    <% end %>
+    <%= link_to transactions_path(q: (search&.attributes&.compact_blank || {}).merge("types" => ["expense"])),
+        class: "p-4 space-y-2 block hover:bg-surface-hover transition-colors group",
+        data: { turbo_frame: "_top" } do %>
+      <p class="text-sm text-secondary group-hover:text-primary"><%= t("transactions.summary.expenses") %> <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span></p>
       <p class="text-primary font-medium text-xl privacy-sensitive" id="total-expense">
         <%= totals.expense_money.format %>
       </p>
     <% end %>
-  </div>
+  <% end %>
 </div>
