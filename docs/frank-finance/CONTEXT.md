@@ -42,6 +42,24 @@ link. Push to BOTH remotes on every change.
 - Every new family gets an active auto-categorize rule (runs on sync).
 - Onboarding flow skipped at signup (defaults: USD/en).
 
+## Current status (updated 2026-07-05, post UX-overhaul)
+
+All three UX phases from the Copilot-benchmark audit are shipped and verified
+live: space reclamation, review loop (needs_review + dashboard card + drawer
+confirm), actionable dashboard cards (monthly spending, next-two-weeks
+recurrings), sankey relocated to Reports, Recurring in nav, header labels.
+See ROADMAP.md checkboxes for the full ledger.
+
+Waiting on Frank (only he can do these):
+1. Resend: verify erech.app domain (DNS records at Namecheap) -> then set
+   REQUIRE_EMAIL_CONFIRMATION=true and re-test signup email
+2. Railway dashboard: usage alerts ($8 soft / $15 hard) + Postgres backups
+3. Create a July budget (upgrades the Monthly-spending card to "$X left")
+4. SnapTrade is on TEST tier (5 connections) — apply for production when
+   user demand justifies (~$1.50/user/mo, ask for Fidelity enablement)
+
+Second user f.li.865985@gmail.com is Frank's own test account (safe to delete).
+
 ## Known issues / gotchas
 
 - AI chat 400s on function-call round-trip with Gemini (works for first call;

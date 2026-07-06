@@ -48,6 +48,12 @@
 
 ## Done (this initiative)
 
+- [x] Header icon controls labeled (Accounts / Hide amounts / AI chat); dashboard
+      button renamed "Add account"
+- [x] Outflows section compacted (smaller donut, scrolling category list) and
+      shows its period inline (answers "is this all time?")
+- [x] Review-card + new-card padding/alignment normalized (px-4 convention)
+
 - [x] Connect-first add-account flow (bank/brokerage/manual)
 - [x] SnapTrade auto-link (no "accounts need setup" step)
 - [x] SnapTrade cash double-count fix (Fidelity SPAXX sweep)
