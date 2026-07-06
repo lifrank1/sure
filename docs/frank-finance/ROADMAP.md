@@ -52,8 +52,10 @@ Trust-breaking numbers (data correctness IS the UX in a finance app):
       from InvestmentFlowStatement (real external flows — a stock sale is not
       a withdrawal); redundant Investment Flows section removed; dashboard
       "All time activity" relabeled Securities bought/sold; Period Return
-      excludes each account's genesis-day balance row (new-account backfill
-      no longer books opening value as a 31% market gain)
+      only counts a day's market flows when the account held >= 1 unit the
+      prior day (a 401k whose holdings dropped to -$0.0027 dust then
+      re-materialized at $40k had booked the whole value as a +31% month;
+      July MTD is now -$647, verified against prod balances)
 - [x] Dashboard Outflows: Investment Contributions split out of the donut into
       a secondary "Moved to investments" line (still linked); card renamed
       "Spending"; percentages recomputed vs spending total
