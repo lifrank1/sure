@@ -5,6 +5,11 @@ export default class extends Controller {
   static values = { timeout: { type: Number, default: 10000 } }
 
   connect() {
+    // The frame may have finished loading before this controller connected
+    // (fast/cached responses) — in that case turbo:frame-load already fired
+    // and would never clear the timer, wrongly replacing loaded content.
+    if (this.element.complete) return
+
     this.timeoutId = setTimeout(() => {
       this.handleTimeout()
     }, this.timeoutValue)
