@@ -31,13 +31,20 @@ link. Push to BOTH remotes on every change.
   Add snaptrade/simplefin here to surface their panels for all users.
 - `SECURITIES_PROVIDERS=yahoo_finance`, `EXCHANGE_RATE_PROVIDER=yahoo_finance` —
   keyless market data.
-- Email: `EMAIL_SENDER=noreply@in.erech.app` (2026-07-07) — reuses the
-  Resend-verified renter-concierge subdomain so sends work today; root
-  erech.app verification in Resend/Namecheap is optional polish later.
-  `REQUIRE_EMAIL_CONFIRMATION=true` (only gates the email-CHANGE flow in this
-  fork; signups were never confirmation-gated — the real win was unblocking
-  password-reset emails). Resend API key on Railway is a restricted
-  send-only key; domain management needs the Resend dashboard.
+- Email WORKING end-to-end (2026-07-07), three fixes were needed:
+  1. `EMAIL_SENDER=noreply@in.erech.app` — reuses the Resend-verified
+     renter-concierge subdomain (root erech.app verification is optional
+     polish later; do NOT touch in.erech.app records — same account, both
+     domains coexist)
+  2. `APP_DOMAIN=finance.erech.app` — was never set; mailer templates
+     crashed with "Missing host to link to" on both services
+  3. `SMTP_PORT=2465` — Railway Hobby blocks standard SMTP egress
+     (25/465/587); Resend's alternate port 2465 (implicit TLS) works
+  `REQUIRE_EMAIL_CONFIRMATION=true` (only gates the email-CHANGE flow in
+  this fork; signups were never confirmation-gated — the real win was
+  password-reset emails, verified delivered via worker logs). Resend API
+  key on Railway is restricted/send-only; domain management needs the
+  Resend dashboard.
 - `AI_CHAT_UI_ENABLED=true` — kill switch for all AI-chat entry points (header
   toggle, right panel, mobile Assistant tab); set false to hide them. Chat's
   Gemini tool-call 400 (history replay sent jsonb Hash arguments; Gemini
