@@ -81,13 +81,14 @@ end %>
        ),
        inert: !Current.user.show_sidebar?,
        data: { app_layout_target: "leftSidebar" } do %>
-      <div class="px-4 h-full w-full flex flex-col overflow-y-auto">
-        <%# Brand %>
-        <div class="flex items-center px-1 mb-4 shrink-0">
+      <div class="px-4 h-full w-full flex flex-col">
+        <%# Brand + account menu (pinned) %>
+        <div class="flex items-center justify-between px-1 mb-4 shrink-0">
           <%= link_to home_path, class: "flex items-center gap-2.5 focus-ring rounded-lg" do %>
             <%= render "shared/logo_mark", css: "w-8 h-8" %>
             <span class="font-semibold text-primary"><%= product_name %></span>
           <% end %>
+          <%= render "users/user_menu", user: Current.user, placement: "bottom-end", offset: 12, intro_mode: intro_mode %>
         </div>
 
         <%# Primary navigation (icon + label rows) %>
@@ -98,9 +99,11 @@ end %>
         </ul>
 
         <% if content_for?(:sidebar) %>
-          <%= yield :sidebar %>
+          <div class="grow overflow-y-auto min-h-0">
+            <%= yield :sidebar %>
+          </div>
         <% else %>
-          <div class="grow">
+          <div class="grow overflow-y-auto min-h-0">
             <%= render "accounts/account_sidebar_tabs", family: Current.family, active_tab: @account_group_tab %>
           </div>
 
@@ -126,13 +129,12 @@ end %>
           <% end %>
         <% end %>
 
-        <div class="shrink-0 mt-auto pt-4 border-t border-tertiary flex items-center justify-between">
+        <div class="shrink-0 mt-auto pt-3 pb-1 border-t border-tertiary flex items-center">
           <%= render DS::Link.new(
             variant: "icon",
             icon: "message-circle-question",
             href: contact_path
           ) %>
-          <%= render "users/user_menu", user: Current.user, intro_mode: intro_mode %>
         </div>
       </div>
     <% end %>
