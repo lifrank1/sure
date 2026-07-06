@@ -49,7 +49,7 @@ class PagesController < ApplicationController
     month_expense_totals = income_statement.expense_totals(period: current_month)
     current_budget = Current.family.budgets.find_by(start_date: Date.current.beginning_of_month)
     budgeted = current_budget&.allocated_spending
-    spent = month_expense_totals.total_money
+    spent = Money.new(month_expense_totals.total, family_currency)
     @monthly_spending = {
       spent: spent,
       budgeted: budgeted.present? ? Money.new(budgeted, family_currency) : nil,
