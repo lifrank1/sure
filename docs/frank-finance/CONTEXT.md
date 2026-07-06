@@ -31,8 +31,13 @@ link. Push to BOTH remotes on every change.
   Add snaptrade/simplefin here to surface their panels for all users.
 - `SECURITIES_PROVIDERS=yahoo_finance`, `EXCHANGE_RATE_PROVIDER=yahoo_finance` —
   keyless market data.
-- `REQUIRE_EMAIL_CONFIRMATION=false` — TEMPORARY until Resend domain verified
-  (erech.app pending DNS records at Namecheap); SMTP vars already set.
+- Email: `EMAIL_SENDER=noreply@in.erech.app` (2026-07-07) — reuses the
+  Resend-verified renter-concierge subdomain so sends work today; root
+  erech.app verification in Resend/Namecheap is optional polish later.
+  `REQUIRE_EMAIL_CONFIRMATION=true` (only gates the email-CHANGE flow in this
+  fork; signups were never confirmation-gated — the real win was unblocking
+  password-reset emails). Resend API key on Railway is a restricted
+  send-only key; domain management needs the Resend dashboard.
 - `AI_CHAT_UI_ENABLED=true` — kill switch for all AI-chat entry points (header
   toggle, right panel, mobile Assistant tab); set false to hide them. Chat's
   Gemini tool-call 400 (history replay sent jsonb Hash arguments; Gemini
@@ -55,12 +60,17 @@ recurrings), sankey relocated to Reports, Recurring in nav, header labels.
 See ROADMAP.md checkboxes for the full ledger.
 
 Waiting on Frank (only he can do these):
-1. Resend: verify erech.app domain (DNS records at Namecheap) -> then set
-   REQUIRE_EMAIL_CONFIRMATION=true and re-test signup email
-2. Railway dashboard: usage alerts ($8 soft / $15 hard) + Postgres backups
-3. Create a July budget (upgrades the Monthly-spending card to "$X left")
-4. SnapTrade is on TEST tier (5 connections) — apply for production when
-   user demand justifies (~$1.50/user/mo, ask for Fidelity enablement)
+1. (optional) Resend: verify root erech.app for a prettier sender — email
+   already WORKS via in.erech.app as of 2026-07-07 (test send delivered,
+   REQUIRE_EMAIL_CONFIRMATION=true)
+2. Railway dashboard: usage alerts ($8 soft; hard limit STOPS services — use
+   $25-30 or skip) + Postgres Backups tab (Daily). API attempts return
+   Not Authorized for CLI tokens; dashboard-only.
+3. Create a July budget (upgrades the Spending card to "$X left")
+4. SnapTrade is on TEST tier (5 connections) — apply for production before
+   sharing publicly (~$1.50/user/mo, ask for Fidelity enablement)
+5. Approve deleting the 2 unused categories (Mortgage / Rent, Sports &
+   Fitness) — 20 of 22 have transactions and stay
 
 Second user f.li.865985@gmail.com is Frank's own test account (safe to delete).
 
