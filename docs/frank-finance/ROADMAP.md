@@ -38,7 +38,8 @@
 
 ## Later / opportunistic
 
-- [ ] Merge icon nav rail + accounts panel into one sidebar (bigger app-shell refactor)
+- [x] Merge icon nav rail + accounts panel into one sidebar (nav rows with labels,
+      brand header, accounts below, contact + user menu footer)
 - [ ] Account sparklines + "last synced X ago" freshness in sidebar
 - [ ] Categories page unifying budget + category management (Copilot-style)
 - [ ] Service worker registration fails (422 on /service-worker) — breaks PWA

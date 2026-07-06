@@ -1,0 +1,19 @@
+<%# Horizontal nav row for the unified desktop sidebar (icon + label).
+    locals: (name:, path:, icon:, icon_custom:, active:, mobile_only: false, preview: false) %>
+
+<%= link_to path,
+    class: class_names(
+      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium focus-ring",
+      active ? "bg-container shadow-xs text-primary" : "text-secondary hover:bg-surface-hover hover:text-primary"
+    ),
+    aria: { current: ("page" if active) } do %>
+  <span class="relative flex items-center justify-center w-5 h-5 shrink-0">
+    <%= icon(icon, size: "sm", color: active ? "current" : "default", custom: icon_custom) %>
+    <% if preview %>
+      <span class="absolute -top-1 -right-1">
+        <%= render DS::Pill.new(tone: :violet, dot_only: true, title: t("shared.preview")) %>
+      </span>
+    <% end %>
+  </span>
+  <span class="truncate"><%= name %></span>
+<% end %>

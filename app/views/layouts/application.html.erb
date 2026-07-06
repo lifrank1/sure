@@ -74,35 +74,6 @@ end %>
       </div>
     </nav>
 
-    <%# DESKTOP - Left navbar %>
-    <div class="hidden lg:block border-r border-divider">
-      <nav class="h-full flex flex-col shrink-0 w-[84px] py-4">
-        <div class="pl-2 mb-3">
-          <%= link_to home_path, class: "block" do %>
-            <span class="w-9 h-9 mx-auto block"><%= render "shared/logo_mark", css: "w-9 h-9" %></span>
-          <% end %>
-        </div>
-
-        <ul class="space-y-0.5">
-          <% desktop_nav_items.reject { |item| item[:mobile_only] }.each do |nav_item| %>
-            <li>
-              <%= render "layouts/shared/nav_item", **nav_item %>
-            </li>
-          <% end %>
-        </ul>
-
-        <div class="pl-2 mt-auto mx-auto flex flex-col gap-2">
-          <%= render DS::Link.new(
-            variant: "icon",
-            icon: "message-circle-question",
-            href: contact_path
-          ) %>
-
-          <%= render "users/user_menu", user: Current.user, intro_mode: intro_mode %>
-        </div>
-      </nav>
-    </div>
-
     <%# DESKTOP - Left sidebar %>
     <%= tag.div class: class_names(
         "hidden lg:block py-4 shrink-0 max-w-[320px] transition-all duration-300 border-divider",
@@ -110,7 +81,22 @@ end %>
        ),
        inert: !Current.user.show_sidebar?,
        data: { app_layout_target: "leftSidebar" } do %>
-      <div class="px-4 h-full flex flex-col overflow-y-auto">
+      <div class="px-4 h-full w-full flex flex-col overflow-y-auto">
+        <%# Brand %>
+        <div class="flex items-center px-1 mb-4 shrink-0">
+          <%= link_to home_path, class: "flex items-center gap-2.5 focus-ring rounded-lg" do %>
+            <%= render "shared/logo_mark", css: "w-8 h-8" %>
+            <span class="font-semibold text-primary"><%= product_name %></span>
+          <% end %>
+        </div>
+
+        <%# Primary navigation (icon + label rows) %>
+        <ul class="space-y-0.5 mb-4 shrink-0">
+          <% desktop_nav_items.each do |nav_item| %>
+            <li><%= render "layouts/shared/nav_row", **nav_item %></li>
+          <% end %>
+        </ul>
+
         <% if content_for?(:sidebar) %>
           <%= yield :sidebar %>
         <% else %>
@@ -139,6 +125,15 @@ end %>
             </div>
           <% end %>
         <% end %>
+
+        <div class="shrink-0 mt-auto pt-4 border-t border-tertiary flex items-center justify-between">
+          <%= render DS::Link.new(
+            variant: "icon",
+            icon: "message-circle-question",
+            href: contact_path
+          ) %>
+          <%= render "users/user_menu", user: Current.user, intro_mode: intro_mode %>
+        </div>
       </div>
     <% end %>
 
@@ -149,10 +144,10 @@ end %>
           <div class="flex items-center gap-2">
             <button type="button"
                     class="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors focus-ring"
-                    title="<%= t("layouts.application.toggle_accounts", default: "Show or hide the accounts panel") %>"
+                    title="<%= t("layouts.application.toggle_sidebar_hint", default: "Show or hide the sidebar") %>"
                     data-action="app-layout#toggleLeftSidebar">
               <%= icon("panel-left", size: "sm") %>
-              <span class="text-xs font-medium"><%= t("layouts.application.accounts_label", default: "Accounts") %></span>
+              <span class="text-xs font-medium"><%= t("layouts.application.sidebar_label", default: "Menu") %></span>
             </button>
 
             <% if content_for?(:breadcrumbs) %>
