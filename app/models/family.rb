@@ -239,8 +239,8 @@ class Family < ApplicationRecord
     AutoCategorizeJob.perform_later(self, transaction_ids: transactions.pluck(:id), rule_run_id: rule_run_id)
   end
 
-  def auto_categorize_transactions(transaction_ids)
-    AutoCategorizer.new(self, transaction_ids: transaction_ids).auto_categorize
+  def auto_categorize_transactions(transaction_ids, user_guidance: nil)
+    AutoCategorizer.new(self, transaction_ids: transaction_ids, user_guidance: user_guidance).auto_categorize
   end
 
   def auto_detect_transaction_merchants_later(transactions, rule_run_id: nil)

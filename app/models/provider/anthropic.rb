@@ -66,7 +66,9 @@ class Provider::Anthropic < Provider
     @base_url.present?
   end
 
-  def auto_categorize(transactions: [], user_categories: [], model: "", family: nil, json_mode: nil)
+  # user_guidance accepted for interface parity with Provider::Openai;
+  # not yet threaded into the Anthropic prompt.
+  def auto_categorize(transactions: [], user_categories: [], model: "", family: nil, json_mode: nil, user_guidance: nil)
     with_provider_response do
       raise Error, "Too many transactions to auto-categorize. Max is 25 per request." if transactions.size > 25
       if user_categories.blank?

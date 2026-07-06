@@ -21,6 +21,34 @@ class Transactions::CategorizesController < ApplicationController
     @total_uncategorized = uncategorized_count
   end
 
+  # "Tell the AI" assist: user guidance is threaded into the auto-categorizer
+  # prompt and re-run over everything still uncategorized. The categorizer
+  # only touches rows with no category and no lock, so this is safe to repeat.
+  def ai_assist
+    guidance = params[:guidance].to_s.strip
+
+    if guidance.blank?
+      redirect_to transactions_categorize_path, alert: t(".guidance_blank", default: "Tell the AI something about these transactions first.") and return
+    end
+
+    ids = Current.family.transactions.visible
+                 .where(category_id: nil)
+                 .where.not(kind: Transaction::TRANSFER_KINDS)
+                 .limit(300)
+                 .pluck(:id)
+
+    if ids.empty?
+      redirect_to transactions_path, notice: t(".nothing_left", default: "Nothing left to categorize!") and return
+    end
+
+    ids.each_slice(20) do |batch|
+      AutoCategorizeJob.perform_later(Current.family, transaction_ids: batch, user_guidance: guidance)
+    end
+
+    redirect_to transactions_categorize_path,
+                notice: t(".started", count: ids.size, default: "AI is working through %{count} transactions with your guidance — check back in a minute.")
+  end
+
   def create
     @position     = params[:position].to_i
     entry_ids     = Array.wrap(params[:entry_ids]).reject(&:blank?)

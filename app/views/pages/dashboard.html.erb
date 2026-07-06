@@ -29,6 +29,22 @@
   </div>
 <% end %>
 
+<% if @uncategorized_count.to_i > 0 %>
+  <div class="mb-4 px-4 py-3 rounded-xl border border-warning bg-warning/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+    <div class="flex items-center gap-2 grow min-w-0">
+      <%= icon("tags", size: "sm", color: "warning") %>
+      <p class="text-sm text-primary truncate">
+        <span class="font-medium"><%= t("pages.dashboard.uncategorized_banner.title", count: @uncategorized_count, default: "%{count} uncategorized transactions") %></span>
+        <span class="text-secondary privacy-sensitive">(<%= @uncategorized_total.format %>)</span>
+        <span class="text-secondary"><%= t("pages.dashboard.uncategorized_banner.subtitle", default: "— your cashflow is only as accurate as its labels") %></span>
+      </p>
+    </div>
+    <%= link_to t("pages.dashboard.uncategorized_banner.cta", default: "Categorize →"),
+                transactions_categorize_path,
+                class: "shrink-0 text-sm font-medium text-primary underline hover:no-underline" %>
+  </div>
+<% end %>
+
 <%= turbo_frame_tag "dashboard_sections", target: "_top" do %>
   <% if accessible_accounts.any? %>
     <div class="flex items-center justify-end mb-4">

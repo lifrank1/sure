@@ -381,6 +381,7 @@ Rails.application.routes.draw do
     resource :bulk_deletion, only: :create
     resource :bulk_update, only: %i[new create]
     resource :categorize, only: %i[show create] do
+      post :ai_assist
       patch :assign_entry, on: :collection
       get :preview_rule, on: :collection
     end

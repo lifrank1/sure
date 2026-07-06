@@ -75,6 +75,13 @@ class PagesController < ApplicationController
                                      .order("entries.date DESC")
                                      .limit(6)
 
+    # Uncategorized nudge banner
+    uncategorized = Current.family.transactions.visible
+                           .where(category_id: nil)
+                           .where.not(kind: Transaction::TRANSFER_KINDS)
+    @uncategorized_count = uncategorized.count
+    @uncategorized_total = Money.new(uncategorized.sum("ABS(entries.amount)"), family_currency)
+
     @dashboard_sections = build_dashboard_sections
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.dashboard"), nil ] ]

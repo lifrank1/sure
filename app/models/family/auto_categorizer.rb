@@ -1,9 +1,10 @@
 class Family::AutoCategorizer
   Error = Class.new(StandardError)
 
-  def initialize(family, transaction_ids: [])
+  def initialize(family, transaction_ids: [], user_guidance: nil)
     @family = family
     @transaction_ids = transaction_ids
+    @user_guidance = user_guidance
   end
 
   def auto_categorize
@@ -26,7 +27,8 @@ class Family::AutoCategorizer
     result = llm_provider.auto_categorize(
       transactions: transactions_input,
       user_categories: categories_input,
-      family: family
+      family: family,
+      user_guidance: @user_guidance
     )
 
     unless result.success?

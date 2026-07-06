@@ -1,8 +1,8 @@
 class AutoCategorizeJob < ApplicationJob
   queue_as :medium_priority
 
-  def perform(family, transaction_ids: [], rule_run_id: nil)
-    modified_count = family.auto_categorize_transactions(transaction_ids)
+  def perform(family, transaction_ids: [], rule_run_id: nil, user_guidance: nil)
+    modified_count = family.auto_categorize_transactions(transaction_ids, user_guidance: user_guidance)
 
     # If this job was part of a rule run, report back the modified count
     if rule_run_id.present?

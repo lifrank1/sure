@@ -107,7 +107,7 @@ class Provider::Openai < Provider
     positive_budget(ENV["LLM_MAX_ITEMS_PER_CALL"], Setting.llm_max_items_per_call, 25)
   end
 
-  def auto_categorize(transactions: [], user_categories: [], model: "", family: nil, json_mode: nil)
+  def auto_categorize(transactions: [], user_categories: [], model: "", family: nil, json_mode: nil, user_guidance: nil)
     with_provider_response do
       if user_categories.blank?
         family_id = family&.id || "unknown"
@@ -133,7 +133,8 @@ class Provider::Openai < Provider
           custom_provider: custom_provider?,
           langfuse_trace: trace,
           family: family,
-          json_mode: json_mode
+          json_mode: json_mode,
+          user_guidance: user_guidance
         ).auto_categorize
       end
 

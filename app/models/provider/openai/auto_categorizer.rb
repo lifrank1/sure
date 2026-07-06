@@ -14,9 +14,9 @@ class Provider::Openai::AutoCategorizer
   # This is a heuristic to detect when strict JSON mode is breaking the model's ability to reason
   AUTO_MODE_NULL_THRESHOLD = 0.5
 
-  attr_reader :client, :model, :transactions, :user_categories, :custom_provider, :langfuse_trace, :family, :json_mode
+  attr_reader :client, :model, :transactions, :user_categories, :custom_provider, :langfuse_trace, :family, :json_mode, :user_guidance
 
-  def initialize(client, model: "", transactions: [], user_categories: [], custom_provider: false, langfuse_trace: nil, family: nil, json_mode: nil)
+  def initialize(client, model: "", transactions: [], user_categories: [], custom_provider: false, langfuse_trace: nil, family: nil, json_mode: nil, user_guidance: nil)
     @client = client
     @model = model
     @transactions = transactions
@@ -25,6 +25,7 @@ class Provider::Openai::AutoCategorizer
     @langfuse_trace = langfuse_trace
     @family = family
     @json_mode = json_mode || default_json_mode
+    @user_guidance = user_guidance.to_s.strip.presence
   end
 
   VALID_JSON_MODES = [ JSON_MODE_STRICT, JSON_MODE_OBJECT, JSON_MODE_NONE, JSON_MODE_AUTO ].freeze
@@ -61,11 +62,15 @@ class Provider::Openai::AutoCategorizer
   end
 
   def instructions
-    if custom_provider
-      simple_instructions
-    else
-      detailed_instructions
-    end
+    base = custom_provider ? simple_instructions : detailed_instructions
+    return base unless user_guidance
+
+    base + <<~GUIDANCE
+
+      USER-PROVIDED CONTEXT (from the account owner — treat as authoritative,
+      it overrides the pessimistic-null rule when it clearly applies):
+      #{user_guidance}
+    GUIDANCE
   end
 
   # Simplified instructions for smaller/local LLMs
