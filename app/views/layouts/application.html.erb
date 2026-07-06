@@ -76,7 +76,7 @@ end %>
 
     <%# DESKTOP - Left sidebar %>
     <%= tag.div class: class_names(
-        "hidden lg:block py-4 shrink-0 max-w-[320px] transition-all duration-300 border-divider",
+        "hidden lg:block py-4 shrink-0 max-w-[320px] lg:h-full overflow-hidden transition-all duration-300 border-divider",
         Current.user.show_sidebar? ? [expanded_sidebar_class, "border-r"] : [collapsed_sidebar_class, "border-r-0"],
        ),
        inert: !Current.user.show_sidebar?,
