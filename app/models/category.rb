@@ -198,6 +198,11 @@ class Category < ApplicationRecord
 
     private
       def default_categories
+        # Deliberately lean starter set (~13) for a young/first-budget audience:
+        # niche categories (insurance, taxes, home improvement, services, ...)
+        # are two clicks away in Settings > Categories rather than day-one
+        # noise. Investment Contributions stays: the transfer auto-matcher
+        # assigns it programmatically.
         [
           [ I18n.t("models.category.defaults.income"),                "#22c55e", "circle-dollar-sign" ],
           [ I18n.t("models.category.defaults.food_and_drink"),        "#f97316", "utensils" ],
@@ -207,19 +212,10 @@ class Category < ApplicationRecord
           [ I18n.t("models.category.defaults.travel"),                "#2563eb", "plane" ],
           [ I18n.t("models.category.defaults.entertainment"),         "#a855f7", "drama" ],
           [ I18n.t("models.category.defaults.healthcare"),            "#4da568", "pill" ],
-          [ I18n.t("models.category.defaults.personal_care"),         "#14b8a6", "scissors" ],
-          [ I18n.t("models.category.defaults.home_improvement"),      "#d97706", "hammer" ],
           [ I18n.t("models.category.defaults.mortgage_rent"),         "#b45309", "home" ],
           [ I18n.t("models.category.defaults.utilities"),             "#eab308", "lightbulb" ],
           [ I18n.t("models.category.defaults.subscriptions"),         "#6366f1", "wifi" ],
-          [ I18n.t("models.category.defaults.insurance"),             "#0284c7", "shield" ],
           [ I18n.t("models.category.defaults.sports_and_fitness"),    "#10b981", "dumbbell" ],
-          [ I18n.t("models.category.defaults.gifts_and_donations"),   "#61c9ea", "hand-helping" ],
-          [ I18n.t("models.category.defaults.taxes"),                 "#dc2626", "landmark" ],
-          [ I18n.t("models.category.defaults.loan_payments"),         "#e11d48", "credit-card" ],
-          [ I18n.t("models.category.defaults.services"),              "#7c3aed", "briefcase" ],
-          [ I18n.t("models.category.defaults.fees"),                  "#6b7280", "receipt" ],
-          [ I18n.t("models.category.defaults.savings_and_investments"), "#059669", "piggy-bank" ],
           [ investment_contributions_name,                       "#0d9488", "trending-up" ]
         ]
       end

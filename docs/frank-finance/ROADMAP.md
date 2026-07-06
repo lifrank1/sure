@@ -59,6 +59,8 @@
 - [x] Outflows section compacted (smaller donut, scrolling category list) and
       shows its period inline (answers "is this all time?")
 - [x] Review-card + new-card padding/alignment normalized (px-4 convention)
+- [x] Default categories trimmed 22 -> 13 for the college-student audience
+      (new families only; niche categories addable in Settings > Categories)
 - [x] QA sweep 2026-07-05: fixed turbo-frame-timeout race that stamped
       'Timeout' over healthy sparklines on every account; verified drawer,
       wizard, budgets, reports, bank-sync, add-account chooser all clean
