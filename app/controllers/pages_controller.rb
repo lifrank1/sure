@@ -79,6 +79,7 @@ class PagesController < ApplicationController
     uncategorized = Current.family.transactions.visible
                            .where(category_id: nil)
                            .where.not(kind: Transaction::TRANSFER_KINDS)
+                           .where.not(accounts: { accountable_type: %w[Investment Crypto] })
     @uncategorized_count = uncategorized.count
     @uncategorized_total = Money.new(uncategorized.sum("ABS(entries.amount)"), family_currency)
 

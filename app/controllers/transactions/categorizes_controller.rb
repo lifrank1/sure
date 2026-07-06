@@ -7,7 +7,7 @@ class Transactions::CategorizesController < ApplicationController
     ]
     @position = [ params[:position].to_i, 0 ].max
     groups = Transaction::Grouper.strategy.call(
-      Current.accessible_entries,
+      spending_entries,
       limit: 1,
       offset: @position
     )
@@ -34,6 +34,7 @@ class Transactions::CategorizesController < ApplicationController
     ids = Current.family.transactions.visible
                  .where(category_id: nil)
                  .where.not(kind: Transaction::TRANSFER_KINDS)
+                 .where.not(accounts: { accountable_type: %w[Investment Crypto] })
                  .limit(300)
                  .pluck(:id)
 
@@ -148,7 +149,16 @@ class Transactions::CategorizesController < ApplicationController
   private
 
     def uncategorized_count
-      Current.accessible_entries.uncategorized_transactions.count
+      spending_entries.uncategorized_transactions.count
+    end
+
+    # Labeling targets money in spending accounts; activity inside
+    # investment/crypto accounts (dividends, journaling) is excluded from
+    # cashflow analytics and doesn't need spending categories.
+    def spending_entries
+      Current.accessible_entries
+             .joins(:account)
+             .where.not(accounts: { accountable_type: %w[Investment Crypto] })
     end
 
     def uncategorized_entries_for(ids)
