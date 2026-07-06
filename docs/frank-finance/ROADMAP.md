@@ -41,6 +41,7 @@
 - [ ] Merge icon nav rail + accounts panel into one sidebar (bigger app-shell refactor)
 - [ ] Account sparklines + "last synced X ago" freshness in sidebar
 - [ ] Categories page unifying budget + category management (Copilot-style)
+- [ ] Recurring page opens inside the settings shell (Back/ESC chrome) — give it a standalone layout
 - [ ] Merchant history section in the transaction drawer
 - [ ] Fix AI chat with Gemini (400 on tool-call round-trip; suspect tool_calls
       message format vs Gemini OpenAI-compat endpoint)
