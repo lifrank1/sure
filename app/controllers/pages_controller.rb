@@ -63,7 +63,10 @@ class PagesController < ApplicationController
     current_month = Period.from_key("current_month")
     month_expense_totals = income_statement.expense_totals(period: current_month)
     current_budget = Current.family.budgets.find_by(start_date: Date.current.beginning_of_month)
+    # A bootstrapped-but-unallocated budget ($0) means "no budget yet" — show
+    # the set-a-budget CTA, not "-$X left of $0.00"
     budgeted = current_budget&.allocated_spending
+    budgeted = nil unless budgeted&.positive?
     spent = Money.new(month_expense_totals.total, family_currency)
     @monthly_spending = {
       spent: spent,
