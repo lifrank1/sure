@@ -23,6 +23,11 @@ en:
     bought: Bought
     sold: Sold
     trades: Trades
+    gains:
+      title: Gains by tax treatment
+      unrealized: Unrealized gains
+      realized: Realized gains
+      taxable_realized_note: These gains may be subject to taxes
     empty:
       title: No investment accounts yet
       description: Connect a brokerage or add an investment account to track your portfolio here.

@@ -155,6 +155,11 @@
       </div>
     </div>
 
+    <%# Gains by tax treatment (moved here from Reports) %>
+    <% if @gains_by_tax_treatment.present? %>
+      <%= render "investment_portfolio/gains_by_tax_treatment", gains_by_tax_treatment: @gains_by_tax_treatment %>
+    <% end %>
+
     <%# Period activity %>
     <% if @period_totals && (@period_totals.trades_count > 0 || @period_flows&.contributions&.amount.to_f > 0 || @period_flows&.withdrawals&.amount.to_f > 0) %>
       <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3">

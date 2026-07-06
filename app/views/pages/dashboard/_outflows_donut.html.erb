@@ -1,7 +1,16 @@
-<%# locals: (outflows_data:, period:) %>
+<%# locals: (outflows_data:, period:, monthly_spending: nil) %>
 <div id="outflows-donut-section" class="@container">
   <div class="px-4">
-    <div class="flex justify-end mb-3">
+    <div class="flex justify-between items-center mb-3 gap-2">
+      <%# Budget context (absorbed from the old Monthly spending card) %>
+      <div class="text-sm min-w-0">
+        <% if monthly_spending && monthly_spending[:left].present? %>
+          <span class="font-medium text-primary privacy-sensitive"><%= format_money(monthly_spending[:left]) %></span>
+          <span class="text-secondary"><%= t(".left_of_budget", budget: format_money(monthly_spending[:budgeted])) %></span>
+        <% elsif monthly_spending %>
+          <%= link_to t(".set_budget"), budgets_path, class: "text-secondary hover:text-primary underline", data: { turbo_frame: "_top" } %>
+        <% end %>
+      </div>
       <%= render UI::PeriodPicker.new(
         selected: period,
         url: root_path,
@@ -66,8 +75,10 @@
             </div>
           </div>
         </div>
-        <div class="py-3 shadow-border-xs rounded-lg bg-container font-medium text-sm max-w-full max-h-96 overflow-y-auto">
-          <% outflows_data[:categories].each_with_index do |category, idx| %>
+        <%# Top 5 only — the Categories page owns the full list %>
+        <% visible_categories = outflows_data[:categories].first(5) %>
+        <div class="py-3 shadow-border-xs rounded-lg bg-container font-medium text-sm max-w-full">
+          <% visible_categories.each_with_index do |category, idx| %>
             <%
               category_content = capture do
             %>
@@ -115,8 +126,18 @@
                 <%= category_content %>
               </div>
             <% end %>
-            <% if idx < outflows_data[:categories].size - 1 %>
+            <% if idx < visible_categories.size - 1 %>
               <%= render "shared/ruler", classes: "mx-3 @2xl:mx-4" %>
+            <% end %>
+          <% end %>
+
+          <% if outflows_data[:categories].size > visible_categories.size %>
+            <%= render "shared/ruler", classes: "mx-3 @2xl:mx-4" %>
+            <%= link_to categories_path,
+                class: "flex items-center justify-between mx-3 px-3 py-2 rounded-lg text-sm text-secondary hover:text-primary",
+                data: { turbo_frame: "_top" } do %>
+              <span><%= t("pages.dashboard.outflows_donut.all_categories", count: outflows_data[:categories].size) %></span>
+              <%= icon("arrow-right", size: "sm", color: "current") %>
             <% end %>
           <% end %>
         </div>

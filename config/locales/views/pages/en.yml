@@ -38,8 +38,6 @@ en:
       heading: Terms of Service
       placeholder: Terms of service content will be displayed here.
     dashboard:
-      monthly_spending:
-        title: Monthly spending
       upcoming_recurrings:
         title: Next two weeks
       transactions_to_review:
@@ -67,16 +65,6 @@ en:
         no_account_subtitle: Since no accounts have been added, there's no data to display. Add your first accounts to start viewing dashboard data.
         no_account_title: No accounts yet
       balance_sheet:
-        title: "Balance Sheet"
-        no_items: "No %{name} yet"
-        add_accounts: "Add your %{name} accounts to see a full breakdown"
-        no_asset: "No assets yet"
-        no_liability: "No liabilities yet"
-        add_asset_accounts: "Add your asset accounts to see a full breakdown"
-        add_liability_accounts: "Add your liability accounts to see a full breakdown"
-        name: "Name"
-        weight: "Weight"
-        value: "Value"
         classifications:
           asset: "Assets"
           liability: "Liabilities"
@@ -97,19 +85,10 @@ en:
         value: "Value"
         weight: "Weight"
         moved_to_investments: "Moved to investments"
+        left_of_budget: "left of %{budget} budgeted this month"
+        set_budget: "Set a budget to track what's left →"
+        all_categories: "All %{count} categories"
       investment_summary:
         title: "Investments"
         total_return: "Total Return"
-        holding: "Holding"
-        weight: "Weight"
-        value: "Value"
-        return: "Return"
-        period_activity: "%{period} Activity"
-        contributions: "Securities bought"
-        withdrawals: "Securities sold"
-        trades: "Trades"
-        accounts_count:
-          one: "1 account"
-          other: "%{count} accounts"
-        no_investments: "No investment accounts"
-        add_investment: "Add an investment account to track your portfolio"
+        view_all: "All investments →"

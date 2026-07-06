@@ -130,47 +130,6 @@ en:
           other: Showing %{count} entries
         previous: Previous
         next: Next
-    net_worth:
-      title: Net Worth
-      current_net_worth: Current Net Worth
-      period_change: Period Change
-      assets_vs_liabilities: Assets vs Liabilities
-      total_assets: Assets
-      total_liabilities: Liabilities
-      no_assets: No assets
-      no_liabilities: No liabilities
-    investment_performance:
-      title: Investment Performance
-      portfolio_value: Portfolio Value
-      total_return: Total Return
-      period_return: Period Return
-      contributions: Period Contributions
-      withdrawals: Period Withdrawals
-      top_holdings: Top Holdings
-      holding: Holding
-      weight: Weight
-      value: Value
-      return: Return
-      accounts_count:
-        one: 1 account
-        other: "%{count} accounts"
-      accounts: Investment Accounts
-      gains_by_tax_treatment: Gains by Tax Treatment
-      unrealized_gains: Unrealized Gains
-      realized_gains: Realized Gains
-      total_gains: Total Gains
-      taxable_realized_note: These gains may be subject to taxes
-      no_data: "-"
-      view_details: View details
-      holdings_count:
-        one: "%{count} holding"
-        other: "%{count} holdings"
-      sells_count:
-        one: "%{count} sell"
-        other: "%{count} sells"
-      holdings: Holdings
-      sell_trades: Sell Trades
-      and_more: "+%{count} more"
     google_sheets_instructions:
       title_with_key: "✅ Copy URL for Google Sheets"
       title_no_key: "⚠️ API Key Required"

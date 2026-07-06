@@ -144,6 +144,19 @@ can't do): live balance estimate, "top movers today" carousel, per-security
 intraday price panel. Copilot's paid-checkmark accuracy also depends on
 bill-level matching we approximate with last_occurrence_date.
 
+Redundancy pass (same day, after the new pages landed): dashboard Balance
+Sheet card deleted (sidebar + Accounts page cover it); dashboard Investments
+card compacted to value + total return + top-3 + link; Monthly spending card
+merged into the Spending donut (budget line in its header); Reports dropped
+its Net Worth and Investment Performance sections (print export keeps both;
+Gains by Tax Treatment moved to /investments, calc now lives in
+InvestmentStatement#gains_by_tax_treatment); donut list shows top 5 + "All
+categories" link; Accounts/Categories removed from settings nav. Each page
+now has one job: Dashboard = today, Accounts = connections, Investments =
+portfolio, Categories = spend vs budget, Budgets = allocation editor,
+Reports = history/analysis, Recurring = bills. Budgets↔Categories full merge
+deliberately deferred.
+
 ## Later / opportunistic
 
 - [x] Merge icon nav rail + accounts panel into one sidebar (nav rows with labels,

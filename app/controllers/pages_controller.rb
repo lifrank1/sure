@@ -11,11 +11,9 @@ class PagesController < ApplicationController
     "cashflow_sankey"    => { col_span: "full",   grow: false, min_height: 384, width_toggle: true },
     "outflows_donut"     => { col_span: "single", grow: false, min_height: 0 },
     "transactions_to_review" => { col_span: "single", grow: false, min_height: 0 },
-    "monthly_spending"   => { col_span: "single", grow: false, min_height: 0 },
     "upcoming_recurrings" => { col_span: "single", grow: false, min_height: 0 },
     "investment_summary" => { col_span: "single", grow: false, min_height: 0, width_toggle: true },
-    "net_worth_chart"    => { col_span: "single", grow: true,  min_height: 208, width_toggle: true },
-    "balance_sheet"      => { col_span: "single", grow: false, min_height: 0, width_toggle: true }
+    "net_worth_chart"    => { col_span: "single", grow: true,  min_height: 208, width_toggle: true }
   }.freeze
 
   # Selectable height presets (px) for grow widgets.
@@ -161,15 +159,6 @@ class PagesController < ApplicationController
     def build_dashboard_sections
       all_sections = [
         {
-          key: "monthly_spending",
-          title: "pages.dashboard.monthly_spending.title",
-          partial: "pages/dashboard/monthly_spending",
-          layout: section_layout("monthly_spending"),
-          locals: { monthly_spending: @monthly_spending },
-          visible: @accounts.any?,
-          collapsible: true
-        },
-        {
           key: "upcoming_recurrings",
           title: "pages.dashboard.upcoming_recurrings.title",
           partial: "pages/dashboard/upcoming_recurrings",
@@ -183,7 +172,7 @@ class PagesController < ApplicationController
           title: "pages.dashboard.outflows_donut.title",
           partial: "pages/dashboard/outflows_donut",
           layout: section_layout("outflows_donut"),
-          locals: { outflows_data: @outflows_data, period: @outflows_period },
+          locals: { outflows_data: @outflows_data, period: @outflows_period, monthly_spending: @monthly_spending },
           visible: @accounts.any? && @outflows_data[:categories].present?,
           collapsible: true
         },
@@ -211,15 +200,6 @@ class PagesController < ApplicationController
           partial: "pages/dashboard/net_worth_chart",
           layout: section_layout("net_worth_chart"),
           locals: { balance_sheet: @balance_sheet, period: @net_worth_period },
-          visible: @accounts.any?,
-          collapsible: true
-        },
-        {
-          key: "balance_sheet",
-          title: "pages.dashboard.balance_sheet.title",
-          partial: "pages/dashboard/balance_sheet",
-          layout: section_layout("balance_sheet"),
-          locals: { balance_sheet: @balance_sheet },
           visible: @accounts.any?,
           collapsible: true
         }

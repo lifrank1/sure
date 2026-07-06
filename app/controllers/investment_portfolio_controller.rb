@@ -15,6 +15,7 @@ class InvestmentPortfolioController < ApplicationController
       @period_totals = @investment_statement.totals(period: @period)
       @period_return_trend = @investment_statement.period_return_trend(period: @period)
       @period_flows = InvestmentFlowStatement.new(Current.family, user: Current.user).period_totals(period: @period)
+      @gains_by_tax_treatment = @investment_statement.gains_by_tax_treatment(period: @period)
     end
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("investment_portfolio.title"), nil ] ]

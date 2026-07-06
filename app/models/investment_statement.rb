@@ -243,6 +243,94 @@ class InvestmentStatement
     )
   end
 
+  # Unrealized + realized gains grouped by account tax treatment (taxable,
+  # tax_deferred, tax_exempt, tax_advantaged). Realized gains come from sell
+  # trades within the period. Moved here from ReportsController so the
+  # investments page and the print report share one implementation.
+  def gains_by_tax_treatment(period: Period.current_month)
+    currency = family.currency
+    # Eager-load account and accountable to avoid N+1 when accessing tax_treatment
+    holdings_list = current_holdings
+      .includes(account: :accountable)
+      .to_a
+
+    holdings_by_treatment = holdings_list.group_by { |h| h.account.tax_treatment || :taxable }
+
+    # Sell trades in period with realized gains
+    sell_trades = family.trades
+      .joins(:entry)
+      .where(entries: { date: period.date_range })
+      .where("trades.qty < 0")
+      .includes(:security, entry: { account: :accountable })
+      .to_a
+
+    # Preload holdings for all accounts that have sell trades to avoid N+1 in realized_gain_loss
+    account_ids = sell_trades.map { |t| t.entry.account_id }.uniq
+    holdings_by_account = Holding
+      .where(account_id: account_ids)
+      .where("date <= ?", period.date_range.end)
+      .order(date: :desc)
+      .group_by(&:account_id)
+
+    sell_trades.each do |trade|
+      trade.instance_variable_set(:@preloaded_holdings, holdings_by_account[trade.entry.account_id] || [])
+    end
+
+    trades_by_treatment = sell_trades.group_by { |t| t.entry.account.tax_treatment || :taxable }
+
+    # Unwrap helper: Trend#value / realized_gain_loss#value are Money objects,
+    # and this codebase's Money keeps the source currency through `*` and
+    # through `Money.new(money, _)`. Unwrapping to BigDecimal first keeps sums
+    # and the final Money.new(..., currency) correctly labeled in family currency.
+    to_numeric = ->(value) { value.is_a?(Money) ? value.amount : value }
+
+    # Unrealized gains mark holdings to market, so convert at today's FX.
+    foreign_holding_currencies = holdings_list.map(&:currency).compact.uniq.reject { |c| c == currency }
+    holding_rates = ExchangeRate.rates_for(foreign_holding_currencies, to: currency, date: Date.current)
+    convert_current = ->(amount, from) {
+      numeric = to_numeric.call(amount)
+      from == currency ? numeric : numeric * (holding_rates[from] || 1)
+    }
+
+    # Realized gains are locked at trade time, so convert each at its own
+    # entry-date FX. Mirrors InvestmentStatement::Totals, which also uses
+    # entry-date rates for contributions/withdrawals.
+    foreign_trade_currencies = sell_trades.map(&:currency).compact.uniq.reject { |c| c == currency }
+    rates_by_trade_date = sell_trades.map { |t| t.entry.date }.uniq.each_with_object({}) do |date, memo|
+      memo[date] = ExchangeRate.rates_for(foreign_trade_currencies, to: currency, date: date)
+    end
+    convert_trade = ->(amount, from, date) {
+      numeric = to_numeric.call(amount)
+      from == currency ? numeric : numeric * (rates_by_trade_date.dig(date, from) || 1)
+    }
+
+    %i[taxable tax_deferred tax_exempt tax_advantaged].each_with_object({}) do |treatment, hash|
+      holdings = holdings_by_treatment[treatment] || []
+      trades = trades_by_treatment[treatment] || []
+
+      unrealized = holdings.sum do |h|
+        trend = h.trend
+        trend ? convert_current.call(trend.value, h.currency) : 0
+      end
+
+      realized = trades.sum do |t|
+        gain = t.realized_gain_loss
+        gain ? convert_trade.call(gain.value, t.currency, t.entry.date) : 0
+      end
+
+      # Only include treatment groups that have some activity
+      next if holdings.empty? && trades.empty?
+
+      hash[treatment] = {
+        holdings: holdings,
+        sell_trades: trades,
+        unrealized_gain: Money.new(unrealized, currency),
+        realized_gain: Money.new(realized, currency),
+        total_gain: Money.new(unrealized + realized, currency)
+      }
+    end
+  end
+
   # Day change across portfolio, summed in family currency
   def day_change
     changes = current_holdings.to_a.filter_map do |h|

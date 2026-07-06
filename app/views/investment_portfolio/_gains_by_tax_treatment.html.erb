@@ -1,0 +1,44 @@
+<%# locals: (gains_by_tax_treatment:) %>
+
+<div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3">
+  <div class="flex items-center gap-1.5 text-xs font-medium text-secondary uppercase">
+    <p><%= t("investment_portfolio.gains.title") %></p>
+  </div>
+
+  <div class="flex flex-wrap gap-4">
+    <% gains_by_tax_treatment.each do |treatment, data| %>
+      <div class="bg-container-inset rounded-lg p-4 space-y-3 flex-1 min-w-64">
+        <div class="flex items-center justify-between">
+          <%= render DS::Pill.new(
+            label: t("accounts.tax_treatments.#{treatment}"),
+            tone: tax_treatment_pill_tone(treatment),
+            marker: false,
+            show_dot: false,
+            title: t("accounts.tax_treatment_descriptions.#{treatment}")
+          ) %>
+          <span class="text-sm font-semibold text-primary privacy-sensitive">
+            <%= format_money(data[:total_gain]) %>
+          </span>
+        </div>
+
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-secondary"><%= t("investment_portfolio.gains.unrealized") %></span>
+            <span class="text-primary privacy-sensitive"><%= format_money(data[:unrealized_gain]) %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-secondary"><%= t("investment_portfolio.gains.realized") %></span>
+            <span class="text-primary privacy-sensitive"><%= format_money(data[:realized_gain]) %></span>
+          </div>
+        </div>
+
+        <% if treatment == :taxable && data[:realized_gain].amount > 0 %>
+          <p class="text-xs text-warning flex items-center gap-1">
+            <%= icon("alert-triangle", size: "sm") %>
+            <%= t("investment_portfolio.gains.taxable_realized_note") %>
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

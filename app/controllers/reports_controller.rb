@@ -135,18 +135,17 @@ class ReportsController < ApplicationController
       # Build trend data (last 6 months)
       @trends_data = build_trends_data(income_statement: @income_statement)
 
-      # Net worth metrics
-      @net_worth_metrics = build_net_worth_metrics
-
       # Transactions breakdown
       @transactions = build_transactions_breakdown
 
-      # Investment flows (real external contributions/withdrawals) feed the
-      # Investment Performance cards so they agree with the rest of the page
-      @investment_flows = InvestmentFlowStatement.new(Current.family, user: Current.user).period_totals(period: @period)
-
-      # Investment metrics
-      @investment_metrics = build_investment_metrics
+      # Net worth + investment snapshots only feed the print export now — the
+      # web page dropped those sections (they duplicated the dashboard and
+      # the /investments page)
+      if action_name == "print"
+        @net_worth_metrics = build_net_worth_metrics
+        @investment_flows = InvestmentFlowStatement.new(Current.family, user: Current.user).period_totals(period: @period)
+        @investment_metrics = build_investment_metrics
+      end
 
       # Flags for view rendering
       @has_accounts = accessible_accounts.any?
@@ -174,27 +173,11 @@ class ReportsController < ApplicationController
           collapsible: true
         },
         {
-          key: "net_worth",
-          title: "reports.net_worth.title",
-          partial: "reports/net_worth",
-          locals: { net_worth_metrics: @net_worth_metrics },
-          visible: accessible_accounts.any?,
-          collapsible: true
-        },
-        {
           key: "trends_insights",
           title: "reports.trends.title",
           partial: "reports/trends_insights",
           locals: { trends_data: @trends_data },
           visible: @has_accounts,
-          collapsible: true
-        },
-        {
-          key: "investment_performance",
-          title: "reports.investment_performance.title",
-          partial: "reports/investment_performance",
-          locals: { investment_metrics: @investment_metrics },
-          visible: @investment_metrics[:has_investments],
           collapsible: true
         },
         {
@@ -495,98 +478,8 @@ class ReportsController < ApplicationController
         period_withdrawals: @investment_flows.withdrawals,
         top_holdings: investment_statement.top_holdings(limit: 5),
         accounts: investment_accounts.to_a,
-        gains_by_tax_treatment: build_gains_by_tax_treatment(investment_statement)
+        gains_by_tax_treatment: investment_statement.gains_by_tax_treatment(period: @period)
       }
-    end
-
-    def build_gains_by_tax_treatment(investment_statement)
-      currency = Current.family.currency
-      # Eager-load account and accountable to avoid N+1 when accessing tax_treatment
-      current_holdings = investment_statement.current_holdings
-        .includes(account: :accountable)
-        .to_a
-
-      # Group holdings by tax treatment (from account)
-      holdings_by_treatment = current_holdings.group_by { |h| h.account.tax_treatment || :taxable }
-
-      # Get sell trades in period with realized gains
-      # Eager-load security, account, and accountable to avoid N+1
-      sell_trades = Current.family.trades
-        .joins(:entry)
-        .where(entries: { date: @period.date_range })
-        .where("trades.qty < 0")
-        .includes(:security, entry: { account: :accountable })
-        .to_a
-
-      # Preload holdings for all accounts that have sell trades to avoid N+1 in realized_gain_loss
-      account_ids = sell_trades.map { |t| t.entry.account_id }.uniq
-      holdings_by_account = Holding
-        .where(account_id: account_ids)
-        .where("date <= ?", @period.date_range.end)
-        .order(date: :desc)
-        .group_by(&:account_id)
-
-      # Inject preloaded holdings into trades for realized_gain_loss calculation
-      sell_trades.each do |trade|
-        trade.instance_variable_set(:@preloaded_holdings, holdings_by_account[trade.entry.account_id] || [])
-      end
-
-      trades_by_treatment = sell_trades.group_by { |t| t.entry.account.tax_treatment || :taxable }
-
-      # Unwrap helper: Trend#value / realized_gain_loss#value are Money objects,
-      # and this codebase's Money keeps the source currency through `*` and
-      # through `Money.new(money, _)`. Unwrapping to BigDecimal first keeps sums
-      # and the final Money.new(..., currency) correctly labeled in family currency.
-      to_numeric = ->(value) { value.is_a?(Money) ? value.amount : value }
-
-      # Unrealized gains mark holdings to market, so convert at today's FX.
-      foreign_holding_currencies = current_holdings.map(&:currency).compact.uniq.reject { |c| c == currency }
-      holding_rates = ExchangeRate.rates_for(foreign_holding_currencies, to: currency, date: Date.current)
-      convert_current = ->(amount, from) {
-        numeric = to_numeric.call(amount)
-        from == currency ? numeric : numeric * (holding_rates[from] || 1)
-      }
-
-      # Realized gains are locked at trade time, so convert each at its own
-      # entry-date FX. Mirrors InvestmentStatement::Totals, which also uses
-      # entry-date rates for contributions/withdrawals on this same card.
-      foreign_trade_currencies = sell_trades.map(&:currency).compact.uniq.reject { |c| c == currency }
-      rates_by_trade_date = sell_trades.map { |t| t.entry.date }.uniq.each_with_object({}) do |date, memo|
-        memo[date] = ExchangeRate.rates_for(foreign_trade_currencies, to: currency, date: date)
-      end
-      convert_trade = ->(amount, from, date) {
-        numeric = to_numeric.call(amount)
-        from == currency ? numeric : numeric * (rates_by_trade_date.dig(date, from) || 1)
-      }
-
-      # Build metrics per treatment
-      %i[taxable tax_deferred tax_exempt tax_advantaged].each_with_object({}) do |treatment, hash|
-        holdings = holdings_by_treatment[treatment] || []
-        trades = trades_by_treatment[treatment] || []
-
-        # Sum unrealized gains from holdings (only those with known cost basis)
-        unrealized = holdings.sum do |h|
-          trend = h.trend
-          trend ? convert_current.call(trend.value, h.currency) : 0
-        end
-
-        # Sum realized gains from sell trades
-        realized = trades.sum do |t|
-          gain = t.realized_gain_loss
-          gain ? convert_trade.call(gain.value, t.currency, t.entry.date) : 0
-        end
-
-        # Only include treatment groups that have some activity
-        next if holdings.empty? && trades.empty?
-
-        hash[treatment] = {
-          holdings: holdings,
-          sell_trades: trades,
-          unrealized_gain: Money.new(unrealized, currency),
-          realized_gain: Money.new(realized, currency),
-          total_gain: Money.new(unrealized + realized, currency)
-        }
-      end
     end
 
     def build_net_worth_metrics
