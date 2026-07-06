@@ -273,17 +273,20 @@ class ReportsController < ApplicationController
     end
 
     def build_summary_metrics
-      # Ensure we always have Money objects
       current_income = ensure_money(@current_income_totals.total)
-      current_expenses = ensure_money(@current_expense_totals.total)
-      net_savings = current_income - current_expenses
-
       previous_income = ensure_money(@previous_income_totals.total)
-      previous_expenses = ensure_money(@previous_expense_totals.total)
 
-      # Calculate percentage changes
+      # Spending (consumption) vs invested (moved into brokerages) —
+      # "expenses" headline is spending; invested + total outflows ride along
+      current_split = @income_statement.expense_split(period: @period)
+      previous_split = @income_statement.expense_split(period: @previous_period)
+
+      # Savings = income minus consumption; money you invested still counts
+      # as saved, not spent
+      net_savings = current_income - current_split.spending
+
       income_change = calculate_percentage_change(previous_income, current_income)
-      expense_change = calculate_percentage_change(previous_expenses, current_expenses)
+      expense_change = calculate_percentage_change(previous_split.spending, current_split.spending)
 
       # Get budget performance for current period
       budget_percent = calculate_budget_performance
@@ -291,7 +294,9 @@ class ReportsController < ApplicationController
       {
         current_income: current_income,
         income_change: income_change,
-        current_expenses: current_expenses,
+        current_expenses: current_split.spending,
+        invested: current_split.invested,
+        total_outflows: current_split.total_outflows,
         expense_change: expense_change,
         net_savings: net_savings,
         budget_percent: budget_percent
@@ -336,14 +341,17 @@ class ReportsController < ApplicationController
         period = Period.custom(start_date: month_start, end_date: month_end)
 
         income = income_statement.income_totals(period: period).total
-        expenses = income_statement.expense_totals(period: period).total
+        split = income_statement.expense_split(period: period)
 
         trends << {
           month: month_start.strftime("%b %Y"),
           is_current_month: (month_start.month == Date.current.month && month_start.year == Date.current.year),
           income: income,
-          expenses: expenses,
-          net: income - expenses
+          # :expenses is consumption; invested rides alongside so the table
+          # can show both without the chart double-counting
+          expenses: split.spending.amount,
+          invested: split.invested.amount,
+          net: income - split.spending.amount
         }
 
         current_month = current_month.next_month

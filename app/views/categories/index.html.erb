@@ -34,7 +34,9 @@
       <div class="flex items-center justify-around text-center">
         <div>
           <p class="text-2xl font-medium text-primary privacy-sensitive"><%= format_money(@total_spent) %></p>
-          <p class="text-sm text-secondary"><%= t(".spent_in", month: Date.current.strftime("%B")) %></p>
+          <p class="text-sm text-secondary">
+            <%= t(".spent_in", month: Date.current.strftime("%B")) %><% if @total_invested.amount.positive? %> <span class="text-subdued privacy-sensitive">· <%= t(".plus_invested", invested: format_money(@total_invested)) %></span><% end %>
+          </p>
         </div>
         <% if @total_budget %>
           <div>

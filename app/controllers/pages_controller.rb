@@ -59,15 +59,16 @@ class PagesController < ApplicationController
 
     @outflows_data = build_outflows_donut_data(net_totals)
 
-    # Monthly spending card: current month expenses + budget context
+    # Budget context for the Spending card header. "Spent" is consumption
+    # only (money moved to investments isn't spending) — same split as the
+    # donut beneath it.
     current_month = Period.from_key("current_month")
-    month_expense_totals = income_statement.expense_totals(period: current_month)
     current_budget = Current.family.budgets.find_by(start_date: Date.current.beginning_of_month)
     # A bootstrapped-but-unallocated budget ($0) means "no budget yet" — show
     # the set-a-budget CTA, not "-$X left of $0.00"
     budgeted = current_budget&.allocated_spending
     budgeted = nil unless budgeted&.positive?
-    spent = Money.new(month_expense_totals.total, family_currency)
+    spent = income_statement.expense_split(period: current_month).spending
     @monthly_spending = {
       spent: spent,
       budgeted: budgeted.present? ? Money.new(budgeted, family_currency) : nil,

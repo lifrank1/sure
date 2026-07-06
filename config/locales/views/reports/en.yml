@@ -36,11 +36,12 @@ en:
     invalid_date_range: "End date cannot be before start date. The dates have been swapped."
     summary:
       total_income: Total Income
-      total_expenses: Total Expenses
+      spending: Spending
+      invested_note: "+ %{invested} invested · %{total} total outflows"
       net_savings: Net Savings
       budget_performance: Budget Performance
       vs_previous: vs previous period
-      income_minus_expenses: Income minus expenses
+      income_minus_expenses: Income minus spending — money you invested counts as saved
       of_budget_used: of budget used
       no_budget_data: No budget set for this period
       create_budget: Create a budget →
@@ -63,11 +64,15 @@ en:
       month: Month
       income: Income
       expenses: Expenses
+      spending: Spending
+      invested: Invested
       net: Net
       savings_rate: Savings Rate
       current: current
       avg_monthly_income: Avg. Monthly Income
       avg_monthly_expenses: Avg. Monthly Expenses
+      avg_monthly_spending: Avg. Monthly Spending
+      avg_monthly_invested: Avg. Monthly Invested
       avg_monthly_savings: Avg. Monthly Savings
       no_data: No trend data available
       spending_patterns: Spending Patterns
@@ -117,8 +122,9 @@ en:
         category: Category
         amount: Amount
         type: Type
-        expense: Expenses
+        expense: Outflows
         income: Income
+        spending_split: "(%{spending} spending + %{invested} invested)"
         uncategorized: Uncategorized
         entries:
           one: "%{count} entry"
@@ -154,7 +160,7 @@ en:
       summary:
         title: Summary
         income: Income
-        expenses: Expenses
+        expenses: Spending (excl. investing)
         net_savings: Net Savings
         budget: Budget
         vs_prior: "%{percent}% vs prior"

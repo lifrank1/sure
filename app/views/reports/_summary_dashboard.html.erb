@@ -36,13 +36,13 @@
     </div>
   </div>
 
-  <%# Total Expenses Card %>
+  <%# Spending Card (consumption; invested shown alongside) %>
   <div class="bg-container rounded-xl shadow-border-xs p-6">
     <div class="flex items-start justify-between mb-3">
       <div class="flex items-center gap-2">
         <%= icon("trending-down", class: "w-5 h-5") %>
         <h3 class="text-sm font-medium text-secondary">
-          <%= t("reports.summary.total_expenses") %>
+          <%= t("reports.summary.spending") %>
         </h3>
       </div>
     </div>
@@ -51,6 +51,12 @@
       <p class="text-2xl font-semibold text-primary privacy-sensitive">
         <%= metrics[:current_expenses].format %>
       </p>
+
+      <% if metrics[:invested] && metrics[:invested].amount.positive? %>
+        <p class="text-sm text-subdued privacy-sensitive">
+          <%= t("reports.summary.invested_note", invested: metrics[:invested].format, total: metrics[:total_outflows].format) %>
+        </p>
+      <% end %>
 
       <% if metrics[:expense_change] %>
         <div class="flex items-center gap-1.5 privacy-sensitive">

@@ -1,7 +1,8 @@
 <%# Renders a breakdown table for income or expense groups %>
-<%# Local variables: groups, total, type (:income or :expense), amount_sort_params, current_sort_by, current_sort_direction %>
+<%# Local variables: groups, total, type (:income or :expense), amount_sort_params, current_sort_by, current_sort_direction, subtitle (optional) %>
 
 <%
+  subtitle = nil unless defined?(subtitle)
   color_class = type == :income ? "text-success" : "text-primary"
   icon_name = type == :income ? "trending-up" : "trending-down"
   title_key = type == :income ? "reports.transactions_breakdown.table.income" : "reports.transactions_breakdown.table.expense"
@@ -12,6 +13,9 @@
     <%= icon(icon_name, class: "w-5 h-5") %>
     <span><%= t(title_key) %>:</span>
     <span class="font-medium text-secondary <%= color_class %> privacy-sensitive"> <%= Money.new(total, Current.family.currency).format %></span>
+    <% if subtitle.present? %>
+      <span class="text-sm text-subdued font-normal privacy-sensitive"><%= subtitle %></span>
+    <% end %>
   </div>
 
   <div class="bg-container-inset rounded-xl p-1 overflow-x-auto">

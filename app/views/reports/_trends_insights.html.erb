@@ -14,7 +14,8 @@
               <tr class="uppercase text-xs font-medium text-secondary">
                 <th class="px-4 py-2 text-left font-medium"><%= t("reports.trends.month") %></th>
                 <th class="px-4 py-2 text-right font-medium"><%= t("reports.trends.income") %></th>
-                <th class="px-4 py-2 text-right font-medium"><%= t("reports.trends.expenses") %></th>
+                <th class="px-4 py-2 text-right font-medium"><%= t("reports.trends.spending") %></th>
+                <th class="px-4 py-2 text-right font-medium"><%= t("reports.trends.invested") %></th>
                 <th class="px-4 py-2 text-right font-medium"><%= t("reports.trends.net") %></th>
                 <th class="px-4 py-2 text-right font-medium"><%= t("reports.trends.savings_rate") %></th>
               </tr>
@@ -36,6 +37,9 @@
                   <td class="py-3 px-4 lg:px-6 text-right privacy-sensitive">
                     <%= Money.new(trend[:expenses], Current.family.currency).format %>
                   </td>
+                  <td class="py-3 px-4 lg:px-6 text-right privacy-sensitive text-secondary">
+                    <%= Money.new(trend[:invested] || 0, Current.family.currency).format %>
+                  </td>
                   <td class="py-3 px-4 lg:px-6 text-right privacy-sensitive <%= trend[:net] >= 0 ? "text-success" : "text-destructive" %>">
                     <%= Money.new(trend[:net], Current.family.currency).format %>
                   </td>
@@ -52,9 +56,10 @@
         </div>
 
         <%# Trend Insights %>
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <% avg_income = trends_data.sum { |t| t[:income] } / trends_data.length %>
           <% avg_expenses = trends_data.sum { |t| t[:expenses] } / trends_data.length %>
+          <% avg_invested = trends_data.sum { |t| t[:invested] || 0 } / trends_data.length %>
           <% avg_net = trends_data.sum { |t| t[:net] } / trends_data.length %>
 
           <div class="p-4 bg-surface-inset rounded-lg">
@@ -65,9 +70,16 @@
           </div>
 
           <div class="p-4 bg-surface-inset rounded-lg">
-            <p class="text-sm text-secondary mb-1"><%= t("reports.trends.avg_monthly_expenses") %></p>
+            <p class="text-sm text-secondary mb-1"><%= t("reports.trends.avg_monthly_spending") %></p>
             <p class="text-lg font-semibold text-primary privacy-sensitive">
               <%= Money.new(avg_expenses, Current.family.currency).format %>
+            </p>
+          </div>
+
+          <div class="p-4 bg-surface-inset rounded-lg">
+            <p class="text-sm text-secondary mb-1"><%= t("reports.trends.avg_monthly_invested") %></p>
+            <p class="text-lg font-semibold text-primary privacy-sensitive">
+              <%= Money.new(avg_invested, Current.family.currency).format %>
             </p>
           </div>
 

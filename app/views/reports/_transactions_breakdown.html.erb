@@ -35,9 +35,14 @@
       income_groups = transactions.select { |g| g[:type] == "income" }
       expense_groups = transactions.select { |g| g[:type] == "expense" }
 
-      # Calculate totals
+      # Calculate totals. Expenses split into spending vs invested (money
+      # moved to brokerages) so the header can show both without a reader
+      # mistaking investing for consumption.
       income_total = income_groups.sum { |g| g[:total] }
       expense_total = expense_groups.sum { |g| g[:total] }
+      invested_names = Category.all_investment_contributions_names
+      invested_total = expense_groups.select { |g| invested_names.include?(g[:category_name]) }.sum { |g| g[:total] }
+      spending_total = expense_total - invested_total
 
       # Determine sort direction for Amount column
       current_sort_by = params[:sort_by]
@@ -67,6 +72,7 @@
         <%= render "reports/breakdown_table",
               groups: expense_groups,
               total: expense_total,
+              subtitle: (invested_total.positive? ? t("reports.transactions_breakdown.table.spending_split", spending: Money.new(spending_total, Current.family.currency).format, invested: Money.new(invested_total, Current.family.currency).format) : nil),
               type: :expense,
               amount_sort_params: amount_sort_params,
               current_sort_by: current_sort_by,

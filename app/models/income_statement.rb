@@ -55,6 +55,26 @@ class IncomeStatement
     @income_totals_by_period[key] = build_period_total(classification: "income", period: period)
   end
 
+  # Splits period expenses into consumption ("spending") and money moved
+  # into investments ("invested"), via the Investment Contributions category —
+  # the same split the dashboard donut uses, so no two surfaces disagree.
+  # total_outflows = spending + invested (what expense_totals reports).
+  def expense_split(period: Period.current_month)
+    totals = expense_totals(period: period)
+    invested = totals.category_totals
+      .reject { |ct| ct.category.subcategory? }
+      .select { |ct| ct.category.investment_contributions? }
+      .sum(&:total)
+
+    ExpenseSplit.new(
+      total_outflows: Money.new(totals.total, family.currency),
+      invested: Money.new(invested, family.currency),
+      spending: Money.new(totals.total - invested, family.currency)
+    )
+  end
+
+  ExpenseSplit = Data.define(:total_outflows, :invested, :spending)
+
   def net_category_totals(period: Period.current_month)
     key = period_cache_key(period)
     @net_category_totals_by_period ||= {}

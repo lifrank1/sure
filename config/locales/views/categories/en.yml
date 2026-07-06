@@ -33,6 +33,7 @@ en:
       merge: Merge categories
       new: New category
       spent_in: spent in %{month}
+      plus_invested: "+ %{invested} invested"
       total_budget: total budget
       set_budget: Set a budget →
       category: Category

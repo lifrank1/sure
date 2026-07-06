@@ -13,7 +13,9 @@ class CategoriesController < ApplicationController
     @period = Period.current_month_for(Current.family)
     @income_statement = Current.family.income_statement
     expense_totals = @income_statement.expense_totals(period: @period)
-    @total_spent = Money.new(expense_totals.total, Current.family.currency)
+    split = @income_statement.expense_split(period: @period)
+    @total_spent = split.spending
+    @total_invested = split.invested
     @spent_by_category = expense_totals.category_totals.each_with_object({}) do |ct, memo|
       memo[ct.category.id] = ct.total if ct.category.id.present?
     end
