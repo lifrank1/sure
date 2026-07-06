@@ -1,1 +1,3 @@
-<%= link_to image_tag("logomark.svg", class: "w-auto h-12 mx-auto"), root_path, data: { turbo: false} %>
+<%= link_to root_path, data: { turbo: false }, class: "block w-12 h-12 mx-auto" do %>
+  <%= render "shared/logo_mark", css: "w-12 h-12" %>
+<% end %>

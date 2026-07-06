@@ -30,7 +30,8 @@
         </div>
       </div>
 
-      <% if self_hosted? %>
+      <%# Upstream release/commit links are operator detail, not user-facing %>
+      <% if self_hosted? && Current.user&.super_admin? %>
         <div class="px-4 py-3 border-t border-tertiary">
           <p class="text-sm">
             <span class="font-medium text-primary"><%= t(".version") %>:</span>
@@ -55,7 +56,10 @@
         icon: "settings",
         href: intro_mode ? settings_profile_path : accounts_path(return_to: request.fullpath)
       ) %>
-      <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".changelog"), icon: "box", href: changelog_path) %>
+      <%# Changelog shows the upstream project's release notes — operator-only %>
+      <% if Current.user&.super_admin? %>
+        <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".changelog"), icon: "box", href: changelog_path) %>
+      <% end %>
 
       <%= render DS::MenuItem.new(variant: "link", roving: false, text: t(".contact"), icon: "message-square-more", href: contact_path) %>
 
