@@ -41,6 +41,12 @@
 - [ ] Merge icon nav rail + accounts panel into one sidebar (bigger app-shell refactor)
 - [ ] Account sparklines + "last synced X ago" freshness in sidebar
 - [ ] Categories page unifying budget + category management (Copilot-style)
+- [ ] Service worker registration fails (422 on /service-worker) — breaks PWA
+      install/offline; likely the route needs skip_authentication
+- [ ] Plaid EU shows as an available provider (ENABLED_PROVIDERS=plaid prefix-
+      matches plaid_eu) — noise for a US-only user base
+- [ ] Account balance chart has no loading state (blank box during first
+      hydration on cold cache)
 - [ ] Recurring page opens inside the settings shell (Back/ESC chrome) — give it a standalone layout
 - [ ] Merchant history section in the transaction drawer
 - [ ] Fix AI chat with Gemini (400 on tool-call round-trip; suspect tool_calls
@@ -53,6 +59,9 @@
 - [x] Outflows section compacted (smaller donut, scrolling category list) and
       shows its period inline (answers "is this all time?")
 - [x] Review-card + new-card padding/alignment normalized (px-4 convention)
+- [x] QA sweep 2026-07-05: fixed turbo-frame-timeout race that stamped
+      'Timeout' over healthy sparklines on every account; verified drawer,
+      wizard, budgets, reports, bank-sync, add-account chooser all clean
 
 - [x] Connect-first add-account flow (bank/brokerage/manual)
 - [x] SnapTrade auto-link (no "accounts need setup" step)
