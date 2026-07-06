@@ -9,7 +9,7 @@
 # native volume backups are dashboard-only); sleeping costs ~nothing on
 # usage-based billing. Dumps land on the service's volume at /backups,
 # 14 most recent kept.
-FROM postgres:16
+FROM postgres:18
 
 COPY backup.sh /backup.sh
 RUN chmod +x /backup.sh
