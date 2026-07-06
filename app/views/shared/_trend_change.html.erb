@@ -7,7 +7,7 @@
     <span class="font-mono">
       <%= trend.value.is_a?(Money) ? format_money(trend.value) : trend.value.round(2) %>
     </span>
-    <% unless trend.percent.infinite? %>
+    <% if trend.percent_meaningful? %>
       <span class="font-mono">(<%= icon(trend.icon, size: "sm", color: "current", class: "mb-0.5 inline") %><%= trend.percent_formatted %>)</span>
     <% end %>
     <span class="text-secondary">

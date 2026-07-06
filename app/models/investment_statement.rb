@@ -179,10 +179,17 @@ class InvestmentStatement
             AND a.family_id = :family_id
             AND a.status IN ('draft', 'active')
             AND b.date BETWEEN :start_date AND :end_date
-            AND b.date > (
-              SELECT MIN(b_first.date)
-              FROM balances b_first
-              WHERE b_first.account_id = b.account_id
+            AND EXISTS (
+              -- Only count market flows on days the account already carried a
+              -- meaningful balance the day before (>= 1 unit; sync dust like
+              -- -0.0027 doesn't count). Provider lifecycle noise (first sync,
+              -- holdings dropping to ~$0 and re-materializing) otherwise books
+              -- the account's whole value as a one-day "market gain" — a 401k
+              -- backfill once showed up as a +31% month.
+              SELECT 1 FROM balances b_prev
+              WHERE b_prev.account_id = b.account_id
+                AND b_prev.date = b.date - 1
+                AND ABS(b_prev.balance) >= 1
             )
         SQL
         {

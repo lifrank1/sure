@@ -67,6 +67,16 @@ class Trend
     end
   end
 
+  # Percent change is only worth showing against a meaningfully positive
+  # starting value. A near-zero or negative base (net worth starting at
+  # -$78) explodes into figures like "-221954.1%", which reads as a bug.
+  def percent_meaningful?
+    return false unless percent.finite?
+
+    previous_numeric = previous.is_a?(Money) ? previous.amount : previous
+    previous_numeric.positive? && percent.abs <= 10_000
+  end
+
   def as_json
     {
       value: value,
