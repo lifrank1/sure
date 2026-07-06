@@ -164,6 +164,13 @@ class InvestmentStatement
     account_ids = investment_account_ids
     return nil if account_ids.empty?
 
+    # The EXISTS clause only counts a day's market flows when the account
+    # already carried a meaningful balance (>= 1 unit) the previous day.
+    # Provider lifecycle noise (first sync, holdings dropping to ~$0 dust and
+    # re-materializing) otherwise books the account's whole value as a one-day
+    # "market gain" — a 401k backfill once showed up as a +31% month.
+    # NB: no `--` comments inside the heredoc — .squish would fold the rest
+    # of the query into the comment.
     absolute_return = ActiveRecord::Base.connection.select_value(
       ActiveRecord::Base.sanitize_sql_array([
         <<~SQL.squish,
@@ -180,12 +187,6 @@ class InvestmentStatement
             AND a.status IN ('draft', 'active')
             AND b.date BETWEEN :start_date AND :end_date
             AND EXISTS (
-              -- Only count market flows on days the account already carried a
-              -- meaningful balance the day before (>= 1 unit; sync dust like
-              -- -0.0027 doesn't count). Provider lifecycle noise (first sync,
-              -- holdings dropping to ~$0 and re-materializing) otherwise books
-              -- the account's whole value as a one-day "market gain" — a 401k
-              -- backfill once showed up as a +31% month.
               SELECT 1 FROM balances b_prev
               WHERE b_prev.account_id = b.account_id
                 AND b_prev.date = b.date - 1
