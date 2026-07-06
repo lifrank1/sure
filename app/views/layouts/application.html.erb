@@ -99,11 +99,11 @@ end %>
         </ul>
 
         <% if content_for?(:sidebar) %>
-          <div class="grow overflow-y-auto min-h-0">
+          <div class="grow overflow-y-auto min-h-0 no-scrollbar">
             <%= yield :sidebar %>
           </div>
         <% else %>
-          <div class="grow overflow-y-auto min-h-0">
+          <div class="grow overflow-y-auto min-h-0 no-scrollbar">
             <%= render "accounts/account_sidebar_tabs", family: Current.family, active_tab: @account_group_tab %>
           </div>
 
