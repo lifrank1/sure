@@ -29,7 +29,7 @@ class UI::AccountPage < ApplicationComponent
   end
 
   def title
-    account.name
+    account.display_name
   end
 
   def subtitle

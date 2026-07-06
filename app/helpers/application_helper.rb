@@ -87,6 +87,14 @@ module ApplicationHelper
     item.merge(preview: true)
   end
 
+  # Kill switch for the AI chat entry points (header toggle, right sidebar,
+  # mobile Assistant tab). Set AI_CHAT_UI_ENABLED=false while the chat
+  # backend is broken — a visible button that silently does nothing costs
+  # more trust than a missing one.
+  def ai_chat_ui_enabled?
+    ENV.fetch("AI_CHAT_UI_ENABLED", "true") == "true"
+  end
+
   # Wrapper around I18n.l to support custom date formats
   def format_date(object, format = :default, options = {})
     date = object.to_date

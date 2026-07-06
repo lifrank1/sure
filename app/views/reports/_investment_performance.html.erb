@@ -100,7 +100,9 @@
                       <% end %>
                       <div>
                         <p class="font-medium text-primary"><%= holding.ticker %></p>
-                        <p class="text-xs text-secondary"><%= truncate(holding.name, length: 25) %></p>
+                        <p class="text-xs text-secondary">
+                          <%= truncate(holding.name, length: 25) %><% if holding.accounts_count > 1 %> · <%= t("reports.investment_performance.accounts_count", count: holding.accounts_count) %><% end %>
+                        </p>
                       </div>
                     </div>
                   </td>

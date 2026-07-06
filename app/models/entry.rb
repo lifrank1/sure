@@ -89,6 +89,35 @@ class Entry < ApplicationRecord
     joins(:account).where(accounts: { family_id: family.id })
   end
 
+  # Cleaned-up payee for lists: strips ACH/processor noise ("PPD ID: 91111...",
+  # "WEB ID: 123..."), long reference-number runs, and softens ALL-CAPS bank
+  # shouting. The stored name is untouched — the drawer's Name field and rule
+  # matching still work with the original string.
+  def display_name
+    self.class.clean_display_name(name)
+  end
+
+  def self.clean_display_name(raw)
+    return raw if raw.blank?
+
+    cleaned = raw.dup
+    # Processor suffixes ("... PPD ID: 9111111101", "... WEB ID: 264681992 NNF")
+    cleaned = cleaned.sub(/\s+(PPD|WEB|CCD|ARC|TEL|POP|POS)\s+ID:\s*\S+.*\z/i, "")
+    # Generic "ID: 12345" tails
+    cleaned = cleaned.sub(/\s+ID:\s*\d+\S*\z/i, "")
+    # Standalone reference numbers (6+ digits) — account numbers render as
+    # masks elsewhere, and confirmation codes are noise at list altitude
+    cleaned = cleaned.gsub(/\b\d{6,}\b/, "").squeeze(" ").strip
+    # Trailing separators left behind by the strips
+    cleaned = cleaned.sub(/[-–—:•#]\s*\z/, "").strip
+    # De-shout fully upper-cased names ("VENMO PAYMENT" -> "Venmo Payment")
+    if cleaned.length > 3 && cleaned == cleaned.upcase && cleaned.match?(/[A-Z]/)
+      cleaned = cleaned.split(/\s+/).map { |word| word.length > 2 ? word.capitalize : word }.join(" ")
+    end
+
+    cleaned.presence || raw
+  end
+
   # Uncategorized, non-transfer transaction entries on draft or active accounts.
   # Caller is responsible for scoping to accessible entries before applying this scope.
   scope :uncategorized_transactions, -> {

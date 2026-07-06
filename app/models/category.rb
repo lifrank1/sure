@@ -261,6 +261,13 @@ class Category < ApplicationRecord
     uncategorized? || other_investments?
   end
 
+  # Predicate: is this the "Investment Contributions" category (any locale)?
+  # Money moved into investments is savings, not spending — analytics use this
+  # to keep it out of spending breakdowns while still surfacing it separately.
+  def investment_contributions?
+    self.class.all_investment_contributions_names.include?(name)
+  end
+
   private
     def category_level_limit
       if (subcategory? && parent.subcategory?) || (parent? && subcategory?)

@@ -1,6 +1,6 @@
 <%# locals: (title:, back_path: nil) %>
 
-<%= render DS::Dialog.new do |dialog| %>
+<%= render DS::Dialog.new(return_on_close: root_path) do |dialog| %>
   <div class="flex flex-col relative" data-controller="list-keyboard-navigation">
     <div class="border-b border-tertiary md:border-alpha-black-25 px-4 pb-4 text-primary flex items-center justify-between gap-2">
       <div class="flex items-center gap-2">

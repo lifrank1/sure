@@ -82,19 +82,21 @@ class InvestmentStatement
       .includes(:security, :account)
   end
 
-  # Top holdings by family-currency value
+  # Top holdings by family-currency value, aggregated by security across accounts
   def top_holdings(limit: 5)
-    current_holdings
-      .to_a
-      .sort_by { |h| -convert_to_family_currency(h.amount, h.currency) }
-      .first(limit)
+    allocation.first(limit)
   end
 
-  # Portfolio allocation by security. Weights and amounts are computed in the
-  # family's currency so cross-currency holdings compare correctly.
+  # Portfolio allocation by security, aggregated across accounts (the same
+  # security held in two accounts renders as one position). Weights and amounts
+  # are computed in the family's currency so cross-currency holdings compare
+  # correctly, and weights are relative to total holdings value so they sum
+  # to 100% portfolio-wide rather than per account.
   def allocation
-    converted = current_holdings.to_a.map do |holding|
-      [ holding, convert_to_family_currency(holding.amount, holding.currency) ]
+    grouped = current_holdings.to_a.group_by(&:security_id).values
+
+    converted = grouped.map do |holdings|
+      [ holdings, holdings.sum { |h| convert_to_family_currency(h.amount, h.currency) } ]
     end
 
     total = converted.sum { |_, value| value }
@@ -102,12 +104,13 @@ class InvestmentStatement
 
     converted
       .sort_by { |_, value| -value }
-      .map do |holding, value|
+      .map do |holdings, value|
         HoldingAllocation.new(
-          security: holding.security,
+          security: holdings.first.security,
           amount: Money.new(value, family.currency),
           weight: (value / total * 100).round(2),
-          trend: holding.trend
+          trend: aggregated_holding_trend(holdings),
+          accounts_count: holdings.map(&:account_id).uniq.size
         )
       end
   end
@@ -176,6 +179,11 @@ class InvestmentStatement
             AND a.family_id = :family_id
             AND a.status IN ('draft', 'active')
             AND b.date BETWEEN :start_date AND :end_date
+            AND b.date > (
+              SELECT MIN(b_first.date)
+              FROM balances b_first
+              WHERE b_first.account_id = b.account_id
+            )
         SQL
         {
           currency: currency,
@@ -299,7 +307,36 @@ class InvestmentStatement
       end
     end
 
-    HoldingAllocation = Data.define(:security, :amount, :weight, :trend)
+    HoldingAllocation = Data.define(:security, :amount, :weight, :trend, :accounts_count) do
+      def ticker
+        security.ticker
+      end
+
+      def name
+        security.name || ticker
+      end
+
+      def amount_money
+        amount
+      end
+    end
+
+    # Cost-basis trend for one security summed across the accounts holding it.
+    # Mirrors unrealized_gains_trend: only holdings with a known cost basis
+    # participate; nil when none have one (return genuinely unknown).
+    def aggregated_holding_trend(holdings)
+      with_cost_basis = holdings.select(&:avg_cost)
+      return nil if with_cost_basis.empty?
+
+      current = with_cost_basis.sum { |h| convert_to_family_currency(h.amount, h.currency) }
+      previous = with_cost_basis.sum { |h| convert_to_family_currency(h.qty * h.avg_cost.amount, h.currency) }
+      return nil if previous.zero?
+
+      Trend.new(
+        current: Money.new(current, family.currency),
+        previous: Money.new(previous, family.currency)
+      )
+    end
 
     def investment_account_ids
       @investment_account_ids ||= investment_accounts.pluck(:id)

@@ -3,8 +3,10 @@ import { Controller } from "@hotwired/stimulus";
 // Connects to data-controller="dialog"
 export default class extends Controller {
   static targets = ["leftSidebar", "rightSidebar", "mobileSidebar"];
+  static values = { userId: String };
   static classes = [
     "expandedSidebar",
+    "expandedRightSidebar",
     "collapsedSidebar",
     "expandedTransition",
     "collapsedTransition",
@@ -19,19 +21,21 @@ export default class extends Controller {
   }
 
   toggleLeftSidebar() {
-    const isOpen = this.leftSidebarTarget.classList.contains("w-full");
+    const isOpen = !this.leftSidebarTarget.classList.contains("w-0");
     this.#updateUserPreference("show_sidebar", !isOpen);
     this.#toggleSidebarWidth(this.leftSidebarTarget, isOpen, "left");
   }
 
   toggleRightSidebar() {
-    const isOpen = this.rightSidebarTarget.classList.contains("w-full");
+    const isOpen = !this.rightSidebarTarget.classList.contains("w-0");
     this.#updateUserPreference("show_ai_sidebar", !isOpen);
     this.#toggleSidebarWidth(this.rightSidebarTarget, isOpen, "right");
   }
 
   #toggleSidebarWidth(el, isCurrentlyOpen, side) {
-    const expandedClasses = side === "left" ? [...this.expandedSidebarClasses, "border-r"] : [...this.expandedSidebarClasses, "border-l"];
+    // The right panel needs a fixed expanded width: w-full battles the
+    // flex-grow main column and collapses the panel to a sliver.
+    const expandedClasses = side === "left" ? [...this.expandedSidebarClasses, "border-r"] : [...this.expandedRightSidebarClasses, "border-l"];
     const collapsedClasses = side === "left" ? [...this.collapsedSidebarClasses, "border-r-0"] : [...this.collapsedSidebarClasses, "border-l-0"];
 
     if (isCurrentlyOpen) {

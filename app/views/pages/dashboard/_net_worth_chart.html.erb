@@ -13,6 +13,14 @@
         <p class="text-sm text-secondary"><%= t(".data_not_available") %></p>
       <% end %>
     </div>
+    <div class="shrink-0">
+      <%= render UI::PeriodPicker.new(
+        selected: period,
+        url: root_path,
+        frame: "dashboard_sections",
+        param_name: :net_worth_period
+      ) %>
+    </div>
   </div>
 
   <% if series.any? %>

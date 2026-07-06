@@ -141,11 +141,12 @@ class ReportsController < ApplicationController
       # Transactions breakdown
       @transactions = build_transactions_breakdown
 
+      # Investment flows (real external contributions/withdrawals) feed the
+      # Investment Performance cards so they agree with the rest of the page
+      @investment_flows = InvestmentFlowStatement.new(Current.family, user: Current.user).period_totals(period: @period)
+
       # Investment metrics
       @investment_metrics = build_investment_metrics
-
-      # Investment flows (contributions/withdrawals)
-      @investment_flows = InvestmentFlowStatement.new(Current.family, user: Current.user).period_totals(period: @period)
 
       # Flags for view rendering
       @has_accounts = accessible_accounts.any?
@@ -194,14 +195,6 @@ class ReportsController < ApplicationController
           partial: "reports/investment_performance",
           locals: { investment_metrics: @investment_metrics },
           visible: @investment_metrics[:has_investments],
-          collapsible: true
-        },
-        {
-          key: "investment_flows",
-          title: "reports.investment_flows.title",
-          partial: "reports/investment_flows",
-          locals: { investment_flows: @investment_flows },
-          visible: @investment_metrics[:has_investments] && (@investment_flows.contributions.amount > 0 || @investment_flows.withdrawals.amount > 0),
           collapsible: true
         },
         {
@@ -333,7 +326,9 @@ class ReportsController < ApplicationController
       return nil unless @period_type == :monthly && @start_date.beginning_of_month.to_date == Date.current.beginning_of_month.to_date
 
       budget = Budget.find_or_bootstrap(Current.family, start_date: @start_date.beginning_of_month.to_date, user: Current.user)
-      return 0 if budget.nil? || budget.allocated_spending.zero?
+      # nil (not 0) when nothing is budgeted — "0% of budget used" reads like
+      # a real stat; the view renders its no-budget state for nil
+      return nil if budget.nil? || budget.allocated_spending.zero?
 
       (budget.actual_spending / budget.allocated_spending * 100).round(1)
     rescue StandardError
@@ -374,29 +369,43 @@ class ReportsController < ApplicationController
       trends
     end
 
-    def build_transactions_breakdown
-      # Base query: all transactions in the period
-      # Exclude transfers, one-time, and CC payments (matching income_statement logic)
+    # Mirrors IncomeStatement::Totals scoping so breakdown tables sum to the
+    # Total Income / Total Expenses cards on the same page: spending accounts
+    # only, no trades (portfolio rebalancing, not cashflow), no transfer-ish
+    # investment activity, no tax-advantaged accounts, no pending.
+    def cashflow_breakdown_transactions_scope
       transactions = Transaction
         .joins(:entry)
         .joins(entry: :account)
         .where(accounts: { family_id: Current.family.id, status: [ "draft", "active" ] })
+        .where.not(accounts: { accountable_type: %w[Investment Crypto] })
         .where(entries: { entryable_type: "Transaction", excluded: false, date: @period.date_range })
         .where.not(kind: Transaction::BUDGET_EXCLUDED_KINDS)
+        .where(
+          "transactions.investment_activity_label IS NULL OR " \
+          "transactions.investment_activity_label NOT IN ('Transfer', 'Sweep In', 'Sweep Out', 'Exchange')"
+        )
+        .excluding_pending
+
+      tax_advantaged_ids = Current.family.tax_advantaged_account_ids
+      transactions = transactions.where.not(entries: { account_id: tax_advantaged_ids }) if tax_advantaged_ids.present?
+
+      transactions
+    end
+
+    # IncomeStatement::Totals always classifies these kinds as expenses (the
+    # outflow leg lives in a spending account even when the sign flips).
+    def breakdown_classification(transaction, entry)
+      return "expense" if %w[investment_contribution loan_payment].include?(transaction.kind)
+      entry.amount > 0 ? "expense" : "income"
+    end
+
+    def build_transactions_breakdown
+      transactions = cashflow_breakdown_transactions_scope
         .includes(entry: :account, category: :parent)
 
       # Apply filters (includes finance account scoping)
       transactions = apply_transaction_filters(transactions)
-
-      # Get trades in the period (matching income_statement logic)
-      trades = Trade
-        .joins(:entry)
-        .joins(entry: :account)
-        .where(accounts: { family_id: Current.family.id, status: [ "draft", "active" ] })
-        .where(entries: { entryable_type: "Trade", excluded: false, date: @period.date_range })
-        .includes(entry: :account, category: :parent)
-
-      trades = apply_entry_filters(trades)
 
       # Get sort parameters
       sort_by = %w[amount count].include?(params[:sort_by]) ? params[:sort_by] : "amount"
@@ -421,9 +430,10 @@ class ReportsController < ApplicationController
         { category_id: category.id, category_name: category.name, category_color: category.color, category_icon: category.lucide_icon, total: 0, count: 0 }
       end
 
-      # Helper to process an entry (transaction or trade)
-      process_entry = ->(category, entry, is_trade) do
-        type = entry.amount > 0 ? "expense" : "income"
+      # Helper to process a transaction entry
+      process_entry = ->(transaction, entry) do
+        category = transaction.category
+        type = breakdown_classification(transaction, entry)
         begin
           converted_amount = Money.new(entry.amount.abs, entry.currency).exchange_to(family_currency).amount
         rescue Money::ConversionError
@@ -431,14 +441,8 @@ class ReportsController < ApplicationController
         end
 
         if category.nil?
-          # Uncategorized or Other Investments (for trades)
-          if is_trade
-            parent_key = [ :other_investments, type ]
-            grouped_data[parent_key] ||= init_category_group.call(:other_investments, Category.other_investments.name, Category.other_investments.color, Category.other_investments.lucide_icon, type)
-          else
-            parent_key = [ :uncategorized, type ]
-            grouped_data[parent_key] ||= init_category_group.call(:uncategorized, Category.uncategorized.name, Category.uncategorized.color, Category.uncategorized.lucide_icon, type)
-          end
+          parent_key = [ :uncategorized, type ]
+          grouped_data[parent_key] ||= init_category_group.call(:uncategorized, Category.uncategorized.name, Category.uncategorized.color, Category.uncategorized.lucide_icon, type)
         elsif category.parent_id.present?
           # This is a subcategory - group under parent
           parent = category.parent
@@ -461,12 +465,7 @@ class ReportsController < ApplicationController
 
       # Process transactions
       transactions.each do |transaction|
-        process_entry.call(transaction.category, transaction.entry, false)
-      end
-
-      # Process trades
-      trades.each do |trade|
-        process_entry.call(trade.category, trade.entry, true)
+        process_entry.call(transaction, transaction.entry)
       end
 
       # Convert to array and sort subcategories
@@ -485,14 +484,15 @@ class ReportsController < ApplicationController
 
       return { has_investments: false } unless investment_accounts.any?
 
-      period_totals = investment_statement.totals(period: @period)
+      # Contributions/withdrawals are real external flows (InvestmentFlowStatement),
+      # not buy/sell trade volume — a stock sale is not a "withdrawal".
       {
         has_investments: true,
         portfolio_value: investment_statement.portfolio_value_money,
         unrealized_trend: investment_statement.unrealized_gains_trend,
         period_return_trend: investment_statement.period_return_trend(period: @period),
-        period_contributions: period_totals.contributions,
-        period_withdrawals: period_totals.withdrawals,
+        period_contributions: @investment_flows.contributions,
+        period_withdrawals: @investment_flows.withdrawals,
         top_holdings: investment_statement.top_holdings(limit: 5),
         accounts: investment_accounts.to_a,
         gains_by_tax_treatment: build_gains_by_tax_treatment(investment_statement)
@@ -716,14 +716,8 @@ class ReportsController < ApplicationController
         current_month = current_month.next_month
       end
 
-      # Get all transactions in the period
-      # Exclude transfers, one-time, and CC payments (matching income_statement logic)
-      transactions = Transaction
-        .joins(:entry)
-        .joins(entry: :account)
-        .where(accounts: { family_id: Current.family.id, status: [ "draft", "active" ] })
-        .where(entries: { entryable_type: "Transaction", excluded: false, date: @period.date_range })
-        .where.not(kind: Transaction::BUDGET_EXCLUDED_KINDS)
+      # Same scope as the on-page Activity Breakdown so exports match the report
+      transactions = cashflow_breakdown_transactions_scope
         .includes(entry: :account, category: [])
 
       transactions = apply_transaction_filters(transactions)
@@ -735,8 +729,7 @@ class ReportsController < ApplicationController
       # Process transactions
       transactions.each do |transaction|
         entry = transaction.entry
-        is_expense = entry.amount > 0
-        type = is_expense ? "expense" : "income"
+        type = breakdown_classification(transaction, entry)
         category_name = transaction.category&.name || "Uncategorized"
         month_key = entry.date.beginning_of_month
 

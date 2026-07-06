@@ -1,4 +1,17 @@
-<%# locals: (totals:) %>
+<%# locals: (totals:, search: nil) %>
+<%# Every figure below is scoped to the active search; say so, because an
+    unlabeled all-time income figure reads like a bug to a first-time user. %>
+<%
+  period_label = if search&.start_date.present? && search&.end_date.present?
+    "#{Date.parse(search.start_date).strftime('%b %-d, %Y')} – #{Date.parse(search.end_date).strftime('%b %-d, %Y')}"
+  elsif search&.start_date.present?
+    t("transactions.summary.since_date", date: Date.parse(search.start_date).strftime("%b %-d, %Y"))
+  elsif search&.end_date.present?
+    t("transactions.summary.until_date", date: Date.parse(search.end_date).strftime("%b %-d, %Y"))
+  else
+    t("transactions.summary.all_time")
+  end rescue t("transactions.summary.all_time")
+%>
 <%# Show Inflow/Outflow labels only when the result set contains exclusively transfers
     (income and expense are both $0). For mixed filters (e.g. Expense+Transfer),
     we keep Income/Expenses labels — transfer amounts aren't included in the summary
@@ -7,7 +20,7 @@
    (totals.transfer_inflow_money.amount > 0 || totals.transfer_outflow_money.amount > 0) %>
 <div class="grid grid-cols-1 md:grid-cols-3 bg-container rounded-xl shadow-border-xs md:divide-x divide-y md:divide-y-0 divide-alpha-black-100 theme-dark:divide-alpha-white-200">
   <div class="p-4 space-y-2">
-    <p class="text-sm text-secondary"><%= t("transactions.summary.total_transactions") %></p>
+    <p class="text-sm text-secondary"><%= t("transactions.summary.total_transactions") %> <span class="text-subdued">· <%= period_label %></span></p>
     <p class="text-primary font-medium text-xl privacy-sensitive" id="total-transactions"><%= totals.count.round(0) %></p>
   </div>
   <div class="p-4 space-y-2">

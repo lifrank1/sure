@@ -52,7 +52,9 @@
                     <% end %>
                     <div class="max-w-32">
                       <p class="font-medium truncate"><%= holding.ticker %></p>
-                      <p class="text-xs text-secondary"><%= truncate(holding.name, length: 20) %></p>
+                      <p class="text-xs text-secondary">
+                        <%= truncate(holding.name, length: 20) %><% if holding.accounts_count > 1 %> · <%= t(".accounts_count", count: holding.accounts_count) %><% end %>
+                      </p>
                     </div>
                   </div>
                 </td>

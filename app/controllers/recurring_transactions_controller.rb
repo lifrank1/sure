@@ -5,6 +5,14 @@ class RecurringTransactionsController < ApplicationController
                                     .includes(:merchant)
                                     .order(status: :asc, next_expected_date: :asc)
     @family = Current.family
+
+    # Headline stat: expected monthly outflow across active recurring charges
+    # (expenses only — recurring income/transfers don't belong in "you spend
+    # $X/month on subscriptions")
+    active_charges = @recurring_transactions.select { |rt| rt.active? && !rt.transfer? && rt.amount.positive? }
+    @monthly_recurring_total = Money.new(active_charges.sum(&:amount), Current.family.currency)
+    @monthly_recurring_count = active_charges.size
+
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("recurring_transactions.title"), nil ] ]
   end
 

@@ -40,9 +40,20 @@ class PagesController < ApplicationController
     income_statement = Current.family.income_statement
     income_totals = income_statement.income_totals(period: @period)
     expense_totals = income_statement.expense_totals(period: @period)
-    # Outflows carries its own period selector (defaults to the global one)
+    # Outflows carries its own period selector. It defaults to the current
+    # month (not the global period) so it answers "what am I spending right
+    # now" alongside the Monthly spending card, even when the global period
+    # is all-time.
     @outflows_period = if params[:outflows_period].present? && Period.valid_key?(params[:outflows_period])
       Period.from_key(params[:outflows_period])
+    else
+      Period.current_month_for(Current.family)
+    end
+
+    # Net worth chart carries its own period selector too (defaults to the
+    # global one — long trajectories are a sensible default for net worth)
+    @net_worth_period = if params[:net_worth_period].present? && Period.valid_key?(params[:net_worth_period])
+      Period.from_key(params[:net_worth_period])
     else
       @period
     end
@@ -199,7 +210,7 @@ class PagesController < ApplicationController
           title: "pages.dashboard.net_worth_chart.title",
           partial: "pages/dashboard/net_worth_chart",
           layout: section_layout("net_worth_chart"),
-          locals: { balance_sheet: @balance_sheet, period: @period },
+          locals: { balance_sheet: @balance_sheet, period: @net_worth_period },
           visible: @accounts.any?,
           collapsible: true
         },
@@ -262,10 +273,17 @@ class PagesController < ApplicationController
 
     def build_outflows_donut_data(net_totals)
       currency_symbol = Money::Currency.new(net_totals.currency).symbol
-      total = net_totals.total_net_expense
 
-      categories = net_totals.net_expense_categories
+      # Money moved into investments is savings, not spending — without this
+      # split it dwarfs every real spending category in the donut. It stays
+      # visible as a secondary "moved to investments" line under the list.
+      spending, invested = net_totals.net_expense_categories
         .reject { |ct| ct.total.zero? }
+        .partition { |ct| !ct.category.investment_contributions? }
+
+      total = spending.sum(&:total)
+
+      categories = spending
         .sort_by { |ct| -ct.total }
         .map do |ct|
           {
@@ -273,14 +291,25 @@ class PagesController < ApplicationController
             name: ct.category.name,
             amount: ct.total.to_f.round(2),
             currency: ct.currency,
-            percentage: ct.weight.round(1),
+            percentage: total.zero? ? 0 : (ct.total.to_f / total * 100).round(1),
             color: ct.category.color.presence || Category::UNCATEGORIZED_COLOR,
             icon: ct.category.lucide_icon,
             clickable: !ct.category.other_investments?
           }
         end
 
-      { categories: categories, total: total.to_f.round(2), currency: net_totals.currency, currency_symbol: currency_symbol }
+      invested_total = invested.sum(&:total)
+      invested_data = if invested_total.positive?
+        { amount: invested_total.to_f.round(2), category_name: invested.first.category.name }
+      end
+
+      {
+        categories: categories,
+        total: total.to_f.round(2),
+        invested: invested_data,
+        currency: net_totals.currency,
+        currency_symbol: currency_symbol
+      }
     end
 
     def ensure_intro_guest!

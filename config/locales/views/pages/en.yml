@@ -91,11 +91,12 @@ en:
         description: "Add accounts to display net worth data"
         add_account: "Add account"
       outflows_donut:
-        title: "Outflows"
-        total_outflows: "Total Outflows"
+        title: "Spending"
+        total_outflows: "Total Spending"
         categories: "Categories"
         value: "Value"
         weight: "Weight"
+        moved_to_investments: "Moved to investments"
       investment_summary:
         title: "Investments"
         total_return: "Total Return"
@@ -104,8 +105,11 @@ en:
         value: "Value"
         return: "Return"
         period_activity: "%{period} Activity"
-        contributions: "Contributions"
-        withdrawals: "Withdrawals"
+        contributions: "Securities bought"
+        withdrawals: "Securities sold"
         trades: "Trades"
+        accounts_count:
+          one: "1 account"
+          other: "%{count} accounts"
         no_investments: "No investment accounts"
         add_investment: "Add an investment account to track your portfolio"

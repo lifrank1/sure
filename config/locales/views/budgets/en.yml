@@ -40,6 +40,9 @@ en:
         amount: Amount
         edit: Edit
         title: Categories
+        empty_title: No budget for this month yet
+        empty_description: Set a budget and this list shows how each category is tracking against it.
+        empty_cta: Set up this month's budget
       on_track_categories:
         short_title: On Track
         title: On Track

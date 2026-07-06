@@ -126,6 +126,7 @@
         <p class="text-base text-subdued">
           <%= t("reports.summary.no_budget_data") %>
         </p>
+        <%= link_to t("reports.summary.create_budget"), budgets_path, class: "text-sm text-link hover:underline", data: { turbo_frame: "_top" } %>
       <% end %>
     </div>
   </div>

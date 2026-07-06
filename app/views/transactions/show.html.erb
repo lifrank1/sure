@@ -107,6 +107,17 @@
             <% end %>
           <% end %>
         <% end %>
+
+        <%# Which account this belongs to — at-a-glance, not buried in Details %>
+        <%= link_to account_path(@entry.account),
+            class: "mt-2 flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-container-inset hover:bg-container-inset-hover text-sm",
+            data: { turbo_frame: "_top" } do %>
+          <span class="text-secondary"><%= t(".account_label", default: "Account") %></span>
+          <span class="flex items-center gap-2 text-primary font-medium min-w-0">
+            <%= render "accounts/logo", account: @entry.account, size: "sm" %>
+            <span class="truncate"><%= @entry.account.display_name %></span>
+          </span>
+        <% end %>
       </div>
     <% end %>
     <% dialog.with_section(title: t(".details")) do %>

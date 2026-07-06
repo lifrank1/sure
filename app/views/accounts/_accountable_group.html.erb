@@ -28,12 +28,12 @@
                     "block flex items-center gap-2 px-3 py-2 rounded-lg",
                     page_active?(account_path(account)) ? "bg-container" : "hover:bg-surface-hover"
                   ),
-                  title: account.name do %>
+                  title: account.display_name do %>
           <%= render "accounts/logo", account: account, size: "sm", color: account_group.color %>
 
           <div class="min-w-0 grow">
             <div class="flex items-center gap-2 mb-0.5">
-              <%= tag.p account.name, class: class_names("text-sm text-primary font-medium truncate", "animate-pulse" => account.syncing?) %>
+              <%= tag.p account.display_name, class: class_names("text-sm text-primary font-medium truncate", "animate-pulse" => account.syncing?) %>
               <% if account.shared? %>
                 <%= icon("users", class: "w-3 h-3 text-secondary shrink-0") %>
               <% end %>

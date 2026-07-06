@@ -37,7 +37,7 @@ class DS::Dialog < DesignSystemComponent
     end
   end
 
-  attr_reader :variant, :auto_open, :reload_on_close, :width, :disable_frame, :content_class, :disable_click_outside, :opts, :responsive, :scrollable, :heading_level, :title_id
+  attr_reader :variant, :auto_open, :reload_on_close, :return_on_close, :width, :disable_frame, :content_class, :disable_click_outside, :opts, :responsive, :scrollable, :heading_level, :title_id
 
   VARIANTS = %w[modal drawer].freeze
   WIDTHS = {
@@ -48,7 +48,10 @@ class DS::Dialog < DesignSystemComponent
   }.freeze
   VALID_HEADING_LEVELS = (1..6).freeze
 
-  def initialize(variant: "modal", auto_open: true, reload_on_close: false, width: "md", frame: nil, disable_frame: false, content_class: nil, disable_click_outside: false, responsive: false, scrollable: true, heading_level: 2, **opts)
+  # return_on_close: fallback destination when the dialog is rendered as a
+  # full page (not inside the modal turbo-frame) — closing such a dialog
+  # would otherwise strand the user on an empty page.
+  def initialize(variant: "modal", auto_open: true, reload_on_close: false, return_on_close: nil, width: "md", frame: nil, disable_frame: false, content_class: nil, disable_click_outside: false, responsive: false, scrollable: true, heading_level: 2, **opts)
     unless heading_level.is_a?(Integer) && VALID_HEADING_LEVELS.cover?(heading_level)
       raise ArgumentError, "heading_level must be an Integer between 1 and 6, got: #{heading_level.inspect}"
     end
@@ -56,6 +59,7 @@ class DS::Dialog < DesignSystemComponent
     @variant = variant.to_sym
     @auto_open = auto_open
     @reload_on_close = reload_on_close
+    @return_on_close = return_on_close
     @width = width.to_sym
     @frame = frame
     @disable_frame = disable_frame
@@ -122,6 +126,7 @@ class DS::Dialog < DesignSystemComponent
     data[:controller] = [ "DS--dialog", "hotkey", data[:controller] ].compact.join(" ")
     data[:DS__dialog_auto_open_value] = auto_open
     data[:DS__dialog_reload_on_close_value] = reload_on_close
+    data[:DS__dialog_return_on_close_value] = return_on_close if return_on_close
     data[:DS__dialog_disable_click_outside_value] = disable_click_outside
     data[:action] = [ "click->DS--dialog#clickOutside", data[:action] ].compact.join(" ")
     data[:hotkey] = "esc:DS--dialog#close"

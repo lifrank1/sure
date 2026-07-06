@@ -5,7 +5,7 @@
     <% entry = transaction.entry %>
     <div id="review_row_<%= transaction.id %>" class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-surface-hover">
       <%= link_to transaction_path(transaction), data: { turbo_frame: "drawer" }, class: "min-w-0 grow" do %>
-        <p class="text-sm text-primary truncate"><%= entry.name %></p>
+        <p class="text-sm text-primary truncate"><%= entry.display_name %></p>
         <p class="text-xs text-secondary truncate">
           <%= entry.account.name %> · <%= entry.date.strftime("%b %-d") %>
           <% if transaction.category %>

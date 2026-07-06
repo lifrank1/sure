@@ -16,6 +16,7 @@ export default class extends Controller {
   static values = {
     autoOpen: { type: Boolean, default: false },
     reloadOnClose: { type: Boolean, default: false },
+    returnOnClose: { type: String, default: "" },
     disableClickOutside: { type: Boolean, default: false },
   };
 
@@ -49,11 +50,24 @@ export default class extends Controller {
   }
 
   close() {
+    const inModalFrame = !!this.element.closest('turbo-frame[id="modal"]');
     this.element.close();
     this.#clearParentModalFrame();
 
     if (this.reloadOnCloseValue) {
       Turbo.visit(window.location.href);
+      return;
+    }
+
+    // Full-page dialogs (navigated to directly, not opened inside the modal
+    // turbo-frame) have nothing behind them — closing must take the user
+    // somewhere real instead of stranding them on an empty page.
+    if (!inModalFrame && this.returnOnCloseValue) {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Turbo.visit(this.returnOnCloseValue);
+      }
     }
   }
 

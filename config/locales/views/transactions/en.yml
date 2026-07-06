@@ -166,6 +166,9 @@ en:
       expenses: Expenses
       inflow: Inflow
       outflow: Outflow
+      all_time: All time
+      since_date: Since %{date}
+      until_date: Until %{date}
     header:
       edit_categories: Edit categories
       edit_imports: Edit imports

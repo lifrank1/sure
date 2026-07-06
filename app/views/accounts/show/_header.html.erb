@@ -28,6 +28,13 @@
           <% if subtitle.present? %>
             <p class="text-sm text-secondary"><%= subtitle %></p>
           <% end %>
+          <%# Freshness: users shouldn't have to dig into Settings to learn
+              whether they're looking at today's numbers %>
+          <% if account.syncing? %>
+            <p class="text-sm text-secondary"><%= t(".syncing_now", default: "Syncing…") %></p>
+          <% elsif account.last_synced_at.present? %>
+            <p class="text-sm text-secondary"><%= t(".last_synced", default: "Updated %{time} ago", time: time_ago_in_words(account.last_synced_at)) %></p>
+          <% end %>
         </div>
       </div>
     </div>

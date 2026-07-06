@@ -3,9 +3,14 @@
 <div class="space-y-0.5 px-4">
   <% upcoming_recurrings.each do |recurring| %>
     <% overdue = recurring.next_expected_date < Date.current %>
-    <div class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-surface-hover">
+    <% recurring_label = recurring.name.presence || recurring.merchant&.name || t(".unnamed", default: "Recurring charge") %>
+    <%# Row links to the charge's transaction history — "what is this and
+        what has it cost me" is the natural next question %>
+    <%= link_to transactions_path(q: { search: recurring_label }),
+        class: "flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-surface-hover",
+        data: { turbo_frame: "_top", turbo_prefetch: false } do %>
       <div class="min-w-0 grow">
-        <p class="text-sm text-primary truncate"><%= recurring.name.presence || recurring.merchant&.name || t(".unnamed", default: "Recurring charge") %></p>
+        <p class="text-sm text-primary truncate"><%= recurring_label %></p>
         <p class="text-xs <%= overdue ? "text-red-500" : "text-secondary" %>">
           <%= overdue ? t(".overdue", default: "Overdue") : recurring.next_expected_date.strftime("%b %-d") %>
         </p>
@@ -13,7 +18,7 @@
       <span class="privacy-sensitive text-sm font-medium text-primary shrink-0">
         <%= Money.new(recurring.amount.abs, recurring.currency).format %>
       </span>
-    </div>
+    <% end %>
   <% end %>
 
   <div class="px-2 pt-3 mt-1 border-t border-tertiary">

@@ -90,7 +90,7 @@ class Period
       },
       label_short: "All",
       label: "All Time",
-      comparison_label: "vs. beginning"
+      comparison_label: "all time"
     }
   }
 

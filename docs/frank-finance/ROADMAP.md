@@ -36,6 +36,82 @@
 - [x] **P3.3 Surface Recurrings** in nav (feature exists at /recurring_transactions,
       just not linked).
 
+## UX audit 2026-07-05 (full walkthrough, live app, desktop) — fixes shipped 2026-07-06
+
+Trust-breaking numbers (data correctness IS the UX in a finance app):
+
+- [x] Holdings table: now aggregated by security across accounts with
+      portfolio-wide weights (InvestmentStatement#allocation); merged rows
+      show "· N accounts"; return uses summed cost basis (still "-" when no
+      account has cost basis — honest unknown, e.g. TG3Y)
+- [x] Reports contradictions: Activity Breakdown + CSV export now mirror
+      IncomeStatement::Totals scoping exactly (spending accounts only, no
+      trades, no transfer-ish activity labels, no tax-advantaged, no pending,
+      investment_contribution/loan_payment classify as expense) so tables sum
+      to the cards; Investment Performance contributions/withdrawals now come
+      from InvestmentFlowStatement (real external flows — a stock sale is not
+      a withdrawal); redundant Investment Flows section removed; dashboard
+      "All time activity" relabeled Securities bought/sold; Period Return
+      excludes each account's genesis-day balance row (new-account backfill
+      no longer books opening value as a 31% market gain)
+- [x] Dashboard Outflows: Investment Contributions split out of the donut into
+      a secondary "Moved to investments" line (still linked); card renamed
+      "Spending"; percentages recomputed vs spending total
+
+Time-period consistency:
+
+- [x] Outflows card defaults to current month (own picker still there);
+      Net Worth chart gained its own period picker (defaults to global);
+      transactions summary strip now labeled with its period ("All time" /
+      "Since …"). Global sticky period behavior unchanged.
+
+Interaction / click-depth:
+
+- [x] AI chat UI (header toggle, right panel, mobile Assistant tab) gated
+      behind AI_CHAT_UI_ENABLED env var — set to false in Railway until the
+      Gemini tool-call fix lands. Also fixed for re-enablement: panel opened
+      as a ~60px sliver (w-full vs flex-grow battle → now fixed w-[400px]),
+      and toggle persistence PATCHed /users/undefined (userId Stimulus value
+      was never declared)
+- [x] Transactions default 50/page (accounts feed 25)
+- [x] Duplicate account names: Account#display_name suffixes Plaid mask
+      ("CREDIT CARD ••1234") only when names collide; account filter now
+      filters by account_ids (name-based filtering couldn't distinguish the
+      four cards at all); applied to sidebar, filters, badges, settings rows,
+      account page title, transaction rows
+- [x] "Next two weeks" rows link to that charge's transaction history
+- [x] Recurring page: monthly total headline ("$X/month across N charges"),
+      data first, toggle + detection explainer demoted below, merchant names
+      link to transaction history, "Identify Patterns" → "Scan for recurring
+      charges". Dunkin' double-detection is a pattern-dedup issue — still open
+- [x] Add-account modal: DS::Dialog gained return_on_close — closing a
+      full-page dialog now goes back (or to a fallback path) instead of
+      stranding on a blank page
+- [x] Budget empty states: Reports card shows "No budget set" + create CTA
+      (was "0% of budget used"); Budgets page shows an honest empty card
+      instead of "ON TRACK · 23" with $0.00 rows
+
+Polish:
+
+- [x] Raw bank strings: Entry#display_name strips PPD/WEB/CCD IDs + 6+-digit
+      reference runs and de-shouts ALL CAPS in lists; stored name untouched
+      (drawer Name field + rule matching still see the original)
+- [x] "Updated Xh ago" freshness on the account page header
+- [x] Transaction drawer Overview shows the account (linked, with logo)
+- [x] Version string: already super_admin-gated (audit saw it as the admin)
+- [ ] Categories settings page: flat chip list, no per-category spend/usage to
+      inform pruning (feeds the existing Copilot-style categories-page item)
+- [x] "vs. beginning" → "all time"
+- [ ] Recurring pattern detection can emit near-duplicates (Dunkin' on day 18
+      and day 19) — needs merge/dedup logic or a UI merge affordance
+
+Verified good: review loop end-to-end, Categorize wizard (merchant-grouped,
+rule creation, AI auto-label), add-account chooser, filter panel, transfer
+auto-match confirm, section collapse/reorder, breadcrumbs + keyboard hints.
+NOT verified: mobile layout (browser window wouldn't resize; needs a real
+device/emulator pass — student audience makes this the top follow-up),
+fresh-signup first-run.
+
 ## Later / opportunistic
 
 - [x] Merge icon nav rail + accounts panel into one sidebar (nav rows with labels,
@@ -48,7 +124,7 @@
       matches plaid_eu) — noise for a US-only user base
 - [ ] Account balance chart has no loading state (blank box during first
       hydration on cold cache)
-- [ ] Recurring page opens inside the settings shell (Back/ESC chrome) — give it a standalone layout
+- [x] Recurring page opens inside the settings shell (Back/ESC chrome) — give it a standalone layout
 - [ ] Merchant history section in the transaction drawer
 - [ ] Fix AI chat with Gemini (400 on tool-call round-trip; suspect tool_calls
       message format vs Gemini OpenAI-compat endpoint)

@@ -120,6 +120,18 @@
             <% end %>
           <% end %>
         </div>
+
+        <% if outflows_data[:invested].present? %>
+          <%= link_to transactions_path(q: { categories: [outflows_data[:invested][:category_name]], start_date: period.date_range.first, end_date: period.date_range.last }),
+              class: "flex items-center justify-between px-4 py-2 text-sm text-secondary hover:text-primary transition-colors",
+              data: { turbo_frame: "_top", turbo_prefetch: false } do %>
+            <span class="flex items-center gap-2">
+              <%= icon("trending-up", size: "sm", color: "current") %>
+              <%= t("pages.dashboard.outflows_donut.moved_to_investments") %>
+            </span>
+            <span class="font-medium privacy-sensitive"><%= format_money Money.new(outflows_data[:invested][:amount], outflows_data[:currency]) %></span>
+          <% end %>
+        <% end %>
       </div>
     </div>
   </div>

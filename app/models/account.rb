@@ -366,6 +366,23 @@ class Account < ApplicationRecord
       manual?
   end
 
+  # Distinguishes same-named accounts wherever names render — banks often
+  # import several cards as just "CREDIT CARD", which makes the sidebar and
+  # account filters unusable. Suffixes the provider's mask (last 4) only
+  # when another family account shares the name.
+  def display_name
+    return name unless family.duplicate_account_names.include?(name)
+
+    provider_mask.present? ? "#{name} ••#{provider_mask}" : name
+  end
+
+  # Last-4 style mask from the linked provider account, when the provider
+  # supplies one (Plaid does). Reads from a family-level map so lists of
+  # transactions/accounts don't N+1.
+  def provider_mask
+    family.account_provider_masks[id].presence
+  end
+
   # True when the account has no live sync provider attached. Mirrors the
   # `Account.manual` scope so per-instance checks don't drift from the query.
   def manual?

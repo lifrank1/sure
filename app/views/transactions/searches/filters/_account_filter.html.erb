@@ -10,17 +10,19 @@
         }
       ) %>
   <div class="my-2" id="list" data-list-filter-target="list">
+    <%# Filter by id, not name — several provider accounts can import with the
+        same name ("CREDIT CARD"), and a name filter can't tell them apart %>
     <% Current.user.accessible_accounts.alphabetically.each do |account| %>
-      <div class="filterable-item flex items-center gap-2 p-2" data-filter-name="<%= account.name %>">
-        <%= form.check_box :accounts,
+      <div class="filterable-item flex items-center gap-2 p-2" data-filter-name="<%= account.display_name %>">
+        <%= form.check_box :account_ids,
                            {
                              multiple: true,
-                             checked: @q[:accounts]&.include?(account.name),
+                             checked: @q[:account_ids]&.include?(account.id),
                              class: "checkbox checkbox--light"
                            },
-                           account.name,
+                           account.id,
                            nil %>
-        <%= form.label :accounts, account.name, value: account.name, class: "text-sm text-primary" %>
+        <%= form.label :account_ids, account.display_name, value: account.id, class: "text-sm text-primary" %>
       </div>
     <% end %>
   </div>

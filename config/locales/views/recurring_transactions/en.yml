@@ -10,8 +10,13 @@ en:
       one: "Expected in %{count} day"
       other: "Expected in %{count} days"
     day_of_month: Day %{day} of month
-    identify_patterns: Identify Patterns
+    identify_patterns: Scan for recurring charges
     cleanup_stale: Clean Up Stale
+    monthly_total_label: Recurring charges
+    per_month: month
+    monthly_total_count:
+      one: across 1 active recurring charge
+      other: across %{count} active recurring charges
     settings:
       enable_label: Enable Recurring Transactions
       enable_description: Automatically detect recurring transaction patterns and show upcoming projected transactions.

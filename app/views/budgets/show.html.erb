@@ -47,6 +47,18 @@
     </div>
 
     <%# Bottom Section: Categories full width %>
+    <% if !@budget.initialized? %>
+      <%# No budget yet — "ON TRACK · 23" with $0.00 rows would be nonsense %>
+      <div class="w-full bg-container rounded-xl shadow-border-xs p-8 text-center space-y-2">
+        <p class="text-primary font-medium"><%= t("budgets.show.categories.empty_title") %></p>
+        <p class="text-sm text-secondary"><%= t("budgets.show.categories.empty_description") %></p>
+        <%= render DS::Link.new(
+          text: t("budgets.show.categories.empty_cta"),
+          variant: "primary",
+          href: budget_budget_categories_path(@budget)
+        ) %>
+      </div>
+    <% else %>
     <% has_over_budget = budget_has_over_budget?(@budget) %>
     <%= content_tag :div,
       class: "w-full bg-container rounded-xl shadow-border-xs p-4",
@@ -80,6 +92,7 @@
       <% end %>
 
       <%= render "budgets/budget_categories", budget: @budget %>
+    <% end %>
     <% end %>
   </div>
 </div>

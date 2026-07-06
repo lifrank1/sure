@@ -33,6 +33,10 @@ link. Push to BOTH remotes on every change.
   keyless market data.
 - `REQUIRE_EMAIL_CONFIRMATION=false` — TEMPORARY until Resend domain verified
   (erech.app pending DNS records at Namecheap); SMTP vars already set.
+- `AI_CHAT_UI_ENABLED=false` — hides all AI-chat entry points (header toggle,
+  right panel, mobile Assistant tab) while chat 400s on Gemini tool-calls.
+  Flip to true (or unset) once chat is fixed; panel-width + toggle-persistence
+  bugs were fixed 2026-07-06 so the UI works when re-enabled.
 
 ## Product decisions
 

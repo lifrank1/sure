@@ -330,6 +330,25 @@ class Family < ApplicationRecord
     InvestmentStatement.new(self, user: user)
   end
 
+  # Account names shared by more than one account in this family. Memoized
+  # per request so Account#display_name can decide cheaply whether it needs
+  # a disambiguating mask suffix.
+  def duplicate_account_names
+    @duplicate_account_names ||= accounts.group(:name).having("COUNT(*) > 1").count.keys.to_set
+  end
+
+  # account_id => provider mask ("1234") for provider-linked accounts, one
+  # query per request. Covers both the account_providers link and the legacy
+  # plaid_account_id foreign key.
+  def account_provider_masks
+    @account_provider_masks ||= accounts
+      .joins("LEFT JOIN account_providers ap ON ap.account_id = accounts.id AND ap.provider_type = 'PlaidAccount'")
+      .joins("LEFT JOIN plaid_accounts linked_pa ON linked_pa.id = ap.provider_id")
+      .joins("LEFT JOIN plaid_accounts legacy_pa ON legacy_pa.id = accounts.plaid_account_id")
+      .pluck(:id, Arel.sql("COALESCE(linked_pa.mask, legacy_pa.mask)"))
+      .to_h
+  end
+
   def eu?
     country != "US" && country != "CA"
   end
