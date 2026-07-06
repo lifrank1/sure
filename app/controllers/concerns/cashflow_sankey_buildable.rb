@@ -61,4 +61,34 @@ module CashflowSankeyBuildable
 
       { nodes: nodes, links: links, currency_symbol: Money::Currency.new(currency).symbol }
     end
+
+    def build_net_subcategories(expense_totals, income_totals)
+      expense_subs = expense_totals.category_totals
+        .select { |ct| ct.category.parent_id.present? }
+        .index_by { |ct| ct.category.id }
+
+      income_subs = income_totals.category_totals
+        .select { |ct| ct.category.parent_id.present? }
+        .index_by { |ct| ct.category.id }
+
+      all_sub_ids = (expense_subs.keys + income_subs.keys).uniq
+      result = {}
+
+      all_sub_ids.each do |sub_id|
+        exp_ct = expense_subs[sub_id]
+        inc_ct = income_subs[sub_id]
+        exp_total = exp_ct&.total || 0
+        inc_total = inc_ct&.total || 0
+        net = exp_total - inc_total
+        category = exp_ct&.category || inc_ct&.category
+
+        next if net.zero?
+
+        parent_id = category.parent_id
+        result[parent_id] ||= []
+        result[parent_id] << { category: category, total: net.abs, net_direction: net > 0 ? :expense : :income }
+      end
+
+      result
+    end
 end
