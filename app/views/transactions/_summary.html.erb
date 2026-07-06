@@ -38,7 +38,10 @@
     </div>
   <% else %>
     <%# Stats double as filters: click income/expenses to scope the list %>
-    <%= link_to transactions_path(q: (search&.attributes&.compact_blank || {}).merge("types" => ["income"])),
+    <%# Carry active filters into the type link, minus defaults that would
+        render as stray filter badges %>
+    <% carried_filters = (search&.attributes&.compact_blank || {}).except("active_accounts_only") %>
+    <%= link_to transactions_path(q: carried_filters.merge("types" => ["income"])),
         class: "p-4 space-y-2 block hover:bg-surface-hover transition-colors group",
         data: { turbo_frame: "_top" } do %>
       <p class="text-sm text-secondary group-hover:text-primary"><%= t("transactions.summary.income") %> <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span></p>
@@ -46,7 +49,7 @@
         <%= totals.income_money.format %>
       </p>
     <% end %>
-    <%= link_to transactions_path(q: (search&.attributes&.compact_blank || {}).merge("types" => ["expense"])),
+    <%= link_to transactions_path(q: carried_filters.merge("types" => ["expense"])),
         class: "p-4 space-y-2 block hover:bg-surface-hover transition-colors group",
         data: { turbo_frame: "_top" } do %>
       <p class="text-sm text-secondary group-hover:text-primary"><%= t("transactions.summary.expenses") %> <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span></p>
