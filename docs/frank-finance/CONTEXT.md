@@ -22,9 +22,13 @@ link. Push to BOTH remotes on every change.
 
 - `PLAID_*` — production keys; banks/credit cards. Redirect URI allow-listed:
   https://finance.erech.app/accounts
-- `SNAPTRADE_CLIENT_ID/CONSUMER_KEY` — test tier (5 connections); brokerages incl.
+- `SNAPTRADE_CLIENT_ID/CONSUMER_KEY` — PRODUCTION as of 2026-07-07 (client
+  ERECH-GIENC, ~$1.50/connected user/mo, no connection cap); brokerages incl.
   Fidelity (Plaid can't do Fidelity). Instance-wide creds trigger hosted-mode
   behavior: auto-create item on connect, auto-link discovered accounts.
+  NOTE: Frank's original connections were made on the old test client
+  (ERECH-TEST-TTUUE) and had to be reconnected after the swap — test/prod
+  user pools are separate.
 - `OPENAI_ACCESS_TOKEN/URI_BASE/MODEL` — Gemini via OpenAI-compat endpoint,
   model gemini-3.1-flash-lite, LLM_JSON_MODE=json_object (strict mode fails).
 - `ENABLED_PROVIDERS=plaid` — UI provider whitelist (prefix-matches plaid_us/eu).
