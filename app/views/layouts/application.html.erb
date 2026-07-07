@@ -9,12 +9,16 @@ else
   [
     { name: t(".nav.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
     { name: t(".nav.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
-    { name: t(".nav.accounts"), path: accounts_path, icon: "landmark", icon_custom: false, active: page_active?(accounts_path), desktop_only: true },
+    # Accounts is a core daily surface — keep it on the mobile bottom bar.
+    { name: t(".nav.accounts"), path: accounts_path, icon: "landmark", icon_custom: false, active: page_active?(accounts_path) },
     { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true },
     { name: t(".nav.categories"), path: categories_path, icon: "shapes", icon_custom: false, active: page_active?(categories_path), desktop_only: true },
-    { name: t(".nav.recurrings"), path: recurring_transactions_path, icon: "refresh-cw", icon_custom: false, active: page_active?(recurring_transactions_path) },
+    # Recurrings/Reports move off the crowded mobile bottom bar (still in the
+    # slide-out menu) so it stays a focused 5 items: Home, Transactions,
+    # Accounts, Budgets, Assistant.
+    { name: t(".nav.recurrings"), path: recurring_transactions_path, icon: "refresh-cw", icon_custom: false, active: page_active?(recurring_transactions_path), desktop_only: true },
     { name: t(".nav.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
-    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path) },
+    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path), desktop_only: true },
     preview_gated_nav_item({ name: t(".nav.goals"), path: goals_path, icon: "piggy-bank", icon_custom: false, active: page_active?(goals_path) }),
     (ai_chat_ui_enabled? ? { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true } : nil)
   ].compact
@@ -43,6 +47,18 @@ end %>
         <div class="mb-2">
           <%= icon("x", as_button: true, data: { action: "app-layout#closeMobileSidebar" }) %>
         </div>
+      <% end %>
+
+      <%# Full primary nav in the slide-out, so every destination (including the
+          ones kept off the compact bottom bar) is reachable on mobile. %>
+      <% unless intro_mode %>
+        <nav class="mb-4">
+          <ul class="space-y-1">
+            <% desktop_nav_items.each do |nav_item| %>
+              <li><%= render "layouts/shared/nav_row", **nav_item %></li>
+            <% end %>
+          </ul>
+        </nav>
       <% end %>
 
       <%= render(
@@ -165,6 +181,23 @@ end %>
           </div>
 
           <div class="flex items-center gap-2">
+            <%# Persistent sync status: one place to see whether the numbers are
+                current, reused on every page (visibility of system status). %>
+            <% if Current.family.syncing? %>
+              <span class="hidden sm:inline-flex items-center gap-1.5 h-9 px-2.5 text-xs font-medium text-secondary"
+                    title="<%= t("layouts.application.sync_status.syncing", default: "Syncing your accounts…") %>">
+                <%= icon("refresh-cw", size: "sm", class: "animate-spin") %>
+                <%= t("layouts.application.sync_status.syncing_label", default: "Syncing…") %>
+              </span>
+            <% elsif (synced_at = Current.family.last_synced_at).present? %>
+              <%= link_to accounts_path,
+                    class: "hidden sm:inline-flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-xs font-medium text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors focus-ring",
+                    title: t("layouts.application.sync_status.updated_at", default: "Last updated %{time}", time: synced_at.strftime("%b %-d, %-l:%M %p")) do %>
+                <%= icon("refresh-cw", size: "sm") %>
+                <%= t("layouts.application.sync_status.updated_ago", default: "Updated %{time} ago", time: time_ago_in_words(synced_at)) %>
+              <% end %>
+            <% end %>
+
             <button type="button"
                     class="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors focus-ring"
                     data-action="click->privacy-mode#toggle"

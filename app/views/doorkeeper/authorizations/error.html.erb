@@ -15,7 +15,7 @@
   <div class="text-center">
     <%= render DS::Link.new(
       text: t("doorkeeper.authorizations.error.go_back"),
-      href: "javascript:history.back()",
+      href: main_app.root_path,
       variant: :secondary
     ) %>
   </div>

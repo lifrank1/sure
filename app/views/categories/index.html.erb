@@ -1,6 +1,11 @@
 <div class="space-y-4 pb-6 lg:pb-12 flex flex-col">
   <header class="flex justify-between items-center text-primary font-medium">
-    <h1 class="text-xl"><%= t(".categories") %></h1>
+    <div class="flex items-baseline gap-2">
+      <h1 class="text-xl"><%= t(".categories") %></h1>
+      <%# Make the (fixed) reporting period explicit so users know the spend
+          figures are current-month, not all-time. %>
+      <span class="text-sm font-normal text-secondary"><%= Date.current.strftime("%B %Y") %></span>
+    </div>
     <div class="flex items-center gap-2">
       <%= render DS::Menu.new do |menu| %>
         <% menu.with_item(
