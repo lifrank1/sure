@@ -114,6 +114,48 @@ NOT verified: mobile layout (browser window wouldn't resize; needs a real
 device/emulator pass — student audience makes this the top follow-up),
 fresh-signup first-run.
 
+## Security + UX audit (2026-07-07, 4-agent team: 2 security, 2 UX)
+
+Full report in session history. Nothing catastrophic — no cross-family data
+leak, no SQL injection, no secret exposure, no SSRF; password/session/
+impersonation well-built. All findings below fixed and shipped 2026-07-07:
+
+Security:
+- [x] S1 (High) invitations no longer auto-reassign an existing user's family;
+      both new and existing users accept from their own session; uniform
+      response removes the email-enumeration oracle
+- [x] S2 (High) CSV/formula-injection guard (CsvSafe) on both export paths
+      (reports Google-Sheets export + full data export)
+- [x] S3 (Med) Rack::Attack throttles for POST /sessions and POST /mfa/verify
+- [x] S4 (Med) Content-Security-Policy enabled (was fully disabled): nonce-based
+      script-src (all inline scripts nonced; inline onclick/javascript: handlers
+      replaced with a stop-propagation Stimulus controller), inline styles
+      allowed (width attrs), permissive img for logos
+- [x] S5/S6 (Med/Low) bulk transaction update + mark_reviewed scoped to
+      writable/accessible accounts (per-account sharing can't be bypassed);
+      merchant website_url format validation
+
+UX/a11y:
+- [x] U1 branded 404/500/422 pages (was raw Rails boilerplate)
+- [x] U2 text-subdued darkened to gray-500 in light mode (WCAG 1.4.3, was 2.6:1)
+- [x] U3 getting-started "connect" step only shown to admins (non-admins can't
+      add accounts — was a dead end)
+- [x] U4 mobile bottom bar rebalanced to 5 incl. Accounts; full nav added to
+      mobile slide-out so every destination stays reachable
+- [x] U5 persistent last-synced/syncing indicator in the app header
+- [x] U6 "Clear all filters" action on no-results transactions
+- [x] U8 form a11y: required-field asterisk aria-hidden + sr-only "(required)";
+      password requirements get list semantics + shape (not color-only) state +
+      sr-only met/not-met; getting-started progressbar role; legal copy to i18n
+- [x] U7 (scoped) explicit month-year label on Categories
+
+Deliberately NOT done (conflicts with Frank's explicit earlier choices, noted):
+- Demoting Categories/Recurring out of the sidebar (Frank asked for the
+  Copilot-shaped sidebar with them present) — only fixed the mobile gap
+- Removing the Categories spending overview (Frank requested it) — kept
+- Investments page tabs/section-nav + full period-picker unification —
+  larger redesign, deferred
+
 ## Copilot Money parity pass (2026-07-06, benchmarked in-app side by side)
 
 Shipped:
