@@ -146,7 +146,11 @@ class StyledFormBuilder < ActionView::Helpers::FormBuilder
       if options[:required]
         label_text = @template.safe_join([
           label_text == true ? method.to_s.humanize : label_text,
-          @template.tag.span("*", class: "text-red-500 ml-0.5")
+          # aria-hidden on the glyph (screen readers get "required" from the
+          # visually-hidden text instead of hearing "star"); the word keeps the
+          # cue non-color-dependent (WCAG 1.4.1).
+          @template.tag.span("*", class: "text-red-500 ml-0.5", aria: { hidden: true }),
+          @template.tag.span(I18n.t("shared.required_field", default: "(required)"), class: "sr-only")
         ])
       end
 

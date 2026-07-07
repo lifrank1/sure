@@ -17,7 +17,9 @@
     </div>
   </div>
 
-  <div class="h-1.5 bg-container-inset rounded-full overflow-hidden">
+  <div class="h-1.5 bg-container-inset rounded-full overflow-hidden"
+       role="progressbar" aria-valuenow="<%= pct %>" aria-valuemin="0" aria-valuemax="100"
+       aria-label="<%= t(".progress", pct: pct) %>">
     <div class="h-full bg-success rounded-full transition-all" style="width: <%= pct %>%"></div>
   </div>
 

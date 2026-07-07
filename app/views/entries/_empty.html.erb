@@ -1,4 +1,10 @@
+<% has_active_filters = params[:q].present? %>
 <div class="flex flex-col items-center justify-center py-40">
   <p class="text-secondary mb-2"><%= t(".title") %></p>
-  <p class="text-subdued max-w-xs text-center"><%= t(".description") %></p>
+  <p class="text-subdued max-w-xs text-center mb-4"><%= t(".description") %></p>
+  <% if has_active_filters %>
+    <%= link_to t(".clear_filters", default: "Clear all filters"),
+          transactions_path(clear_filters: true),
+          class: "text-sm font-medium text-primary underline hover:no-underline" %>
+  <% end %>
 </div>

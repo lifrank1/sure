@@ -25,7 +25,12 @@ en:
         then be able to configure additional settings within the app.
       welcome_title: Welcome to %{product_name}!
       password_placeholder: Enter your password
+      legal_agreement_html: By creating an account, you agree to the %{terms} and %{privacy}.
+      terms_of_service: Terms of Service
+      privacy_policy: Privacy Policy
       password_requirements:
+        aria_label: Password requirements
+        not_met: not met
         length: Minimum 8 characters
         case: Upper and lowercase letters
         number: A number (0-9)

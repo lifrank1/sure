@@ -293,7 +293,10 @@
 }
 
 @utility text-subdued {
-  @apply text-gray-400;
+  /* gray-500 meets WCAG 2.1 AA (4.5:1) on the white light-mode surface;
+     gray-400 (2.6:1) failed. Dark mode keeps gray-400, which has ample
+     contrast on the dark surface. */
+  @apply text-gray-500;
 
   @variant theme-dark {
     @apply text-gray-400;

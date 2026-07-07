@@ -71,31 +71,27 @@
       <div class="h-1 bg-surface-inset rounded-full flex-grow" data-password-validator-target="blockLine" data-requirement-type="special"></div>
     </div>
 
-    <div class="space-y-1 my-4">
-      <div class="flex items-center gap-2 text-secondary text-sm" data-password-validator-target="requirementType" data-requirement-type="length">
-        <%= icon("check", size: "sm") %>
-        <span><%= t(".password_requirements.length") %></span>
-      </div>
-      <div class="flex items-center gap-2 text-secondary text-sm" data-password-validator-target="requirementType" data-requirement-type="case">
-        <%= icon("check", size: "sm") %>
-        <span><%= t(".password_requirements.case") %></span>
-      </div>
-      <div class="flex items-center gap-2 text-secondary text-sm" data-password-validator-target="requirementType" data-requirement-type="number">
-        <%= icon("check", size: "sm") %>
-        <span><%= t(".password_requirements.number") %></span>
-      </div>
-      <div class="flex items-center gap-2 text-secondary text-sm" data-password-validator-target="requirementType" data-requirement-type="special">
-        <%= icon("check", size: "sm") %>
-        <span><%= t(".password_requirements.special") %></span>
-      </div>
-    </div>
+    <ul class="space-y-1 my-4" aria-label="<%= t(".password_requirements.aria_label", default: "Password requirements") %>">
+      <% %w[length case number special].each do |req| %>
+        <li class="flex items-center gap-2 text-secondary text-sm" data-password-validator-target="requirementType" data-requirement-type="<%= req %>">
+          <%# Two icons: a hollow circle (not-yet-met) and a check (met). JS
+              toggles which is visible so state is conveyed by shape, not just
+              color (WCAG 1.4.1). %>
+          <span data-requirement-icon="pending" aria-hidden="true"><%= icon("circle", size: "sm") %></span>
+          <span data-requirement-icon="met" class="hidden" aria-hidden="true"><%= icon("check", size: "sm") %></span>
+          <span><%= t(".password_requirements.#{req}") %></span>
+          <%# Visually-hidden state, read by screen readers (WCAG 4.1.2). %>
+          <span class="sr-only" data-requirement-status><%= t(".password_requirements.not_met", default: "not met") %></span>
+        </li>
+      <% end %>
+    </ul>
   </div>
 
   <%= form.submit t(".submit") %>
 
   <p class="text-xs text-secondary text-center mt-3">
-    By creating an account, you agree to the
-    <%= link_to "Terms of Service", terms_path, class: "underline", target: "_blank" %> and
-    <%= link_to "Privacy Policy", privacy_path, class: "underline", target: "_blank" %>.
+    <%= t(".legal_agreement_html",
+          terms: link_to(t(".terms_of_service"), terms_path, class: "underline", target: "_blank"),
+          privacy: link_to(t(".privacy_policy"), privacy_path, class: "underline", target: "_blank")) %>
   </p>
 <% end %>

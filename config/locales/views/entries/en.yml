@@ -8,6 +8,7 @@ en:
     empty:
       description: Try adding an entry, editing filters or refining your search
       title: No entries found
+      clear_filters: Clear all filters
     loading:
       loading: Loading entries...
     update:

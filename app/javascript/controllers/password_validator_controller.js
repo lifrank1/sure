@@ -44,6 +44,18 @@ export default class extends Controller {
           target.classList.remove("text-green-600");
           target.classList.add("text-secondary");
         }
+
+        // Non-color cue: toggle hollow-circle vs check icon (WCAG 1.4.1)
+        const pendingIcon = target.querySelector('[data-requirement-icon="pending"]');
+        const metIcon = target.querySelector('[data-requirement-icon="met"]');
+        if (pendingIcon && metIcon) {
+          pendingIcon.classList.toggle("hidden", isValid);
+          metIcon.classList.toggle("hidden", !isValid);
+        }
+
+        // Screen-reader state (WCAG 4.1.2)
+        const status = target.querySelector("[data-requirement-status]");
+        if (status) status.textContent = isValid ? " met" : " not met";
       }
     });
   }

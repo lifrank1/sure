@@ -186,11 +186,18 @@ class PagesController < ApplicationController
       has_budget = Current.family.budgets.includes(:budget_categories).any?(&:initialized?)
 
       steps = [
-        { key: "signup", done: true, href: nil },
-        { key: "connect", done: has_account, href: new_account_path(step: "method_select") },
-        { key: "review", done: review_clear, href: transactions_path },
-        { key: "budget", done: has_budget, href: budgets_path }
+        { key: "signup", done: true, href: nil }
       ]
+
+      # Only admins can link/add accounts; a non-admin member who followed a
+      # "connect" prompt would hit a method selector with no providers. Show the
+      # step (and count it toward progress) only when the user can complete it.
+      if Current.user.admin?
+        steps << { key: "connect", done: has_account, href: new_account_path(step: "method_select") }
+      end
+
+      steps << { key: "review", done: review_clear, href: transactions_path }
+      steps << { key: "budget", done: has_budget, href: budgets_path }
 
       steps.all? { |s| s[:done] } ? nil : steps
     end
