@@ -29,6 +29,10 @@
   </div>
 <% end %>
 
+<% if @getting_started_steps.present? %>
+  <%= render "pages/dashboard/getting_started", steps: @getting_started_steps %>
+<% end %>
+
 <% if @uncategorized_count.to_i > 0 %>
   <div class="mb-4 px-4 py-3 rounded-xl border border-warning bg-warning/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
     <div class="flex items-center gap-2 grow min-w-0">

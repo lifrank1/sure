@@ -706,6 +706,7 @@ Rails.application.routes.draw do
   get "privacy", to: privacy_url ? redirect(privacy_url) : "pages#privacy"
   get "terms", to: terms_url ? redirect(terms_url) : "pages#terms"
   get "intro", to: "pages#intro"
+  post "dismiss_getting_started", to: "pages#dismiss_getting_started"
 
   # Admin namespace for super admin functionality
   namespace :admin do

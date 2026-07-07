@@ -389,6 +389,10 @@ class User < ApplicationRecord
     preferences&.dig("dashboard_two_column") != false
   end
 
+  def getting_started_dismissed?
+    preferences&.dig("getting_started_dismissed") == true
+  end
+
   def preview_features_enabled?
     preferences&.dig("preview_features_enabled") == true
   end

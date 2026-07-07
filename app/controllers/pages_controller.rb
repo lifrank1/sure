@@ -96,14 +96,28 @@ class PagesController < ApplicationController
     @uncategorized_count = uncategorized.count
     @uncategorized_total = Money.new(uncategorized.sum("ABS(entries.amount)"), family_currency)
 
+    @getting_started_steps = build_getting_started_steps
+
     @dashboard_sections = build_dashboard_sections
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.dashboard"), nil ] ]
   end
 
+  def dismiss_getting_started
+    user = Current.user
+    user.transaction do
+      user.lock!
+      updated_prefs = (user.preferences || {}).deep_dup
+      updated_prefs["getting_started_dismissed"] = true
+      user.update!(preferences: updated_prefs)
+    end
+    redirect_back_or_to root_path
+  end
+
   def intro
     @breadcrumbs = [ [ t("breadcrumbs.home"), chats_path ], [ t("breadcrumbs.intro"), nil ] ]
   end
+
 
   def update_preferences
     if Current.user.update_dashboard_preferences(preferences_params)
@@ -158,6 +172,27 @@ class PagesController < ApplicationController
         permitted["section_order"] = prefs[:section_order] if prefs[:section_order].is_a?(Array)
         permitted["dashboard_section_layout"] = prefs[:dashboard_section_layout].to_unsafe_h if prefs[:dashboard_section_layout].respond_to?(:to_unsafe_h)
       end
+    end
+
+    # Goal-gradient getting-started checklist: pre-stamped (signup counts), so
+    # a fresh account starts at 25% instead of 0. Hides once every step is
+    # complete or the user dismisses it.
+    def build_getting_started_steps
+      return nil if Current.user.getting_started_dismissed?
+
+      has_account = Current.family.accounts.visible.exists?
+      has_transactions = Current.family.transactions.visible.exists?
+      review_clear = has_transactions && Current.family.transactions.to_review.none?
+      has_budget = Current.family.budgets.includes(:budget_categories).any?(&:initialized?)
+
+      steps = [
+        { key: "signup", done: true, href: nil },
+        { key: "connect", done: has_account, href: new_account_path(step: "method_select") },
+        { key: "review", done: review_clear, href: transactions_path },
+        { key: "budget", done: has_budget, href: budgets_path }
+      ]
+
+      steps.all? { |s| s[:done] } ? nil : steps
     end
 
     def build_dashboard_sections
