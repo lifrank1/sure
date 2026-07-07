@@ -123,7 +123,7 @@ class TransactionsController < ApplicationController
 
   # Review queue: one-click confirm for a synced transaction
   def mark_reviewed
-    transaction = Current.family.transactions.find(params[:id])
+    transaction = accessible_transactions.find(params[:id])
     transaction.mark_reviewed!
 
     respond_to do |format|
@@ -138,8 +138,8 @@ class TransactionsController < ApplicationController
   end
 
   def mark_all_reviewed
-    scope = Current.family.transactions.to_review
-    Transaction.where(id: scope.select(:id)).update_all(needs_review: false, updated_at: Time.current)
+    scope = accessible_transactions.merge(Transaction.to_review)
+    Transaction.where(id: scope.select("transactions.id")).update_all(needs_review: false, updated_at: Time.current)
 
     redirect_back_or_to root_path, notice: t(".success", default: "You're all caught up")
   end

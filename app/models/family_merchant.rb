@@ -8,6 +8,11 @@ class FamilyMerchant < Merchant
 
   validates :color, presence: true
   validates :name, uniqueness: { scope: :family }
+  # Only accept parseable http(s) URLs so the derived Brandfetch logo path
+  # can't be built from an unparseable/attacker-shaped string.
+  validates :website_url,
+            format: { with: %r{\Ahttps?://[^\s]+\z}, message: "must be a valid http(s) URL" },
+            allow_blank: true
 
   private
     def set_default_color

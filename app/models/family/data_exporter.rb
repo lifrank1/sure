@@ -64,7 +64,7 @@ class Family::DataExporter
         @family.accounts.includes(:accountable).find_each do |account|
           csv << [
             account.id,
-            account.name,
+            CsvSafe.csv_safe(account.name),
             account.accountable_type,
             account.subtype,
             account.balance.to_s,
@@ -86,12 +86,12 @@ class Family::DataExporter
           .find_each do |transaction|
             csv << [
               transaction.entry.date&.iso8601,
-              transaction.entry.account.name,
+              CsvSafe.csv_safe(transaction.entry.account.name),
               transaction.entry.amount.to_s,
-              transaction.entry.name,
-              transaction.category&.name,
-              transaction.tags.map { |tag| escape_legacy_tag_name(tag.name) }.join(","),
-              transaction.entry.notes,
+              CsvSafe.csv_safe(transaction.entry.name),
+              CsvSafe.csv_safe(transaction.category&.name),
+              CsvSafe.csv_safe(transaction.tags.map { |tag| escape_legacy_tag_name(tag.name) }.join(",")),
+              CsvSafe.csv_safe(transaction.entry.notes),
               transaction.entry.currency
             ]
           end
@@ -130,9 +130,9 @@ class Family::DataExporter
         # Only export categories belonging to this family
         @family.categories.includes(:parent).find_each do |category|
           csv << [
-            category.name,
+            CsvSafe.csv_safe(category.name),
             category.color,
-            category.parent&.name,
+            CsvSafe.csv_safe(category.parent&.name),
             category.lucide_icon
           ]
         end
@@ -146,7 +146,7 @@ class Family::DataExporter
         # Only export rules belonging to this family
         @family.rules.includes(conditions: :sub_conditions, actions: []).find_each do |rule|
           csv << [
-            rule.name,
+            CsvSafe.csv_safe(rule.name),
             rule.resource_type,
             rule.active,
             rule.effective_date&.iso8601,

@@ -15,18 +15,15 @@ class InvitationsController < ApplicationController
     @invitation.inviter = Current.user
 
     if @invitation.save
-      normalized_email = @invitation.email.to_s.strip.downcase
-      existing_user = User.find_by(email: normalized_email)
-      if existing_user && @invitation.would_orphan_owned_accounts?(existing_user)
-        flash[:alert] = t(".existing_user_has_family_data")
-      elsif existing_user && @invitation.accept_for(existing_user)
-        flash[:notice] = t(".existing_user_added")
-      elsif existing_user
-        flash[:alert] = t(".failure")
-      else
-        InvitationMailer.invite_email(@invitation).deliver_later unless self_hosted?
-        flash[:notice] = t(".success")
-      end
+      # Never mutate an existing user's family/role as a side effect of the
+      # inviter's action. Both new and existing users accept the invitation
+      # from their own authenticated session (see accept_pending_invitation_for),
+      # which is where the family/role change is actually applied. Response is
+      # identical whether or not the email matched an existing user, so the
+      # endpoint can't be used to enumerate registered accounts. The copyable
+      # invite link surfaces on the settings page for the admin to share.
+      InvitationMailer.invite_email(@invitation).deliver_later unless self_hosted?
+      flash[:notice] = t(".success")
     else
       flash[:alert] = t(".failure")
     end

@@ -14,12 +14,31 @@ class Rack::Attack
     request.ip if request.post? && request.path == "/register"
   end
 
+  # Throttle password sign-in by IP and by email, to blunt credential-stuffing
+  # and single-account brute force. Login is POST /sessions.
+  throttle("logins/ip", limit: 10, period: 1.minute) do |request|
+    request.ip if request.post? && request.path == "/sessions"
+  end
+
+  throttle("logins/email", limit: 10, period: 1.minute) do |request|
+    if request.post? && request.path == "/sessions"
+      email = request.params.dig("email") || request.params.dig("session", "email")
+      email.to_s.strip.downcase.presence
+    end
+  end
+
   # Throttle unauthenticated WebAuthn MFA ceremonies similarly to sign-in
   # endpoints; registration remains behind normal application authentication.
   throttle("mfa/webauthn", limit: 10, period: 1.minute) do |request|
     if request.post? && request.path.in?(%w[/mfa/webauthn_options /mfa/verify_webauthn])
       request.ip
     end
+  end
+
+  # Throttle raw TOTP code verification (6-digit code = 1M-space brute force).
+  # verify_code is POST /mfa/verify.
+  throttle("mfa/verify_code", limit: 10, period: 1.minute) do |request|
+    request.ip if request.post? && request.path == "/mfa/verify"
   end
 
   # Throttle admin endpoints to prevent brute-force attacks

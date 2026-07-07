@@ -3,9 +3,12 @@ class Transactions::BulkUpdatesController < ApplicationController
   end
 
   def create
-    # Skip split parents from bulk update - update children instead
+    # Skip split parents from bulk update - update children instead.
+    # Restrict to accounts the user can write (owner/full_control), mirroring
+    # BulkDeletionsController so per-account sharing can't be bypassed.
     updated = Current.family
                      .entries
+                     .where(account_id: writable_accounts.select(:id))
                      .excluding_split_parents
                      .where(id: bulk_update_params[:entry_ids])
                      .bulk_update!(bulk_update_params, update_tags: tags_provided?)
@@ -14,6 +17,10 @@ class Transactions::BulkUpdatesController < ApplicationController
   end
 
   private
+    def writable_accounts
+      Current.family.accounts.writable_by(Current.user)
+    end
+
     def bulk_update_params
       params.require(:bulk_update)
             .permit(:date, :notes, :name, :category_id, :merchant_id, entry_ids: [], tag_ids: [])
