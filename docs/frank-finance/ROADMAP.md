@@ -273,6 +273,35 @@ Deferred fast-follows:
 - [ ] Rent card is invisible for national-numbers users with no rent-categorized
       transactions (needs metro OR detected rent) — consider a 30%-guideline
       fallback framing instead of hiding the card
+
+## Financial fitness score + leagues (/compare hero), shipped 2026-07-09
+
+Proprietary 0-1000 composite behind Bronze(0)/Silver(550)/Gold(700)/
+Diamond(850) leagues. Behavior-weighted BY DESIGN — savings rate 25%, cash
+buffer 25%, revolving debt 20%, momentum 20%, habits 10% — so rank is
+movable regardless of wealth (net-worth standing stays the percentile
+card's job). Pillars map raw metrics through anchor curves
+(FinancialHealth::Curve, pure/Rails-free) calibrated to public stats;
+missing data LOCKS a pillar (weight renormalized, never zero) and
+MIN_AVAILABLE_WEIGHT=0.5 stops a rank resting on slivers (habits-only was
+scoring Gold in testing). Provisional badge under 30 days history. Daily
+snapshots (lazy on visit + FinancialHealthSnapshotJob 4:15 UTC cron) power
+the weekly delta chip. Hero is fully rescued — can never 500 /compare.
+Verified on prod 2026-07-09: Frank = Bronze 507, math exact, CTA targets
+weakest pillar, no console errors.
+
+Fast-follows:
+- [ ] Promotion/demotion hysteresis (2 wks above to promote / 3 below to
+      demote) once snapshot history densifies; promotion celebration modal
+- [ ] Dashboard teaser badge (this supersedes the /compare dashboard-teaser
+      fast-follow above)
+- [ ] Save pillar (90-day) vs savings-rate card (30-day) can disagree on the
+      same page (83 vs -100% on launch day) — align windows or label them
+- [ ] Buffer pillar reads near-zero for Frank (~$60k/mo implied 90-day spend
+      vs $9.6k liquid) — sanity-check expense_split window for one-off
+      lumps (tuition/rent?) before tuning anchors
+- [ ] Anchor tuning pass after a few weeks of snapshots
+- [ ] "Wrapped"-style share card on promotion ("I hit Gold")
 - [ ] Add payroll-401k contributions to savings rate (currently take-home only)
 - [ ] Dashboard teaser card (hero metric + "See all 5 →")
 - [ ] Polished DS::Dialog onboarding modal (v1 uses an inline form)

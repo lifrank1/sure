@@ -74,6 +74,12 @@ a11y, slimmer nav, header sync status. SnapTrade is PRODUCTION (client
 ERECH-GIENC) as of 2026-07-07 — no connection cap; Frank must reconnect his
 own Fidelity/Robinhood (test/prod user pools are separate).
 
+Financial fitness score + leagues shipped 2026-07-09 as the /compare hero:
+0-1000 behavior-weighted composite (FinancialHealth::Score/Rank/Snapshot),
+Bronze/Silver/Gold/Diamond bands, daily snapshots (lazy + 4:15 UTC cron),
+locked pillars for missing data, provisional <30d. Verified on prod
+(Frank = Bronze 507). See ROADMAP for pillar weights and fast-follows.
+
 Cohort benchmarking ("How you compare", /compare) shipped 2026-07-08 as a v1
 vertical slice — see ROADMAP for the ledger and the deferred fast-follows.
 Browser-verified 2026-07-09 on prod: cards, age form, disclosures, no
