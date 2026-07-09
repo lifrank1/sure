@@ -76,8 +76,12 @@ own Fidelity/Robinhood (test/prod user pools are separate).
 
 Cohort benchmarking ("How you compare", /compare) shipped 2026-07-08 as a v1
 vertical slice — see ROADMAP for the ledger and the deferred fast-follows.
-NOT yet browser-verified (a boot-breaking syntax error took the whole site
-down mid-deploy; fixed forward — VERIFY /compare renders next session).
+Browser-verified 2026-07-09 on prod: cards, age form, disclosures, no
+console/CSP errors. Three bugs found in verification fixed forward
+(9ae5d523), incl. a 500 that fired only after an age band was saved
+(net_worth is BigDecimal, not Money — don't call .amount on it). Frank's
+cohort is set to under-25 + national numbers. Rent card stays hidden until
+a metro is chosen or rent-categorized transactions exist.
 
 Waiting on Frank (only he can do these):
 1. Rotate CENSUS_API_KEY + FRED_API_KEY (passed through chat; both free to

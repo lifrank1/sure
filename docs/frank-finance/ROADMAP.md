@@ -263,10 +263,22 @@ Shipped (v1 vertical slice):
 - [x] Desktop nav row "Compare"; inline age/metro capture form; privacy alert
 
 Deferred fast-follows:
-- [ ] BROWSER-VERIFY /compare renders (blocked by the 2026-07-08 outage; do first)
+- [x] BROWSER-VERIFY /compare (2026-07-09): renders clean, age form round-trips,
+      cards + disclosures + sources OK, no console/CSP errors. Found and fixed
+      forward 3 bugs (9ae5d523): net-worth card 500 (`.amount` on BigDecimal —
+      only fired once an age band was saved, so it hid until form use),
+      inverted percentile label ("Top 70%" at the 70th percentile → now
+      "Nth percentile"), and subscriptions CTA said "Set a dining budget"
+      (shared cta.set_budget key → per-card cards.<key>.cta)
+- [ ] Rent card is invisible for national-numbers users with no rent-categorized
+      transactions (needs metro OR detected rent) — consider a 30%-guideline
+      fallback framing instead of hiding the card
 - [ ] Add payroll-401k contributions to savings rate (currently take-home only)
 - [ ] Dashboard teaser card (hero metric + "See all 5 →")
 - [ ] Polished DS::Dialog onboarding modal (v1 uses an inline form)
-- [ ] Settings "About you" section for age/metro
+- [ ] Settings "About you" section for age/metro (note: "Use national numbers"
+      stores metro as nil, indistinguishable from unanswered, so the inline
+      onboarding form re-shows forever — it's also currently the only edit
+      affordance, so fix both together)
 - [ ] "Wrapped"-style shareable card (agent recommended deferring)
 - [ ] Expand metro list beyond 20; city typeahead → CBSA resolution
