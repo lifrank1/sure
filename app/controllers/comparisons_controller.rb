@@ -172,13 +172,15 @@ class ComparisonsController < ApplicationController
 
     # Best-effort monthly rent from recurring housing transactions.
     def detected_rent_monthly
-      @detected_rent_monthly ||= begin
+      return @detected_rent_monthly if defined?(@detected_rent_monthly)
+      @detected_rent_monthly = begin
         cat = Current.family.categories.find_by("LOWER(name) IN (?)", [ "rent", "mortgage / rent", "housing" ])
-        next nil unless cat
-        Current.family.transactions.visible
-          .joins(:entry).where(category_id: cat.id)
-          .where(entries: { date: Period.last_30_days.date_range })
-          .sum("ABS(entries.amount)").to_f.then { |v| v.positive? ? v : nil }
+        if cat
+          Current.family.transactions.visible
+            .joins(:entry).where(category_id: cat.id)
+            .where(entries: { date: Period.last_30_days.date_range })
+            .sum("ABS(entries.amount)").to_f.then { |v| v.positive? ? v : nil }
+        end
       end
     rescue
       nil
