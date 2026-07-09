@@ -242,3 +242,31 @@ deliberately deferred.
 - [x] Data-provider warning gated to super_admin; Yahoo Finance keyless providers
 - [x] Provider whitelist (ENABLED_PROVIDERS); default auto-categorize rule at signup
 - [x] Skip onboarding flow at signup; rebrand; legal pages; /contact page
+
+## Cohort benchmarking — "How you compare" (/compare), shipped 2026-07-08
+
+Benchmarks a user against PUBLIC-DATA cohorts (age band × metro × income),
+never other users. Private-by-construction; works from first session.
+Design spec by a UX/PM subagent; grounded in existing DS::/UI:: components.
+
+Shipped (v1 vertical slice):
+- [x] PublicBenchmark: cached fetchers — BLS CEX (keyless), Zillow (keyless),
+      Census (CENSUS_API_KEY), FRED (FRED_API_KEY), Fed SCF (static table)
+- [x] Cohort: age-band × metro resolver (20 metros curated → national fallback),
+      detected income; age_band+metro stored in user.preferences["compare"]
+- [x] SavingsRate: take-home rate (income − spending) from linked accounts
+- [x] /compare page: 5 cards (savings, food, subscriptions, rent-to-income,
+      net-worth percentile), reusable _card partial
+- [x] Psychology per spec: amber-not-red for "worse", savings-led / net-worth
+      last, "Typical for people like you" language, per-card source disclosure,
+      national fallback so nothing is ever blank
+- [x] Desktop nav row "Compare"; inline age/metro capture form; privacy alert
+
+Deferred fast-follows:
+- [ ] BROWSER-VERIFY /compare renders (blocked by the 2026-07-08 outage; do first)
+- [ ] Add payroll-401k contributions to savings rate (currently take-home only)
+- [ ] Dashboard teaser card (hero metric + "See all 5 →")
+- [ ] Polished DS::Dialog onboarding modal (v1 uses an inline form)
+- [ ] Settings "About you" section for age/metro
+- [ ] "Wrapped"-style shareable card (agent recommended deferring)
+- [ ] Expand metro list beyond 20; city typeahead → CBSA resolution

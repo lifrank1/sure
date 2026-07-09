@@ -53,6 +53,9 @@ link. Push to BOTH remotes on every change.
   toggle, right panel, mobile Assistant tab); set false to hide them. Chat's
   Gemini tool-call 400 (history replay sent jsonb Hash arguments; Gemini
   requires JSON strings) fixed 2026-07-06.
+- `CENSUS_API_KEY` / `FRED_API_KEY` — free public-data keys for the cohort
+  benchmarking feature (see below). Read-only; both should be rotated (they
+  passed through a chat transcript). BLS CEX + Zillow need no key.
 
 ## Product decisions
 
@@ -62,32 +65,45 @@ link. Push to BOTH remotes on every change.
 - Every new family gets an active auto-categorize rule (runs on sync).
 - Onboarding flow skipped at signup (defaults: USD/en).
 
-## Current status (updated 2026-07-05, post UX-overhaul)
+## Current status (updated 2026-07-08)
 
-All three UX phases from the Copilot-benchmark audit are shipped and verified
-live: space reclamation, review loop (needs_review + dashboard card + drawer
-confirm), actionable dashboard cards (monthly spending, next-two-weeks
-recurrings), sankey relocated to Reports, Recurring in nav, header labels.
-See ROADMAP.md checkboxes for the full ledger.
+Security + UX audit (2026-07-07) shipped: all findings fixed and deployed —
+invite-consent, CSV-injection guard, login/MFA rate limits, sharing scopes,
+CSP (browser-verified), branded error pages, contrast, clear-filters, form
+a11y, slimmer nav, header sync status. SnapTrade is PRODUCTION (client
+ERECH-GIENC) as of 2026-07-07 — no connection cap; Frank must reconnect his
+own Fidelity/Robinhood (test/prod user pools are separate).
+
+Cohort benchmarking ("How you compare", /compare) shipped 2026-07-08 as a v1
+vertical slice — see ROADMAP for the ledger and the deferred fast-follows.
+NOT yet browser-verified (a boot-breaking syntax error took the whole site
+down mid-deploy; fixed forward — VERIFY /compare renders next session).
 
 Waiting on Frank (only he can do these):
-1. (optional) Resend: verify root erech.app for a prettier sender — email
-   already WORKS via in.erech.app as of 2026-07-07 (test send delivered,
-   REQUIRE_EMAIL_CONFIRMATION=true)
-2. Railway dashboard: usage alerts only ($8 soft; hard limit STOPS services —
-   use $25-30 or skip). Postgres backups are DONE (2026-07-07): nightly
-   pg_dump via the db-backup service (infra/db-backup, postgres:18, own
-   volume at /backups, 14 kept) — verified first dump 1.4MB. Native Railway
-   backups/limits API is dashboard-session-only.
-3. Create a July budget (upgrades the Spending card to "$X left")
-4. SnapTrade is on TEST tier (5 connections) — apply for production before
-   sharing publicly (~$1.50/user/mo, ask for Fidelity enablement)
-5. Approve deleting the 2 unused categories (Mortgage / Rent, Sports &
-   Fitness) — 20 of 22 have transactions and stay
+1. Rotate CENSUS_API_KEY + FRED_API_KEY (passed through chat; both free to
+   reissue at api.census.gov/data/key_signup.html and fredaccount.stlouisfed.org)
+2. Railway dashboard: usage alerts ($8 soft; hard limit STOPS services — use
+   $25-30 or skip). Backups already DONE (db-backup service, nightly pg_dump).
+3. Reconnect Fidelity/Robinhood via SnapTrade (prod swap dropped test links)
+4. Create a July budget (upgrades the Spending card to "$X left")
+5. (optional) Resend: verify root erech.app for a prettier sender — email
+   already WORKS via in.erech.app
+6. Approve deleting the 2 unused categories (Mortgage / Rent, Sports & Fitness)
 
 Second user f.li.865985@gmail.com is Frank's own test account (safe to delete).
 
 ## Known issues / gotchas
+- DEPLOY GOTCHA (learned the hard way 2026-07-08): main auto-deploys to
+  PROD and boot-time errors 502 the ENTIRE site, not just the new page.
+  `ruby -c` on the host (Ruby 3.4.2) is NOT a sufficient gate — it passed a
+  `next`-in-begin/end that the server's Ruby 3.4.0 rejected as a SyntaxError,
+  taking the site down. For risky/new code, deploy a feature branch to a
+  Railway PREVIEW environment first rather than merging straight to main.
+- Cohort benchmarking internals: PublicBenchmark (cached public-data fetchers),
+  Cohort (age-band × metro resolver; 20 metros curated, else national),
+  SavingsRate (take-home rate = income − spending; does NOT yet add payroll
+  401k contributions — that's the deferred enhancement). age_band + metro live
+  in user.preferences["compare"]. /compare nav row is desktop_only.
 - SnapTrade balance rule: prefer API total unless it's below holdings value
   (Fidelity sweeps cash into SPAXX → double-count guard in
   SnaptradeAccount::Processor#calculate_total_balance).
