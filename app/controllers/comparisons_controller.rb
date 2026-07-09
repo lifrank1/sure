@@ -108,7 +108,7 @@ class ComparisonsController < ApplicationController
         ring_percent: nil, framing: framing, source: t("comparisons.sources.cex"),
         method_note: t("comparisons.cards.#{key}.method", cohort: @cohort.age_label || "under-25"),
         cta_path: (direction == :worse ? budgets_path : nil),
-        cta_label: (direction == :worse ? t("comparisons.cta.set_budget") : nil)
+        cta_label: (direction == :worse ? t("comparisons.cards.#{key}.cta") : nil)
       )
     end
 
@@ -152,7 +152,7 @@ class ComparisonsController < ApplicationController
     # ---- Net worth percentile (softest framing; last) ----
     def net_worth_card
       return nil unless @cohort.age_band?
-      nw = Current.family.balance_sheet.net_worth.amount.to_f
+      nw = Current.family.balance_sheet.net_worth.to_f
       pct = PublicBenchmark.net_worth_percentile(age_band: @cohort.scf_age_band, net_worth: nw)
       return nil unless pct
 
@@ -162,7 +162,7 @@ class ComparisonsController < ApplicationController
 
       Card.new(
         key: :net_worth, icon: "trending-up", title: t("comparisons.cards.net_worth.title"),
-        your_label: t("comparisons.percentile", n: pct), cohort_label: nil,
+        your_label: t("comparisons.percentile", n: [ pct, 1 ].max.ordinalize), cohort_label: nil,
         direction: direction, viz: :ring, your_frac: nil, cohort_frac: nil, ring_percent: pct,
         framing: t("comparisons.cards.net_worth.#{direction}", age: @cohort.age_label || ""),
         source: t("comparisons.sources.scf"), method_note: t("comparisons.cards.net_worth.method"),

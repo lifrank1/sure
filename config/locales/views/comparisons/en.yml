@@ -8,7 +8,7 @@ en:
     typical: Typical
     for_your_age: for your age
     per_mo: /mo
-    percentile: "Top %{n}%"
+    percentile: "%{n} percentile"
     thirty_pct_rule: "30% guideline"
     your_area: your area
     how_we_work_this_out: How we work this out
@@ -29,7 +29,6 @@ en:
     cta:
       link_account: Link an account
       link_retirement: Link a 401(k) for your full rate
-      set_budget: Set a dining budget
     empty:
       title: See how you compare
       description: Link an account and we'll show how your spending, saving, and net worth stack up against people like you — using public data, privately.
@@ -60,6 +59,7 @@ en:
         better: "You spend less on food than typical for your age — nicely done."
         on_par: "Your food spending is right around typical for people your age."
         worse: "You're spending a bit more on food than typical for your age. If that feels high, a soft dining budget helps."
+        cta: Set a dining budget
         method: "Compared to average food spending for %{cohort} in the BLS Consumer Expenditure Survey. Estimate, not an exact average."
       subscriptions:
         title: Subscriptions & fun
@@ -67,6 +67,7 @@ en:
         better: "You spend less on entertainment than typical for your age."
         on_par: "Your entertainment spending is right around typical."
         worse: "You're spending a bit more on entertainment than typical. Worth a look at your subscriptions."
+        cta: Set an entertainment budget
         method: "Compared to average entertainment spending for %{cohort} in the BLS Consumer Expenditure Survey. Estimate, not exact."
       rent:
         title: Rent vs. income
