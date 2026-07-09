@@ -9,12 +9,16 @@ class ComparisonsController < ApplicationController
     :framing, :source, :method_note, :cta_path, :cta_label
   )
 
+  # Financial fitness hero view model (league rank + pillars).
+  Fitness = Data.define(:result, :delta, :cta_label, :cta_path)
+
   def show
     @cohort = Cohort.for(Current.user)
     @has_accounts = Current.family.accounts.visible.any?
     @needs_age = !@cohort.age_band?
     @needs_metro = !@cohort.metro?
 
+    @fitness = @has_accounts ? build_fitness : nil
     @cards = @has_accounts ? build_cards : []
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("comparisons.title"), nil ] ]
@@ -35,6 +39,51 @@ class ComparisonsController < ApplicationController
   private
     def build_cards
       [ savings_card, food_card, subscriptions_card, rent_card, net_worth_card ].compact
+    end
+
+    # The fitness hero must never take the page down — on any error it
+    # degrades to hidden and the benchmark cards still render.
+    def build_fitness
+      result = FinancialHealth::Score.new(Current.family, user: Current.user).call
+      return nil unless result.computable?
+
+      FinancialHealth::Snapshot.record!(user: Current.user, result: result)
+      delta = FinancialHealth::Snapshot.weekly_delta(Current.user)
+      cta_label, cta_path = fitness_cta(result)
+
+      Fitness.new(result: result, delta: delta, cta_label: cta_label, cta_path: cta_path)
+    rescue => e
+      Rails.logger.warn("Financial fitness hero failed for user #{Current.user&.id}: #{e.message}")
+      nil
+    end
+
+    # One next-best action, keyed off the weakest available pillar.
+    def fitness_cta(result)
+      weakest = result.weakest_pillar
+      return [ nil, nil ] if weakest.nil? || weakest.score.to_f >= 70
+
+      case weakest.key
+      when :save, :debt
+        [ t("comparisons.fitness.win.#{weakest.key}"), budgets_path ]
+      when :buffer
+        [ t("comparisons.fitness.win.buffer"), new_account_path(step: "method_select") ]
+      when :momentum
+        [ t("comparisons.fitness.win.momentum"), reports_path ]
+      when :habits
+        habits_cta
+      else
+        [ nil, nil ]
+      end
+    end
+
+    def habits_cta
+      budget = @family_budget_checked ||= Current.family.budgets
+        .where("start_date <= :today AND end_date >= :today", today: Date.current).first
+      if budget.nil?
+        [ t("comparisons.fitness.win.habits_budget"), budgets_path ]
+      else
+        [ t("comparisons.fitness.win.habits_review"), transactions_path ]
+      end
     end
 
     def money(amount) = Money.new(amount, Current.family.currency)

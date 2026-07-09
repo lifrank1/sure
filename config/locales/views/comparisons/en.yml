@@ -35,6 +35,40 @@ en:
     computing:
       title: Getting your comparisons ready
       description: We need a bit more account history to compare you fairly. Check back after your next sync.
+    fitness:
+      title: Financial fitness
+      delta: "%{delta} this week"
+      to_next: "%{points} pts to %{rank}"
+      top_tier: Top tier — keep it rolling
+      you: you
+      provisional: Provisional
+      provisional_hint: About a month of account history places you in a league.
+      ranks:
+        bronze: Bronze
+        silver: Silver
+        gold: Gold
+        diamond: Diamond
+      pillars:
+        save: Save
+        buffer: Buffer
+        debt: Debt
+        momentum: Momentum
+        habits: Habits
+      locked:
+        save: needs income history
+        buffer: link a checking account
+        debt: link a card or loan
+        momentum: needs income history
+        habits: link an account
+      win:
+        save: Set a soft budget to lift your savings rate
+        buffer: Start a savings stash
+        debt: Set a paydown budget
+        momentum: See where this month went
+        habits_budget: Set this month's budget
+        habits_review: Clear your review queue
+      method: Your score blends five things you control — savings rate, cash buffer, debt load, month-over-month momentum, and money habits — each graded against public reference stats, then weighted into a 0–1,000 total. Leagues are Bronze to Diamond; missing data locks a pillar instead of counting against you. Scores update daily and are estimates, not judgments.
+      not_credit: This is not a credit score and has no effect outside this app.
     onboard:
       title: Make this about you
       body: Add your age and city and we'll compare you to people in a similar situation — never to other users.

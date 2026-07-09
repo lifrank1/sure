@@ -54,3 +54,9 @@ sweep_expired_goal_pledges:
   class: "SweepExpiredGoalPledgesJob"
   queue: "scheduled"
   description: "Marks goal pledges that passed their 7-day window as expired"
+
+financial_health_snapshots:
+  cron: "15 4 * * *" # daily at 4:15 AM UTC, after data cleanup
+  class: "FinancialHealthSnapshotJob"
+  queue: "scheduled"
+  description: "Records the daily financial fitness score snapshot for every user"

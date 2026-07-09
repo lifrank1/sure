@@ -1,0 +1,125 @@
+<%# locals: (fitness:) %>
+<%
+  result = fitness.result
+
+  rank_meta = {
+    bronze:  { color: "#BA7517", icon: "shield" },
+    silver:  { color: "#9CA3AF", icon: "shield" },
+    gold:    { color: "#CA8A04", icon: "shield" },
+    diamond: { color: "#0EA5E9", icon: "gem" }
+  }
+
+  rank = result.rank
+  meta = rank_meta[rank] || rank_meta[:bronze]
+  next_tier = FinancialHealth::Rank.next_tier(result.total)
+  progress = FinancialHealth::Rank.band_progress(result.total)
+
+  provisional = result.provisional?
+  badge_color = provisional ? "var(--color-gray-400)" : meta[:color]
+
+  delta_pill =
+    if !provisional && fitness.delta.present? && fitness.delta != 0
+      tone = fitness.delta.positive? ? :success : :warning
+      sign = fitness.delta.positive? ? "+" : ""
+      { label: t("comparisons.fitness.delta", delta: "#{sign}#{fitness.delta}"), tone: tone }
+    end
+
+  bar_color = ->(score) {
+    if score >= 70 then "var(--color-success)"
+    elsif score >= 40 then "var(--color-gray-400)"
+    else "var(--color-warning)"
+    end
+  }
+%>
+
+<div class="bg-container rounded-xl shadow-border-xs p-4 space-y-4">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="h-7 w-7 rounded-full bg-surface-inset flex items-center justify-center text-secondary">
+        <%= icon("activity", size: "sm") %>
+      </span>
+      <h2 class="text-sm font-medium text-primary"><%= t("comparisons.fitness.title") %></h2>
+    </div>
+    <% if delta_pill %>
+      <%= render DS::Pill.new(label: delta_pill[:label], tone: delta_pill[:tone], marker: false, show_dot: true) %>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <span class="h-16 w-16 rounded-full flex items-center justify-center shrink-0"
+          style="border: 2px solid <%= badge_color %>; color: <%= badge_color %>;">
+      <%= icon(provisional ? "hourglass" : meta[:icon], size: "lg", color: "current") %>
+    </span>
+    <div class="min-w-0 flex-1">
+      <% if provisional %>
+        <p class="text-xl font-medium text-primary"><%= t("comparisons.fitness.provisional") %></p>
+        <p class="text-sm text-secondary"><%= t("comparisons.fitness.provisional_hint") %></p>
+      <% else %>
+        <p class="text-xl font-medium text-primary">
+          <%= t("comparisons.fitness.ranks.#{rank}") %>
+          <span class="text-sm font-normal text-subdued">&middot; <%= result.total %></span>
+        </p>
+        <p class="text-sm text-secondary mb-2">
+          <% if next_tier %>
+            <%= t("comparisons.fitness.to_next", points: next_tier[1], rank: t("comparisons.fitness.ranks.#{next_tier[0]}")) %>
+          <% else %>
+            <%= t("comparisons.fitness.top_tier") %>
+          <% end %>
+        </p>
+        <div class="relative h-1.5 bg-surface-inset rounded-full max-w-72">
+          <div class="h-full rounded-full" style="width: <%= (progress * 100).round(1) %>%; background-color: <%= badge_color %>;"></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-5 gap-y-3">
+    <% result.pillars.each do |p| %>
+      <div>
+        <% if p.available? %>
+          <div class="flex items-center justify-between text-sm mb-1">
+            <span class="text-secondary"><%= t("comparisons.fitness.pillars.#{p.key}") %></span>
+            <span class="font-medium text-primary"><%= p.score.round %></span>
+          </div>
+          <div class="relative h-1 bg-surface-inset rounded-full">
+            <div class="h-full rounded-full" style="width: <%= p.score.round %>%; background-color: <%= bar_color.call(p.score) %>;"></div>
+          </div>
+        <% else %>
+          <div class="flex items-center justify-between text-sm mb-1">
+            <span class="text-subdued flex items-center gap-1">
+              <%= icon("lock", size: "xs") %>
+              <%= t("comparisons.fitness.pillars.#{p.key}") %>
+            </span>
+            <span class="text-xs text-subdued"><%= t("comparisons.fitness.locked.#{p.key}") %></span>
+          </div>
+          <div class="relative h-1 bg-surface-inset rounded-full"></div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex items-center justify-between gap-3 flex-wrap border-t border-tertiary pt-3">
+    <div class="flex items-center gap-2 flex-wrap">
+      <% FinancialHealth::Rank::TIERS.each do |tier| %>
+        <%
+          current = !provisional && tier[:key] == rank
+          tier_color = rank_meta[tier[:key]][:color]
+        %>
+        <span class="inline-flex items-center gap-1.5 text-xs rounded-full px-2.5 py-1 <%= current ? "font-medium text-primary shadow-border-xs" : "text-secondary" %>">
+          <span style="color: <%= tier_color %>;"><%= icon(rank_meta[tier[:key]][:icon], size: "xs", color: "current") %></span>
+          <%= t("comparisons.fitness.ranks.#{tier[:key]}") %><% if current %> &middot; <%= t("comparisons.fitness.you") %><% elsif tier[:min] > 0 %> <span class="text-subdued"><%= tier[:min] %></span><% end %>
+        </span>
+      <% end %>
+    </div>
+    <% if fitness.cta_path %>
+      <%= link_to fitness.cta_label, fitness.cta_path, class: "text-sm font-medium text-link hover:underline", data: { turbo_frame: "_top" } %>
+    <% end %>
+  </div>
+
+  <%= render DS::Disclosure.new(title: t("comparisons.how_we_work_this_out"), align: "left") do %>
+    <div class="pt-2 space-y-1 text-xs text-subdued">
+      <p><%= t("comparisons.fitness.method") %></p>
+      <p><%= t("comparisons.fitness.not_credit") %></p>
+    </div>
+  <% end %>
+</div>

@@ -22,6 +22,10 @@
   <% else %>
     <%= render DS::Alert.new(message: t("comparisons.privacy_oneliner"), variant: :info) %>
 
+    <% if @fitness %>
+      <%= render "comparisons/fitness", fitness: @fitness %>
+    <% end %>
+
     <% if @needs_age || @needs_metro %>
       <div id="compare-cohort-form" class="bg-container rounded-xl shadow-border-xs p-4">
         <p class="text-sm font-medium text-primary mb-1"><%= t("comparisons.onboard.title") %></p>
