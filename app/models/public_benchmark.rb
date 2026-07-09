@@ -105,19 +105,28 @@ class PublicBenchmark
 
     private
       def cached(key, &block)
-        Rails.cache.fetch("public_benchmark:#{key}", expires_in: CACHE_TTL) { block.call }
+        # Cache negative results too (short TTL) so a slow/failing source is not
+        # re-hit on every page load — critical: an unwrapped external call in the
+        # request path can blow Railway's gateway timeout and 502 the page.
+        val = Rails.cache.fetch("public_benchmark:#{key}", expires_in: CACHE_TTL) { block.call }
+        return val unless val.nil?
+        Rails.cache.write("public_benchmark:#{key}", nil, expires_in: 1.hour)
+        nil
       rescue => e
         Rails.logger.warn("PublicBenchmark #{key} failed: #{e.message}")
+        Rails.cache.write("public_benchmark:#{key}", nil, expires_in: 1.hour)
         nil
       end
 
       def census_key = ENV["CENSUS_API_KEY"].presence
       def fred_key   = ENV["FRED_API_KEY"].presence
 
+      # Fail FAST: no retries, tight timeouts. A benchmark is a nice-to-have —
+      # it must never hold a web request open long enough to time out the page.
       def client
         @client ||= Faraday.new do |f|
-          f.request :retry, max: 2
-          f.options.timeout = 20
+          f.options.timeout = 4
+          f.options.open_timeout = 3
         end
       end
 
