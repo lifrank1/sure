@@ -19,6 +19,7 @@ else
     { name: t(".nav.recurrings"), path: recurring_transactions_path, icon: "refresh-cw", icon_custom: false, active: page_active?(recurring_transactions_path), desktop_only: true },
     { name: t(".nav.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
     { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path), desktop_only: true },
+    { name: t(".nav.compare"), path: comparisons_path, icon: "users-round", icon_custom: false, active: page_active?(comparisons_path), desktop_only: true },
     preview_gated_nav_item({ name: t(".nav.goals"), path: goals_path, icon: "piggy-bank", icon_custom: false, active: page_active?(goals_path) }),
     (ai_chat_ui_enabled? ? { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true } : nil)
   ].compact

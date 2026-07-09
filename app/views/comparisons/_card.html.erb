@@ -1,0 +1,73 @@
+<%# locals: (card:) %>
+<%
+  pill = {
+    better:  { label: t("comparisons.status.better"),  tone: :success },
+    on_par:  { label: t("comparisons.status.on_par"),  tone: :neutral },
+    worse:   { label: t("comparisons.status.worse"),   tone: :warning },
+    unknown: { label: t("comparisons.status.unknown"), tone: :info }
+  }[card.direction]
+
+  fill_color = {
+    better: "var(--color-success)", on_par: "var(--color-gray-400)",
+    worse: "var(--color-warning)", unknown: "var(--color-gray-400)"
+  }[card.direction]
+
+  ring_tone = { better: :success, on_par: :neutral, worse: :warning, unknown: :neutral }[card.direction]
+%>
+
+<div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="h-7 w-7 rounded-full bg-surface-inset flex items-center justify-center text-secondary">
+        <%= icon(card.icon, size: "sm") %>
+      </span>
+      <h3 class="text-sm font-medium text-primary"><%= card.title %></h3>
+    </div>
+    <%= render DS::Pill.new(label: pill[:label], tone: pill[:tone], marker: false, show_dot: true) %>
+  </div>
+
+  <% if card.viz == :ring && card.ring_percent %>
+    <div class="flex items-center gap-4">
+      <%= render DS::ProgressRing.new(percent: card.ring_percent, size: 72, tone: ring_tone, show_percent: false) %>
+      <div>
+        <p class="text-2xl font-medium text-primary privacy-sensitive"><%= card.your_label %></p>
+        <p class="text-xs text-secondary"><%= t("comparisons.for_your_age") %></p>
+      </div>
+    </div>
+  <% else %>
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <p class="text-xs text-secondary"><%= t("comparisons.you") %></p>
+        <p class="text-2xl font-medium text-primary privacy-sensitive"><%= card.your_label || "—" %></p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-secondary"><%= t("comparisons.typical") %></p>
+        <p class="text-lg font-medium text-secondary privacy-sensitive"><%= card.cohort_label %></p>
+      </div>
+    </div>
+
+    <% if card.your_frac %>
+      <div class="relative h-1.5 bg-surface-inset rounded-full">
+        <div class="h-full rounded-full" style="width: <%= (card.your_frac * 100).round(1) %>%; background-color: <%= fill_color %>;"></div>
+        <% if card.cohort_frac %>
+          <span class="absolute top-1/2 -translate-y-1/2 h-3 w-0.5 bg-primary rounded"
+                style="left: <%= (card.cohort_frac * 100).round(1) %>%;"
+                title="<%= t('comparisons.typical') %>"></span>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <p class="text-sm text-secondary"><%= card.framing %></p>
+
+  <% if card.cta_path %>
+    <%= link_to card.cta_label, card.cta_path, class: "inline-block text-sm font-medium text-link hover:underline", data: { turbo_frame: "_top" } %>
+  <% end %>
+
+  <%= render DS::Disclosure.new(title: t("comparisons.how_we_work_this_out"), align: "left") do %>
+    <div class="pt-2 space-y-1 text-xs text-subdued">
+      <p><%= card.method_note %></p>
+      <p><%= t("comparisons.source_prefix") %> <%= card.source %></p>
+    </div>
+  <% end %>
+</div>

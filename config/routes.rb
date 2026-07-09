@@ -488,6 +488,8 @@ Rails.application.routes.draw do
   # Portfolio overview page (nav "Investments"); distinct from the Investment
   # accountable CRUD below
   get "investments", to: "investment_portfolio#show", as: :investment_portfolio
+  get "compare", to: "comparisons#show", as: :comparisons
+  patch "compare/cohort", to: "comparisons#update_cohort", as: :comparisons_cohort
   resources :investments, only: %i[new create edit update]
   resources :properties, only: %i[new create edit update] do
     member do

@@ -1,0 +1,83 @@
+---
+en:
+  comparisons:
+    title: How you compare
+    subtitle: "vs. %{cohort}"
+    edit_cohort: Edit my cohort
+    you: You
+    typical: Typical
+    for_your_age: for your age
+    per_mo: /mo
+    percentile: "Top %{n}%"
+    thirty_pct_rule: "30% guideline"
+    your_area: your area
+    how_we_work_this_out: How we work this out
+    source_prefix: "Source:"
+    cohort_saved: Updated your cohort.
+    privacy_oneliner: These comparisons use public data — never other Frank users. Your numbers stay private.
+    honesty_footer: These are estimates from public surveys and indices, not exact figures. "Typical" means the middle of a broad group — not a precise average, and not a target you have to hit.
+    status:
+      better: On track
+      on_par: Right on typical
+      worse: Room to grow
+      unknown: Add a detail
+    sources:
+      cex: Bureau of Labor Statistics, Consumer Expenditure Survey 2023
+      fred_cex: Federal Reserve (FRED) + BLS Consumer Expenditure Survey
+      zillow_census: Zillow rent index + U.S. Census metro data
+      scf: Federal Reserve Survey of Consumer Finances 2022
+    cta:
+      link_account: Link an account
+      link_retirement: Link a 401(k) for your full rate
+      set_budget: Set a dining budget
+    empty:
+      title: See how you compare
+      description: Link an account and we'll show how your spending, saving, and net worth stack up against people like you — using public data, privately.
+    computing:
+      title: Getting your comparisons ready
+      description: We need a bit more account history to compare you fairly. Check back after your next sync.
+    onboard:
+      title: Make this about you
+      body: Add your age and city and we'll compare you to people in a similar situation — never to other users.
+      age_label: Your age
+      age_prompt: Select age range
+      metro_label: Where you live
+      metro_national: Use national numbers
+      save: Save & compare
+    cards:
+      savings:
+        title: Savings rate
+        match: ""
+        better: "You're putting away more than most people your age — nice. The U.S. average right now is just %{national}%."
+        on_par: "Your savings rate is right around typical for your age. Steady wins."
+        worse: "There's room to save a little more. Even bumping it a few percent adds up fast."
+        no_income: "Link a checking account and we'll work out your savings rate."
+        take_home_note: "This is your take-home rate — link a 401(k) to include retirement saving."
+        method: "Your savings rate is money left after spending, as a share of take-home pay, from your linked accounts. 'Typical' blends the FRED U.S. savings rate with what under-25s put toward retirement. Estimates, not exact figures."
+      food:
+        title: Food & dining
+        match: food
+        better: "You spend less on food than typical for your age — nicely done."
+        on_par: "Your food spending is right around typical for people your age."
+        worse: "You're spending a bit more on food than typical for your age. If that feels high, a soft dining budget helps."
+        method: "Compared to average food spending for %{cohort} in the BLS Consumer Expenditure Survey. Estimate, not an exact average."
+      subscriptions:
+        title: Subscriptions & fun
+        match: entertainment
+        better: "You spend less on entertainment than typical for your age."
+        on_par: "Your entertainment spending is right around typical."
+        worse: "You're spending a bit more on entertainment than typical. Worth a look at your subscriptions."
+        method: "Compared to average entertainment spending for %{cohort} in the BLS Consumer Expenditure Survey. Estimate, not exact."
+      rent:
+        title: Rent vs. income
+        metro_typical: "~%{pct}% (typical)"
+        better: "Your rent is a comfortable share of your income — under the 30% 'rent-burdened' line."
+        on_par: "Your rent is right in line with others in %{metro}, near the 30% guideline."
+        worse: "Your rent is a larger share of your income than ideal. Not always avoidable in %{metro}, but worth knowing."
+        method: "Rent from Zillow's metro rent index; income is your detected take-home. The 30% line is the common 'rent-burdened' threshold. Metro figures are estimates."
+      net_worth:
+        title: Net worth
+        better: "You're ahead of most people your age on net worth."
+        on_par: "Your net worth is right around typical for your age."
+        worse: "Early days — net worth grows a lot through your 20s and 30s. You're just getting started."
+        method: "Your net worth placed against Federal Reserve Survey of Consumer Finances data for your age band. Estimates."

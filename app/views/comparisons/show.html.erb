@@ -1,0 +1,67 @@
+<div class="space-y-4 pb-6 lg:pb-12 flex flex-col">
+  <header class="flex justify-between items-center gap-4">
+    <div class="min-w-0">
+      <h1 class="text-xl font-medium text-primary"><%= t("comparisons.title") %></h1>
+      <p class="text-sm text-secondary truncate"><%= t("comparisons.subtitle", cohort: @cohort.description) %></p>
+    </div>
+    <% if @has_accounts %>
+      <%= render DS::Menu.new do |menu| %>
+        <% menu.with_item(variant: "link", text: t("comparisons.edit_cohort"), href: "#compare-cohort-form", icon: "user-round-cog") %>
+      <% end %>
+    <% end %>
+  </header>
+
+  <% unless @has_accounts %>
+    <div class="bg-container rounded-xl shadow-border-xs p-4">
+      <%= render DS::EmptyState.new(icon: "users-round", title: t("comparisons.empty.title"), description: t("comparisons.empty.description")) do |es| %>
+        <% es.with_action do %>
+          <%= render DS::Link.new(text: t("comparisons.cta.link_account"), variant: "primary", icon: "plus", href: new_account_path(step: "method_select"), frame: :modal) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render DS::Alert.new(message: t("comparisons.privacy_oneliner"), variant: :info) %>
+
+    <% if @needs_age || @needs_metro %>
+      <div id="compare-cohort-form" class="bg-container rounded-xl shadow-border-xs p-4">
+        <p class="text-sm font-medium text-primary mb-1"><%= t("comparisons.onboard.title") %></p>
+        <p class="text-sm text-secondary mb-3"><%= t("comparisons.onboard.body") %></p>
+        <%= form_with url: comparisons_cohort_path, method: :patch, class: "flex flex-col sm:flex-row gap-3 sm:items-end" do |f| %>
+          <div class="flex-1">
+            <label class="text-xs text-secondary" for="compare_age_band"><%= t("comparisons.onboard.age_label") %></label>
+            <select name="compare[age_band]" id="compare_age_band" class="form-field__input w-full">
+              <option value=""><%= t("comparisons.onboard.age_prompt") %></option>
+              <% { "under_25" => "Under 25", "25_34" => "25–34", "35_44" => "35–44", "45_54" => "45–54", "55_64" => "55–64", "65_plus" => "65+" }.each do |val, label| %>
+                <option value="<%= val %>" <%= "selected" if @cohort.age_band == val %>><%= label %></option>
+              <% end %>
+            </select>
+          </div>
+          <div class="flex-1">
+            <label class="text-xs text-secondary" for="compare_metro"><%= t("comparisons.onboard.metro_label") %></label>
+            <select name="compare[metro]" id="compare_metro" class="form-field__input w-full">
+              <option value="__national__"><%= t("comparisons.onboard.metro_national") %></option>
+              <% Cohort::METROS.keys.each do |m| %>
+                <option value="<%= m %>" <%= "selected" if @cohort.metro_label == m %>><%= m %></option>
+              <% end %>
+            </select>
+          </div>
+          <%= render DS::Button.new(text: t("comparisons.onboard.save"), variant: "primary", type: "submit") %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <% @cards.each do |card| %>
+        <%= render "comparisons/card", card: card %>
+      <% end %>
+    </div>
+
+    <% if @cards.empty? %>
+      <div class="bg-container rounded-xl shadow-border-xs p-4">
+        <%= render DS::EmptyState.new(icon: "hourglass", title: t("comparisons.computing.title"), description: t("comparisons.computing.description")) %>
+      </div>
+    <% end %>
+
+    <p class="text-xs text-subdued px-1"><%= t("comparisons.honesty_footer") %></p>
+  <% end %>
+</div>
