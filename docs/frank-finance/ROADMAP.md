@@ -158,6 +158,19 @@ Deliberately NOT done (conflicts with Frank's explicit earlier choices, noted):
 
 ## Copilot Money parity pass (2026-07-06, benchmarked in-app side by side)
 
+Late additions (2026-07-11, browser-verified on prod):
+- [x] Monthly spending pace card (Copilot's spend-vs-pace chart): cumulative
+      MTD spending line vs dashed even-pace guide, over/under badge at today.
+      Target = budget, else avg of last 3 full months ("typical month" +
+      set-budget CTA), hidden if neither. IncomeStatement::DailyExpenses
+      mirrors Totals scoping grouped by date — verified sums exactly to
+      expense_split.spending. New default top card (spending_pace,
+      net_worth_chart, outflows_donut, ...); Frank's saved order updated
+      in-place via SQL (saved prefs override the default).
+- [x] Spending donut compacted: 176px donut left of the category list at @md
+      container width (was stacked; @2xl/@lg never fired in the two-column
+      grid — measure the real container before picking breakpoints)
+
 Shipped:
 
 - [x] Sidebar nav now Copilot-shaped: Home, Transactions, Accounts,
