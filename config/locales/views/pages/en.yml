@@ -52,7 +52,6 @@ en:
       transactions_to_review:
         title: To review
       welcome: "Welcome back, %{name}"
-      subtitle: "Here's what's happening with your finances"
       new: "Add account"
       sections_aria_label: "Dashboard sections"
       drag_to_reorder: "Drag to reorder section"
@@ -93,7 +92,7 @@ en:
         over_budget: "%{amount} over"
         budgeted: "%{amount} budgeted"
         spent: "%{amount} spent"
-        typical: "typical month: %{amount}"
+        income_avg: "you bring in %{amount}/mo on average"
         set_budget: "Set a budget"
       outflows_donut:
         title: "Spending"

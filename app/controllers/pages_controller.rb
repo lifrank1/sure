@@ -205,18 +205,19 @@ class PagesController < ApplicationController
     end
 
     # Cumulative month-to-date spending vs an even pace toward the target.
-    # Target is the allocated budget; without one, the average of up to the
-    # last 3 full months of spending stands in ("typical month"). No target
-    # and no history means the section stays hidden.
+    # Target is the allocated budget; without one, average money IN per month
+    # (mean income of up to the last 3 full months) stands in — pacing under
+    # it means spending less than you earn. No target and no history means
+    # the section stays hidden.
     def build_spending_pace(income_statement, current_month, family_currency)
       target = @monthly_spending[:budgeted]&.amount&.to_f
-      target_kind = target ? "budget" : "typical"
+      target_kind = target ? "budget" : "income"
 
       if target.nil?
         prior_months = (1..3).filter_map do |i|
           start = Date.current.beginning_of_month - i.months
           period = Period.custom(start_date: start, end_date: start.end_of_month)
-          amount = income_statement.expense_split(period: period).spending.amount.to_f
+          amount = income_statement.income_totals(period: period).total.to_f
           amount if amount.positive?
         end
         target = (prior_months.sum / prior_months.size).round if prior_months.any?
