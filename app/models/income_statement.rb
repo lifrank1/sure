@@ -75,6 +75,19 @@ class IncomeStatement
 
   ExpenseSplit = Data.define(:total_outflows, :invested, :spending)
 
+  # Daily consumption spending (same scope as expense_split.spending), for the
+  # dashboard Monthly spending pace chart. => { Date => Float }
+  def daily_spending(period: Period.current_month)
+    key = period_cache_key(period)
+    @daily_spending_by_period ||= {}
+    @daily_spending_by_period[key] ||= IncomeStatement::DailyExpenses.new(
+      family,
+      transactions_scope: self.class.cashflow_transactions_scope(family).in_period(period),
+      date_range: period.date_range,
+      included_account_ids: included_account_ids
+    ).call
+  end
+
   def net_category_totals(period: Period.current_month)
     key = period_cache_key(period)
     @net_category_totals_by_period ||= {}

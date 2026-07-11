@@ -87,6 +87,14 @@ en:
         title: "No accounts yet"
         description: "Add accounts to display net worth data"
         add_account: "Add account"
+      spending_pace:
+        title: "Monthly spending"
+        left: "%{amount} left"
+        over_budget: "%{amount} over"
+        budgeted: "%{amount} budgeted"
+        spent: "%{amount} spent"
+        typical: "typical month: %{amount}"
+        set_budget: "Set a budget"
       outflows_donut:
         title: "Spending"
         total_outflows: "Total Spending"

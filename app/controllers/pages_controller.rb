@@ -75,6 +75,8 @@ class PagesController < ApplicationController
       left: budgeted.present? ? Money.new(budgeted, family_currency) - spent : nil
     }
 
+    @spending_pace = build_spending_pace(income_statement, current_month, family_currency)
+
     # Upcoming recurring charges (next two weeks, incl. overdue)
     @upcoming_recurrings = RecurringTransaction.for_family(Current.family)
                                                .active
@@ -202,8 +204,54 @@ class PagesController < ApplicationController
       steps.all? { |s| s[:done] } ? nil : steps
     end
 
+    # Cumulative month-to-date spending vs an even pace toward the target.
+    # Target is the allocated budget; without one, the average of up to the
+    # last 3 full months of spending stands in ("typical month"). No target
+    # and no history means the section stays hidden.
+    def build_spending_pace(income_statement, current_month, family_currency)
+      target = @monthly_spending[:budgeted]&.amount&.to_f
+      target_kind = target ? "budget" : "typical"
+
+      if target.nil?
+        prior_months = (1..3).filter_map do |i|
+          start = Date.current.beginning_of_month - i.months
+          period = Period.custom(start_date: start, end_date: start.end_of_month)
+          amount = income_statement.expense_split(period: period).spending.amount.to_f
+          amount if amount.positive?
+        end
+        target = (prior_months.sum / prior_months.size).round if prior_months.any?
+      end
+
+      daily = income_statement.daily_spending(period: current_month)
+      running = 0.0
+      series = (Date.current.beginning_of_month..Date.current).map do |date|
+        running += daily[date] || 0.0
+        running.round(2)
+      end
+
+      {
+        series: series,
+        target: target,
+        target_kind: target_kind,
+        days_in_month: Date.current.end_of_month.day,
+        spent: @monthly_spending[:spent],
+        budgeted: @monthly_spending[:budgeted],
+        left: @monthly_spending[:left],
+        currency_symbol: Money::Currency.new(family_currency).symbol
+      }
+    end
+
     def build_dashboard_sections
       all_sections = [
+        {
+          key: "spending_pace",
+          title: "pages.dashboard.spending_pace.title",
+          partial: "pages/dashboard/spending_pace",
+          layout: section_layout("spending_pace"),
+          locals: { spending_pace: @spending_pace },
+          visible: @accounts.any? && @spending_pace[:target].present?,
+          collapsible: true
+        },
         {
           key: "upcoming_recurrings",
           title: "pages.dashboard.upcoming_recurrings.title",

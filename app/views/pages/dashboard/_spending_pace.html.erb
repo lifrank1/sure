@@ -1,0 +1,29 @@
+<%# locals: (spending_pace:) %>
+<div id="spending-pace-section" class="@container">
+  <div class="px-4">
+    <div class="text-center mb-2">
+      <% if spending_pace[:left].present? %>
+        <% over_budget = spending_pace[:left].amount.negative? %>
+        <p class="text-2xl font-medium privacy-sensitive <%= over_budget ? "text-destructive" : "text-primary" %>">
+          <%= over_budget ? t(".over_budget", amount: format_money(-spending_pace[:left])) : t(".left", amount: format_money(spending_pace[:left])) %>
+        </p>
+        <p class="text-sm text-secondary privacy-sensitive"><%= t(".budgeted", amount: format_money(spending_pace[:budgeted])) %></p>
+      <% else %>
+        <p class="text-2xl font-medium text-primary privacy-sensitive"><%= t(".spent", amount: format_money(spending_pace[:spent])) %></p>
+        <p class="text-sm text-secondary privacy-sensitive">
+          <%= t(".typical", amount: format_money(Money.new(spending_pace[:target], spending_pace[:spent].currency))) %>
+          <span class="text-subdued mx-1">&middot;</span>
+          <%= link_to t(".set_budget"), budgets_path, class: "underline hover:text-primary", data: { turbo_frame: "_top" } %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="h-[190px] relative"
+      data-controller="spending-pace-chart"
+      data-spending-pace-chart-series-value="<%= spending_pace[:series].to_json %>"
+      data-spending-pace-chart-target-value="<%= spending_pace[:target] %>"
+      data-spending-pace-chart-days-value="<%= spending_pace[:days_in_month] %>"
+      data-spending-pace-chart-currency-value="<%= spending_pace[:currency_symbol] %>">
+    </div>
+  </div>
+</div>
