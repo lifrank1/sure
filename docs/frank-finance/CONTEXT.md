@@ -94,13 +94,28 @@ Waiting on Frank (only he can do these):
    reissue at api.census.gov/data/key_signup.html and fredaccount.stlouisfed.org)
 2. Railway dashboard: usage alerts ($8 soft; hard limit STOPS services — use
    $25-30 or skip). Backups already DONE (db-backup service, nightly pg_dump).
-3. Reconnect Fidelity/Robinhood via SnapTrade (prod swap dropped test links)
+3. URGENT-ish: the dead test-client SnapTrade item (b6e792fd) 401s every
+   night and has FAILED Frank's entire family sync since 2026-07-08 (stale
+   "Updated Xd ago" header, no nightly rule runs). Fix = reconnect Fidelity
+   via SnapTrade portal (prod client), then remove the dead connection in
+   the app (removal deletes that connection's accounts/history — Frank's
+   call, do NOT do it for him). Consider a code fix so one dead provider
+   item doesn't fail the whole family sync.
 4. Create a July budget (upgrades the Spending card to "$X left")
 5. (optional) Resend: verify root erech.app for a prettier sender — email
    already WORKS via in.erech.app
 6. Approve deleting the 2 unused categories (Mortgage / Rent, Sports & Fitness)
 
 Second user f.li.865985@gmail.com is Frank's own test account (safe to delete).
+
+Uncategorized-backlog root causes found + fixed 2026-07-12 (9489f660): the
+simple/Gemini auto-categorize prompt hardcoded phantom category names
+("Salary" for payroll — obediently echoed by the model, never matching, so
+payroll stayed uncategorized forever); default category set lacked
+Insurance + Fees (added, 13→15, and backfilled into the Jul-6 family).
+Verified live: payroll rows now land in Income. Remaining uncategorized is
+the correct long tail (ATM cash, P2P, expense-classified payroll
+reversals) — Categorize-wizard territory, not a bug.
 
 ## Known issues / gotchas
 - DEPLOY GOTCHA (learned the hard way 2026-07-08): main auto-deploys to
