@@ -5,6 +5,10 @@ en:
       redis_configured: "Redis is now configured properly! You can now setup your Frank Finance application."
   shared:
     preview: Preview
+    email_confirmation_banner:
+      title: Verify your email
+      subtitle: "— we sent a link to %{email}. Verifying lets you recover your account if you forget your password."
+      cta: Resend link
     sync_toast:
       message: "New data available"
       refresh: "Refresh"

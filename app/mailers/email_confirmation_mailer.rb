@@ -12,4 +12,15 @@ class EmailConfirmationMailer < ApplicationMailer
 
     mail to: @user.unconfirmed_email, subject: @subject
   end
+
+  # Signup verification (confirms the CURRENT address, unlike the
+  # email-change flow above which confirms a pending new one).
+  def signup_confirmation_email
+    @user = params[:user]
+    @subject = t(".subject", product_name: product_name)
+    @cta = t(".cta")
+    @confirmation_url = signup_email_confirmation_url(token: @user.generate_token_for(:signup_confirmation))
+
+    mail to: @user.email, subject: @subject
+  end
 end

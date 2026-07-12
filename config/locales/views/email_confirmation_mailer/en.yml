@@ -8,3 +8,11 @@ en:
       expiry_notice: This link will expire in %{hours} hours.
       greeting: Hello!
       subject: '%{product_name}: Confirm your email change'
+    signup_confirmation_email:
+      body: Welcome! Click the button below to verify your email address. Verifying
+        makes sure you can recover your account if you ever forget your password.
+      cta: Verify my email
+      expiry_notice: This link will expire in %{days} days. You can request a new
+        one from the banner in the app.
+      greeting: Hello!
+      subject: '%{product_name}: Verify your email'

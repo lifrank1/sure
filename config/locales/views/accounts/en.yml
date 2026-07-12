@@ -198,3 +198,10 @@ en:
       invalid_token: Invalid or expired confirmation link.
       success_login: Your email has been confirmed. Please log in with your new email
         address.
+    signup:
+      invalid_token: Invalid or expired verification link. You can request a new
+        one from the banner in the app.
+      success: Your email is verified. You're all set.
+      success_login: Your email is verified. Log in to continue.
+    resend:
+      sent: Verification link sent to %{email}.

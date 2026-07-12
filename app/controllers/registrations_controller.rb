@@ -35,6 +35,7 @@ class RegistrationsController < ApplicationController
 
     if signup_with_invite_claim!
       create_default_auto_categorize_rule
+      handle_signup_email_confirmation
       redirect_to root_path, notice: t(".success")
     elsif @invite_code_invalid
       redirect_to new_registration_path, alert: t("registrations.create.invalid_invite_code")
@@ -62,6 +63,19 @@ class RegistrationsController < ApplicationController
       rule.save!
     rescue => e
       Rails.logger.error("Default auto-categorize rule creation failed for family #{family&.id}: #{e.message}")
+    end
+
+    # Invited users' addresses are already known-good (the invite was
+    # delivered there), so they're confirmed on the spot; everyone else gets
+    # a verification link. Soft gate — failures must never block a signup.
+    def handle_signup_email_confirmation
+      if @invitation || !Setting.require_email_confirmation
+        @user.confirm_email!
+      else
+        EmailConfirmationMailer.with(user: @user).signup_confirmation_email.deliver_later
+      end
+    rescue => e
+      Rails.logger.error("Signup confirmation handling failed for user #{@user&.id}: #{e.message}")
     end
 
     def set_invitation

@@ -1,0 +1,14 @@
+<%# locals: (user:) %>
+<div class="mb-4 px-4 py-3 rounded-xl border border-warning bg-warning/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+  <div class="flex items-center gap-2 grow min-w-0">
+    <%= icon("mail", size: "sm", color: "warning") %>
+    <p class="text-sm text-primary truncate">
+      <span class="font-medium"><%= t("shared.email_confirmation_banner.title") %></span>
+      <span class="text-secondary"><%= t("shared.email_confirmation_banner.subtitle", email: user.email) %></span>
+    </p>
+  </div>
+  <%= button_to t("shared.email_confirmation_banner.cta"),
+              resend_email_confirmation_path,
+              method: :post,
+              class: "shrink-0 text-sm font-medium text-primary underline hover:no-underline bg-transparent border-0 p-0 cursor-pointer" %>
+</div>

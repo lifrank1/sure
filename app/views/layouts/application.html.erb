@@ -224,6 +224,10 @@ end %>
         </div>
       <% end %>
 
+      <% if Current.user&.needs_email_confirmation? %>
+        <%= render "shared/email_confirmation_banner", user: Current.user %>
+      <% end %>
+
       <% if content_for?(:page_header) %>
         <%= yield :page_header %>
       <% end %>

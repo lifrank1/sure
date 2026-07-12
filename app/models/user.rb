@@ -84,6 +84,26 @@ class User < ApplicationRecord
     unconfirmed_email
   end
 
+  # Signup verification of the CURRENT address (email_confirmation above is
+  # the email-CHANGE flow). Token invalidates if the address changes.
+  generates_token_for :signup_confirmation, expires_in: 3.days do
+    email
+  end
+
+  def email_confirmed?
+    confirmed_at.present?
+  end
+
+  def confirm_email!
+    update!(confirmed_at: Time.current) unless email_confirmed?
+  end
+
+  # Soft gate: drives the "verify your email" banner only — nothing is
+  # blocked. Off entirely when the instance disables confirmation.
+  def needs_email_confirmation?
+    Setting.require_email_confirmation && !email_confirmed?
+  end
+
   def pending_email_change?
     unconfirmed_email.present?
   end
