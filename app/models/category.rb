@@ -198,11 +198,15 @@ class Category < ApplicationRecord
 
     private
       def default_categories
-        # Deliberately lean starter set (~13) for a young/first-budget audience:
-        # niche categories (insurance, taxes, home improvement, services, ...)
-        # are two clicks away in Settings > Categories rather than day-one
-        # noise. Investment Contributions stays: the transfer auto-matcher
-        # assigns it programmatically.
+        # Deliberately lean starter set (~15) for a young/first-budget audience:
+        # niche categories (taxes, home improvement, services, ...) are two
+        # clicks away in Settings > Categories rather than day-one noise.
+        # Insurance and Fees are included because bank feeds surface both
+        # constantly (State Farm, membership/foreign-transaction fees) and the
+        # AI categorizer can only use categories that exist — without them
+        # those transactions pile up as uncategorized. Investment
+        # Contributions stays: the transfer auto-matcher assigns it
+        # programmatically.
         [
           [ I18n.t("models.category.defaults.income"),                "#22c55e", "circle-dollar-sign" ],
           [ I18n.t("models.category.defaults.food_and_drink"),        "#f97316", "utensils" ],
@@ -216,6 +220,8 @@ class Category < ApplicationRecord
           [ I18n.t("models.category.defaults.utilities"),             "#eab308", "lightbulb" ],
           [ I18n.t("models.category.defaults.subscriptions"),         "#6366f1", "wifi" ],
           [ I18n.t("models.category.defaults.sports_and_fitness"),    "#10b981", "dumbbell" ],
+          [ I18n.t("models.category.defaults.insurance"),             "#475569", "shield" ],
+          [ I18n.t("models.category.defaults.fees"),                  "#64748b", "receipt" ],
           [ investment_contributions_name,                       "#0d9488", "trending-up" ]
         ]
       end

@@ -80,18 +80,16 @@ class Provider::Openai::AutoCategorizer
 
       CRITICAL RULES:
       1. Match transaction_id exactly from input
-      2. Use EXACT category_name from the provided list, or "null" if unsure
-      3. Match expense transactions to expense categories only
-      4. Match income transactions to income categories only
-      5. Return "null" if the description is generic/ambiguous (e.g., "POS DEBIT", "ACH WITHDRAWAL", "CHECK #1234")
-      6. Prefer MORE SPECIFIC subcategories over general parent categories when available
+      2. Use EXACT category_name from the AVAILABLE CATEGORIES list, or "null" if unsure. NEVER answer a name that is not in the list — made-up names are discarded and the transaction stays uncategorized.
+      3. For transactions with Type: income (payroll, direct deposits, employer payments, interest, refunds): use the income-oriented category from the list (e.g. one named "Income") if present, otherwise "null"
+      4. Return "null" if the description is generic/ambiguous (e.g., "POS DEBIT", "ACH WITHDRAWAL", "CHECK #1234")
+      5. Prefer MORE SPECIFIC subcategories over general parent categories when available
 
-      CATEGORY HIERARCHY NOTES:
-      - Use "Restaurants" for sit-down restaurants, "Fast Food" for quick service chains
-      - Use "Coffee Shops" for coffee places, "Food & Drink" only when type is unclear
-      - Use "Shopping" for general retail, big-box stores, and online marketplaces
-      - Use "Groceries" for dedicated grocery stores ONLY
-      - For income: use "Salary" for payroll/employer deposits, "Income" for generic income sources
+      GUIDELINES (each applies ONLY when a matching category exists in the list):
+      - Dedicated grocery stores go to a groceries category; restaurants, fast food, and coffee shops go to the closest dining/food category
+      - Insurance premiums (auto, renters, health — e.g. State Farm, Geico, Lemonade) go to an insurance category
+      - Bank and card fees (membership fees, foreign transaction fees, service charges, ATM fees) go to a fees category
+      - General retail, big-box, and online marketplaces go to a shopping category
 
       Output JSON format only (no markdown, no explanation):
       {"categorizations": [{"transaction_id": "...", "category_name": "..."}]}
