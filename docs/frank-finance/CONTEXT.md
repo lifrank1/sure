@@ -44,11 +44,12 @@ link. Push to BOTH remotes on every change.
      crashed with "Missing host to link to" on both services
   3. `SMTP_PORT=2465` — Railway Hobby blocks standard SMTP egress
      (25/465/587); Resend's alternate port 2465 (implicit TLS) works
-  `REQUIRE_EMAIL_CONFIRMATION=true` (only gates the email-CHANGE flow in
-  this fork; signups were never confirmation-gated — the real win was
-  password-reset emails, verified delivered via worker logs). Resend API
-  key on Railway is restricted/send-only; domain management needs the
-  Resend dashboard.
+  `REQUIRE_EMAIL_CONFIRMATION=true` — as of 2026-07-12 (f30c7d09) gates
+  BOTH the email-change flow AND signup verification: new signups get a
+  3-day verification link + persistent in-app banner w/ resend (soft gate,
+  nothing blocked); invited users auto-confirm; all pre-existing users
+  grandfathered via users.confirmed_at backfill. Resend API key on Railway
+  is restricted/send-only; domain management needs the Resend dashboard.
 - `AI_CHAT_UI_ENABLED=true` — kill switch for all AI-chat entry points (header
   toggle, right panel, mobile Assistant tab); set false to hide them. Chat's
   Gemini tool-call 400 (history replay sent jsonb Hash arguments; Gemini
