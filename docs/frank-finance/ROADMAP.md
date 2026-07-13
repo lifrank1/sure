@@ -161,12 +161,14 @@ Deliberately NOT done (conflicts with Frank's explicit earlier choices, noted):
 Late additions (2026-07-11, browser-verified on prod):
 - [x] Monthly spending pace card (Copilot's spend-vs-pace chart): cumulative
       MTD spending line vs dashed even-pace guide, over/under badge at today.
-      Target = budget, else avg of last 3 full months ("typical month" +
-      set-budget CTA), hidden if neither. IncomeStatement::DailyExpenses
-      mirrors Totals scoping grouped by date — verified sums exactly to
-      expense_split.spending. New default top card (spending_pace,
-      net_worth_chart, outflows_donut, ...); Frank's saved order updated
-      in-place via SQL (saved prefs override the default).
+      Target = budget, else avg monthly money-IN of last 3 full months
+      (8b90ee67 — "you bring in $X/mo on average" + set-budget CTA; pacing
+      under it means spending less than you earn), hidden if neither.
+      IncomeStatement::DailyExpenses mirrors Totals scoping grouped by
+      date — verified sums exactly to expense_split.spending. New default
+      top card (spending_pace, net_worth_chart, outflows_donut, ...);
+      Frank's saved order updated in-place via SQL (saved prefs override
+      the default). Greeting subtitle removed same commit.
 - [x] Spending donut compacted: 176px donut left of the category list at @md
       container width (was stacked; @2xl/@lg never fired in the two-column
       grid — measure the real container before picking breakpoints)
@@ -324,3 +326,30 @@ Fast-follows:
       affordance, so fix both together)
 - [ ] "Wrapped"-style shareable card (agent recommended deferring)
 - [ ] Expand metro list beyond 20; city typeahead → CBSA resolution
+
+## Signup email verification, shipped 2026-07-12 (f30c7d09)
+
+Soft gate: new signups get a 3-day verification link + persistent banner
+with resend; nothing is blocked (the win is guaranteed password recovery).
+Invited users auto-confirm; all pre-existing users grandfathered
+(users.confirmed_at backfill). Same Setting.require_email_confirmation
+gates this AND the email-change flow. Verified on prod: migration/backfill,
+garbage-token rejection; mailer verified in the prod image (full e2e needs
+a real signup — account creation is off-limits for the agent).
+
+## AI auto-categorization fixes, 2026-07-12 (9489f660)
+
+Root causes of the uncategorized backlog (see CONTEXT gotchas): phantom
+category names hardcoded in the Gemini prompt ("Salary" etc. — echoed by
+the model, never matching) + missing Insurance/Fees in the trimmed default
+set (now 15; backfilled into the Jul-6 family via SQL). Verified live:
+payroll → Income. Remaining uncategorized is the legitimate long tail —
+Categorize-wizard territory.
+
+Fast-follows:
+- [ ] Normalize LLM category-name matching (case/whitespace-insensitive) in
+      Family::AutoCategorizer — exact string match is one typo from a miss
+- [ ] Family sync resilience: one dead provider item (Frank's stale
+      test-client SnapTrade connection, 401s nightly) fails the ENTIRE
+      family sync, so post-sync rule runs never fire for that family —
+      rescue per-item and continue (also see CONTEXT "Waiting on Frank" #3)

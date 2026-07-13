@@ -66,7 +66,13 @@ link. Push to BOTH remotes on every change.
 - Every new family gets an active auto-categorize rule (runs on sync).
 - Onboarding flow skipped at signup (defaults: USD/en).
 
-## Current status (updated 2026-07-08)
+## Current status (updated 2026-07-13)
+
+Shipped 2026-07-11/12: Monthly spending pace card (dashboard top-left;
+target = budget else avg monthly money-in), compact donut layout, widget
+reorder (spending_pace, net_worth, donut, ...), signup email verification
+(soft gate — see env-var section), AI categorization fixes (see gotchas).
+All browser- or prod-verified; ledger in ROADMAP.
 
 Security + UX audit (2026-07-07) shipped: all findings fixed and deployed —
 invite-consent, CSV-injection guard, login/MFA rate limits, sharing scopes,
@@ -103,8 +109,14 @@ Waiting on Frank (only he can do these):
    call, do NOT do it for him). Consider a code fix so one dead provider
    item doesn't fail the whole family sync.
 4. Create a July budget (upgrades the Spending card to "$X left")
-5. (optional) Resend: verify root erech.app for a prettier sender — email
-   already WORKS via in.erech.app
+5. (optional) Root-domain sender (noreply@erech.app): no Resend/Namecheap
+   MCP exists (checked 2026-07-12) and none is needed — Frank creates a
+   FULL-ACCESS Resend API key and puts it on Railway as RESEND_ADMIN_KEY
+   (not through chat); agent then registers the domain via API, hands him
+   ~3 DNS records to paste into Namecheap (root erech.app is a clean slate,
+   verified — no conflict with in.erech.app), polls verification, flips
+   EMAIL_SENDER. Namecheap API not worth enabling (eligibility gates).
+   Email already WORKS via in.erech.app.
 6. Approve deleting the 2 unused categories (Mortgage / Rent, Sports & Fitness)
 
 Second user f.li.865985@gmail.com is Frank's own test account (safe to delete).
