@@ -327,6 +327,28 @@ Fast-follows:
 - [ ] "Wrapped"-style shareable card (agent recommended deferring)
 - [ ] Expand metro list beyond 20; city typeahead → CBSA resolution
 
+## Onboarding flow, shipped 2026-07-14 (1eb335e8)
+
+3-step wizard for FRESH family creators only (invited/invite-only-default
+signups skip it): outcome screen + founder note -> personalize (age/metro
+-> compare cohort incl. metro_answered; goal -> dashboard section order
+via OnboardingsController::GOAL_SECTION_ORDERS) -> connect (trust copy +
+existing account hub in the modal frame). Reuses upstream wizard rails
+(/onboarding routes, wizard layout, Onboardable bouncer) — upstream
+goals/trial views left in place unlinked. Completion stamped server-side;
+every screen skippable; getting-started checklist backstops skips.
+Built with a 5-agent subsystem map + 4-lens adversarial review (11
+findings, 8 confirmed and fixed pre-deploy, incl.: email-verification
+links bounced for un-onboarded users — /email_confirmation/signup added
+to Onboardable exclusions; metro select needed a blank "Decide later" so
+untouched submits don't lock the cohort; "Edit my cohort" resurrections
+via /compare?edit_cohort=1). Browser-verified on prod.
+
+Fast-follows:
+- [ ] Narrated sync progress after first connect ("Found 4 accounts →
+      importing 23 months → categorizing…") — the dead-air killer
+- [ ] Social login (Google/Apple) — biggest remaining signup-friction gap
+
 ## Signup email verification, shipped 2026-07-12 (f30c7d09)
 
 Soft gate: new signups get a 3-day verification link + persistent banner

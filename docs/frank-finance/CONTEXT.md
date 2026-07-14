@@ -68,6 +68,13 @@ link. Push to BOTH remotes on every change.
 
 ## Current status (updated 2026-07-13)
 
+Shipped 2026-07-14 (1eb335e8): 3-step onboarding for fresh signups
+(welcome/outcome + founder note -> personalize: age/metro/goal ->
+connect), reusing the upstream wizard rails; goal reorders the dashboard;
+invited users skip it (registrations stamps onboarded_at only when
+family is persisted). "Edit my cohort" on /compare works permanently via
+?edit_cohort=1. Browser-verified on prod; details in ROADMAP.
+
 Shipped 2026-07-11/12: Monthly spending pace card (dashboard top-left;
 target = budget else avg monthly money-in), compact donut layout, widget
 reorder (spending_pace, net_worth, donut, ...), signup email verification
