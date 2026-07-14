@@ -31,7 +31,11 @@ module Onboardable
         new_registration_path,
         new_session_path,
         new_password_reset_path,
-        new_email_confirmation_path
+        new_email_confirmation_path,
+        # Fresh signups are un-onboarded AND holding a verification email —
+        # without this exclusion the link bounces to /onboarding and the
+        # token is never consumed.
+        signup_email_confirmation_path
       ].exclude?(path)
     end
 end

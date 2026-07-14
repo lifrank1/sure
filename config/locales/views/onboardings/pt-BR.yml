@@ -9,33 +9,10 @@ pt-BR:
       start: Iniciar
     logout:
       sign_out: Sair
-    show:
-      title: Vamos configurar sua conta
-      subtitle: Primeiro, vamos completar seu perfil.
-      first_name: Nome
-      first_name_placeholder: Nome
-      last_name: Sobrenome
-      last_name_placeholder: Sobrenome
-      household_name: Nome da família
-      household_name_placeholder: Nome da família
-      country: País
-      submit: Continuar
-    preferences:
-      title: Configure suas preferências
-      subtitle: Vamos configurar suas preferências.
-      example: Conta de exemplo
-      preview: Visualização de como os dados são exibidos com base nas preferências.
-      color_theme: Tema de cores
-      theme_system: Sistema
-      theme_light: Claro
-      theme_dark: Escuro
-      locale: Idioma
-      currency: Moeda
-      date_format: Formato de data
-      submit: Concluir
     goals:
       title: O que te traz aqui?
-      subtitle: Selecione um ou mais objetivos que você tem com o %{product_name} como sua ferramenta de finanças pessoais.
+      subtitle: Selecione um ou mais objetivos que você tem com o %{product_name}
+        como sua ferramenta de finanças pessoais.
       unified_accounts: Ver todas as minhas contas em um só lugar
       cashflow: Entender fluxo de caixa e despesas
       budgeting: Gerenciar planos financeiros e orçamentos
@@ -48,7 +25,8 @@ pt-BR:
     trial:
       title: Experimente o Sure por 45 dias
       data_deletion: Os dados serão excluídos depois
-      description_html: A partir de hoje você pode testar o produto a fundo.<br/>Se gostar, hospede você mesmo ou contribua para continuar usando aqui.
+      description_html: A partir de hoje você pode testar o produto a fundo.<br/>Se
+        gostar, hospede você mesmo ou contribua para continuar usando aqui.
       try_button: Experimentar Sure por 45 dias
       continue_trial: Continuar teste
       upgrade: Atualizar
@@ -58,4 +36,5 @@ pt-BR:
       in_40_days: Em 40 dias (%{date})
       in_40_days_description: Notificaremos você para lembrar de exportar seus dados.
       in_45_days: Em 45 dias (%{date})
-      in_45_days_description: Excluímos seus dados — contribua para continuar usando o Sure aqui!
+      in_45_days_description: Excluímos seus dados — contribua para continuar usando
+        o Sure aqui!

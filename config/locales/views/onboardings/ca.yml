@@ -22,37 +22,6 @@ ca:
       start: Inici
     logout:
       sign_out: Tanca la sessió
-    preferences:
-      color_theme: Tema de color
-      currency: Divisa
-      date_format: Format de data
-      example: Compte d'exemple
-      locale: Idioma
-      preview: Previsualitza com es mostren les dades segons les preferències.
-      submit: Finalitza
-      subtitle: Configurem les teves preferències.
-      theme_dark: Fosc
-      theme_light: Clar
-      theme_system: Sistema
-      title: Configura les teves preferències
-    show:
-      country: País
-      first_name: Nom
-      first_name_placeholder: Nom
-      group_name: Nom del grup
-      group_name_placeholder: Nom del grup
-      household_name: Nom de la llar
-      household_name_placeholder: Nom de la llar
-      last_name: Cognom
-      last_name_placeholder: Cognom
-      moniker_family: Membres de la família (tu sol/a o amb la teva parella, fills,
-        etc.)
-      moniker_group: Grup de persones (empresa, club, associació, qualsevol altre
-        tipus)
-      moniker_prompt: Faràs servir %{product_name} amb...
-      submit: Continua
-      subtitle: Primer de tot, completem el teu perfil.
-      title: Configurem el teu compte
     trial:
       continue_trial: Continua la prova
       data_deletion: Les dades s'eliminaran després

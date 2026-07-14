@@ -9,9 +9,24 @@ en:
       start: Start
     logout:
       sign_out: Sign out
+    steps:
+      welcome: Welcome
+      personalize: About you
+      connect: Connect
     show:
-      title: Let's set up your account
-      subtitle: First things first, let's get your profile set up.
+      title: See where your money actually goes
+      subtitle: Link your accounts once — Frank Finance does the rest, automatically.
+      outcome_pace_title: Know if you're on track by mid-month
+      outcome_pace_body: A live pace line shows whether you're spending faster than money comes in.
+      outcome_net_worth_title: Watch your net worth build itself
+      outcome_net_worth_body: Banks and brokerages sync automatically — no spreadsheets, no manual entry.
+      outcome_compare_title: See how you stack up
+      outcome_compare_body: Compare your savings and spending to people your age — public data, never other users.
+      founder_note: "I built this because budgeting apps kept dying or charging $100 a year. It's free, private, and I use it every day."
+      founder_sig: "— Frank"
+      cta: Get started
+      old_title: Let's set up your account
+      old_subtitle: First things first, let's get your profile set up.
       first_name: First name
       first_name_placeholder: First name
       last_name: Last name
@@ -25,9 +40,34 @@ en:
       moniker_group: Group of people (company, club, association, any other type)
       country: Country
       submit: Continue
+    connect:
+      title: Bring in your accounts
+      subtitle: This is the moment the app comes alive — your real numbers, visualized.
+      trust_readonly: Read-only connections through Plaid and SnapTrade. Your bank login never touches our servers.
+      trust_history: Up to two years of history import automatically, usually in under a minute.
+      trust_ai: AI categorizes your transactions on the way in, so your spending picture is ready when you are.
+      cta: Connect an account
+      later: I'll do this later
     preferences:
-      title: Configure your preferences
-      subtitle: Let's configure your preferences.
+      title: Make this about you
+      subtitle: Two quick questions — both optional, both changeable later.
+      goal_label: What matters most to you right now?
+      goal_overspending: Stop overspending
+      goal_grow_wealth: Grow my savings and net worth
+      goal_see_everything: Just see everything in one place
+      goal_hint: We'll arrange your dashboard so the answer is front and center.
+      cohort_label: Compare me to people like me
+      cohort_privacy: Used only to benchmark you against public data — never against other users.
+      age_label: Your age
+      age_prompt: Select age range
+      metro_label: Where you live
+      metro_prompt: Decide later
+      metro_national: Use national numbers
+      unlock_hint: Your answers unlock the "How you compare" page with benchmarks for your age and city.
+      continue: Continue
+      skip: Skip for now
+      old_title: Configure your preferences
+      old_subtitle: Let's configure your preferences.
       example: Example account
       preview: Preview how data displays based on preferences.
       color_theme: Color theme

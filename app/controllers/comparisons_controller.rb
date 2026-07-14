@@ -16,7 +16,13 @@ class ComparisonsController < ApplicationController
     @cohort = Cohort.for(Current.user)
     @has_accounts = Current.family.accounts.visible.any?
     @needs_age = !@cohort.age_band?
-    @needs_metro = !@cohort.metro?
+    # metro_answered distinguishes an explicit "use national numbers" choice
+    # (stored as metro=nil) from never-asked, so the capture form stops
+    # re-prompting people who already answered (here or in onboarding).
+    @needs_metro = !@cohort.metro? && !Current.user.preferences&.dig("compare", "metro_answered")
+    # The capture form is also the only cohort EDIT surface, so "Edit my
+    # cohort" must be able to summon it after the questions are answered.
+    @show_cohort_form = @needs_age || @needs_metro || params[:edit_cohort].present?
 
     @fitness = @has_accounts ? build_fitness : nil
     @cards = @has_accounts ? build_cards : []
@@ -30,8 +36,8 @@ class ComparisonsController < ApplicationController
     metro = params.dig(:compare, :metro)
     compare = (Current.user.preferences&.dig("compare") || {}).dup
     compare["age_band"] = age if age.present? && Cohort::AGE_BANDS.include?(age)
-    compare["metro"] = metro if metro.present?
-    compare["metro"] = nil if params.dig(:compare, :metro) == "__national__"
+    compare["metro"] = Cohort::METROS.key?(metro) ? metro : nil if metro.present?
+    compare["metro_answered"] = true if metro.present?
     Current.user.update_dashboard_preferences({ "compare" => compare })
     redirect_to comparisons_path, notice: t("comparisons.cohort_saved")
   end

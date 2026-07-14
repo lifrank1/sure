@@ -1,0 +1,22 @@
+<%# locals: (current:) %>
+<% steps = [
+  { name: t("onboardings.steps.welcome"), path: onboarding_path },
+  { name: t("onboardings.steps.personalize"), path: preferences_onboarding_path },
+  { name: t("onboardings.steps.connect"), path: connect_onboarding_path }
+] %>
+
+<ul class="hidden md:flex items-center gap-2">
+  <% steps.each_with_index do |step, idx| %>
+    <% is_current = idx == current %>
+    <% is_complete = idx < current %>
+    <li class="flex items-center gap-2 group">
+      <div class="flex items-center gap-2 text-sm font-medium <%= is_current ? "text-primary" : (is_complete ? "text-green-600" : "text-secondary") %>">
+        <span class="<%= is_current ? "bg-surface-inset text-primary" : (is_complete ? "bg-green-600/10 border-alpha-black-25" : "bg-container-inset") %> w-7 h-7 rounded-full shrink-0 inline-flex items-center justify-center border border-transparent">
+          <%= is_complete ? icon("check", size: "sm", color: "current") : idx + 1 %>
+        </span>
+        <span><%= step[:name] %></span>
+      </div>
+      <hr class="border border-secondary w-12 group-last:hidden">
+    </li>
+  <% end %>
+</ul>

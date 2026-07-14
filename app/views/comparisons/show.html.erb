@@ -6,7 +6,7 @@
     </div>
     <% if @has_accounts %>
       <%= render DS::Menu.new do |menu| %>
-        <% menu.with_item(variant: "link", text: t("comparisons.edit_cohort"), href: "#compare-cohort-form", icon: "user-round-cog") %>
+        <% menu.with_item(variant: "link", text: t("comparisons.edit_cohort"), href: comparisons_path(edit_cohort: 1, anchor: "compare-cohort-form"), icon: "user-round-cog") %>
       <% end %>
     <% end %>
   </header>
@@ -26,7 +26,7 @@
       <%= render "comparisons/fitness", fitness: @fitness %>
     <% end %>
 
-    <% if @needs_age || @needs_metro %>
+    <% if @show_cohort_form %>
       <div id="compare-cohort-form" class="bg-container rounded-xl shadow-border-xs p-4">
         <p class="text-sm font-medium text-primary mb-1"><%= t("comparisons.onboard.title") %></p>
         <p class="text-sm text-secondary mb-3"><%= t("comparisons.onboard.body") %></p>

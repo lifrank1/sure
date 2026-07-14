@@ -238,6 +238,8 @@ Rails.application.routes.draw do
       get :preferences
       get :goals
       get :trial
+      get :connect
+      patch :personalize
     end
   end
 

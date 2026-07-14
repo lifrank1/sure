@@ -1,0 +1,36 @@
+<%= content_for :previous_path, preferences_onboarding_path %>
+
+<%= content_for :header_nav do %>
+  <%= render "onboardings/steps", current: 2 %>
+<% end %>
+
+<%= content_for :cancel_path, root_path %>
+
+<div class="grow max-w-lg w-full mx-auto bg-surface flex flex-col justify-center md:py-0 py-2 px-4 md:px-0">
+  <div>
+    <div class="space-y-1 mb-8 text-center">
+      <h1 class="text-2xl font-medium"><%= t(".title") %></h1>
+      <p class="text-secondary text-sm"><%= t(".subtitle") %></p>
+    </div>
+
+    <div class="bg-container rounded-xl shadow-border-xs p-4 mb-8 space-y-3">
+      <div class="flex items-start gap-3">
+        <span class="mt-0.5"><%= icon("lock", size: "sm", color: "success") %></span>
+        <p class="text-sm text-secondary"><%= t(".trust_readonly") %></p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="mt-0.5"><%= icon("history", size: "sm", color: "success") %></span>
+        <p class="text-sm text-secondary"><%= t(".trust_history") %></p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="mt-0.5"><%= icon("sparkles", size: "sm", color: "success") %></span>
+        <p class="text-sm text-secondary"><%= t(".trust_ai") %></p>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <%= render DS::Link.new(text: t(".cta"), variant: "primary", full_width: true, icon: "plus", href: new_account_path(step: "method_select"), frame: :modal) %>
+      <%= render DS::Link.new(text: t(".later"), variant: "ghost", full_width: true, href: root_path) %>
+    </div>
+  </div>
+</div>
