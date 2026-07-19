@@ -28,10 +28,12 @@ class SettingsTest < ApplicationSystemTestCase
     if @user.admin?
       merchants_index = @settings_links.index([ "Merchants", family_merchants_path ])
       @settings_links.insert(merchants_index + 1, [ "Statement Vault", account_statements_path ])
-      @settings_links += [
-        [ "AI Prompts", settings_ai_prompts_path ],
-        [ "API Key", settings_api_key_path ]
-      ]
+      @settings_links += [ [ "API Key", settings_api_key_path ] ]
+    end
+
+    # Operator plumbing (AI config/costs) is super_admin-only (SuperAdminGated)
+    if @user.super_admin?
+      @settings_links += [ [ "AI Prompts", settings_ai_prompts_path ] ]
     end
   end
 

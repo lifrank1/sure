@@ -49,7 +49,7 @@ en:
       new_holding: New activity
       no_holdings: No holdings to show.
       return: Total return
-      weight: Weight
+      weight: Share
     missing_price_tooltip:
       description: This investment has missing values and we could not calculate
         its returns or value.
@@ -65,7 +65,7 @@ en:
       history: History
       no_trade_history: No trade history available for this holding.
       overview: Overview
-      portfolio_weight_label: Portfolio Weight
+      portfolio_weight_label: Portfolio share
       settings: Settings
       security_label: Security
       originally: "was %{ticker}"

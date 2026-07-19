@@ -2,6 +2,14 @@
 en:
   settings:
     hostings:
+      funnel_settings:
+        user: User
+        signed_up: Signed up
+        linked: Linked
+        week1_days: Week-1 days
+        week2_retained: Week-2
+        last_active: Last active
+        note: "Linked = family has a Plaid/SnapTrade/SimpleFin connection. Week-1 days = active days in the 7 days after signup; Week-2 = any activity in days 8–14. Activity history before this feature shipped is backfilled from login sessions only."
       invite_code_settings:
         description: Control how new people sign up for your instance of %{product}.
         email_confirmation_description: When enabled, users must confirm their email

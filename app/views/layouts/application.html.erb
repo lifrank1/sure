@@ -9,17 +9,20 @@ else
   [
     { name: t(".nav.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
     { name: t(".nav.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
-    # Accounts is a core daily surface — keep it on the mobile bottom bar.
-    { name: t(".nav.accounts"), path: accounts_path, icon: "landmark", icon_custom: false, active: page_active?(accounts_path) },
-    { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true },
-    { name: t(".nav.categories"), path: categories_path, icon: "shapes", icon_custom: false, active: page_active?(categories_path), desktop_only: true },
-    # Recurrings/Reports move off the crowded mobile bottom bar (still in the
-    # slide-out menu) so it stays a focused 5 items: Home, Transactions,
-    # Accounts, Budgets, Assistant.
-    { name: t(".nav.recurrings"), path: recurring_transactions_path, icon: "refresh-cw", icon_custom: false, active: page_active?(recurring_transactions_path), desktop_only: true },
+    # Accounts stays 3rd in the ARRAY so the mobile bottom-bar order is
+    # byte-identical to before (the bar renders in array order); more: true
+    # only moves it into the desktop "More" group.
+    { name: t(".nav.accounts"), path: accounts_path, icon: "landmark", icon_custom: false, active: page_active?(accounts_path), more: true },
     { name: t(".nav.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
-    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path), desktop_only: true },
     { name: t(".nav.compare"), path: comparisons_path, icon: "users-round", icon_custom: false, active: page_active?(comparisons_path), desktop_only: true },
+    # Progressive disclosure: remaining power surfaces live in the collapsed
+    # desktop "More" group; the mobile slide-out keeps the full flat list.
+    # Investments/Recurring hide entirely until the family has such data —
+    # index-only probes, memoized on Family for the request.
+    (Current.family&.any_investment_accounts? ? { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true, more: true } : nil),
+    { name: t(".nav.categories"), path: categories_path, icon: "shapes", icon_custom: false, active: page_active?(categories_path), desktop_only: true, more: true },
+    (Current.family&.any_active_recurrings? ? { name: t(".nav.recurrings"), path: recurring_transactions_path, icon: "refresh-cw", icon_custom: false, active: page_active?(recurring_transactions_path), desktop_only: true, more: true } : nil),
+    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path), desktop_only: true, more: true },
     preview_gated_nav_item({ name: t(".nav.goals"), path: goals_path, icon: "piggy-bank", icon_custom: false, active: page_active?(goals_path) }),
     (ai_chat_ui_enabled? ? { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true } : nil)
   ].compact
@@ -56,7 +59,7 @@ end %>
         <nav class="mb-4">
           <ul class="space-y-1">
             <% desktop_nav_items.each do |nav_item| %>
-              <li><%= render "layouts/shared/nav_row", **nav_item %></li>
+              <li><%= render "layouts/shared/nav_row", **nav_item.except(:more) %></li>
             <% end %>
           </ul>
         </nav>
@@ -113,10 +116,31 @@ end %>
           <%= render "users/user_menu", user: Current.user, placement: "bottom-end", offset: 12, intro_mode: intro_mode %>
         </div>
 
-        <%# Primary navigation (icon + label rows) %>
+        <%# Primary navigation (icon + label rows). Power surfaces collapse
+            into a "More" disclosure; it opens itself when the current page
+            lives inside it, otherwise remembers the user's last choice
+            (localStorage via nav-more). %>
+        <% core_nav_items = desktop_nav_items.reject { |item| item[:more] } %>
+        <% more_nav_items = desktop_nav_items.select { |item| item[:more] } %>
         <ul class="space-y-0.5 mb-4 shrink-0">
-          <% desktop_nav_items.each do |nav_item| %>
-            <li><%= render "layouts/shared/nav_row", **nav_item %></li>
+          <% core_nav_items.each do |nav_item| %>
+            <li><%= render "layouts/shared/nav_row", **nav_item.except(:more) %></li>
+          <% end %>
+          <% if more_nav_items.any? %>
+            <li>
+              <details class="group" data-controller="nav-more" data-action="toggle->nav-more#persist" <%= "open" if more_nav_items.any? { |item| item[:active] } %> data-nav-more-forced-value="<%= more_nav_items.any? { |item| item[:active] } %>">
+                <summary class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-secondary hover:bg-surface-hover hover:text-primary cursor-pointer list-none focus-ring">
+                  <%= icon("ellipsis", size: "md", color: "current") %>
+                  <span><%= t(".nav.more") %></span>
+                  <span class="ml-auto transition-transform group-open:rotate-180"><%= icon("chevron-down", size: "sm", color: "current") %></span>
+                </summary>
+                <ul class="space-y-0.5 mt-0.5">
+                  <% more_nav_items.each do |nav_item| %>
+                    <li><%= render "layouts/shared/nav_row", **nav_item.except(:more) %></li>
+                  <% end %>
+                </ul>
+              </details>
+            </li>
           <% end %>
         </ul>
 
@@ -267,7 +291,7 @@ end %>
     <%= tag.nav class: "lg:hidden fixed bottom-0 left-0 right-0 bg-surface z-10 border-t border-tertiary flex justify-around pb-[env(safe-area-inset-bottom)]",
       data: { viewport_target: "bottomNav" } do %>
       <% mobile_nav_items.reject { |item| item[:desktop_only] }.each do |nav_item| %>
-        <%= render "layouts/shared/nav_item", **nav_item %>
+        <%= render "layouts/shared/nav_item", **nav_item.except(:more) %>
       <% end %>
     <% end %>
   </div>

@@ -225,3 +225,24 @@
     </label>
   <% end %>
 <% end %>
+
+<%# AI assistant on/off — user-facing control. The AI Prompts settings page
+    (which used to hold the only disable button) is super_admin-only now, so
+    this toggle keeps consent two-way for every user. %>
+<%= settings_section do %>
+  <%= form_with url: settings_preferences_path, method: :patch,
+        data: { controller: "auto-submit-form" } do |f| %>
+    <label for="user_ai_enabled" class="flex cursor-pointer items-center gap-4 justify-between">
+      <div class="text-sm space-y-1">
+        <p class="text-primary font-medium"><%= t(".ai.title") %></p>
+        <p class="text-secondary"><%= t(".ai.description") %></p>
+      </div>
+      <%= render DS::Toggle.new(
+            id: "user_ai_enabled",
+            name: "user[ai_enabled]",
+            checked: Current.user.ai_enabled?,
+            data: { auto_submit_form_target: "auto" }
+      ) %>
+    </label>
+  <% end %>
+<% end %>

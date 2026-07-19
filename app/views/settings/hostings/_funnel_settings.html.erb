@@ -1,0 +1,28 @@
+<%# locals: (funnel:) %>
+<div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-xs uppercase text-secondary">
+        <th class="px-3 py-2"><%= t(".user") %></th>
+        <th class="px-3 py-2"><%= t(".signed_up") %></th>
+        <th class="px-3 py-2"><%= t(".linked") %></th>
+        <th class="px-3 py-2"><%= t(".week1_days") %></th>
+        <th class="px-3 py-2"><%= t(".week2_retained") %></th>
+        <th class="px-3 py-2"><%= t(".last_active") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% funnel.rows.each do |row| %>
+        <tr class="border-t border-tertiary">
+          <td class="px-3 py-2 text-primary font-medium"><%= row.user.email %></td>
+          <td class="px-3 py-2 text-secondary"><%= l(row.signed_up_on, format: :short) %></td>
+          <td class="px-3 py-2"><%= row.linked ? "✓" : "—" %></td>
+          <td class="px-3 py-2 text-secondary"><%= row.week1_days %>/7</td>
+          <td class="px-3 py-2"><%= row.week2_retained ? "✓" : "—" %></td>
+          <td class="px-3 py-2 text-secondary"><%= row.last_active_on ? l(row.last_active_on, format: :short) : "—" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <p class="text-xs text-subdued px-3 py-2"><%= t(".note") %></p>
+</div>

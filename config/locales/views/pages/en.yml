@@ -99,7 +99,7 @@ en:
         total_outflows: "Total Spending"
         categories: "Categories"
         value: "Value"
-        weight: "Weight"
+        weight: "Share"
         moved_to_investments: "Moved to investments"
         left_of_budget: "left of %{budget} budgeted this month"
         set_budget: "Set a budget to track what's left →"

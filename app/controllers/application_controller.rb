@@ -15,10 +15,29 @@ class ApplicationController < ActionController::Base
   before_action :detect_os
   before_action :set_default_chat
   before_action :set_active_storage_url_options
+  before_action :record_user_day
 
   helper_method :demo_config, :demo_host_match?, :show_demo_warning?
 
   private
+    # Retention instrument: stamp one user_days row per active day. Uses the
+    # raw session user (not Current.user) so API/MCP requests — where the
+    # session is nil at this point in the callback chain — are a no-op, and
+    # so impersonation stamps nobody but the real session owner. Cache
+    # throttle keeps the hot path to a memcache hit; failures never block a
+    # request.
+    def record_user_day
+      user = Current.session&.user
+      return unless user
+
+      Rails.cache.fetch([ "user_day", user.id, Date.current.iso8601 ], expires_in: 12.hours) do
+        UserDay.record!(user)
+        true
+      end
+    rescue => e
+      Rails.logger.error("record_user_day failed: #{e.message}")
+    end
+
     def accept_pending_invitation_for(user)
       return false if user.blank?
 

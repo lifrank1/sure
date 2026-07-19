@@ -414,6 +414,19 @@ class Family < ApplicationRecord
     ].compact.join("_")
   end
 
+  # Nav zero-state probes — the layout builds the nav on every request, so
+  # these must stay index-only LIMIT-1 queries, memoized per request
+  # (Current.family returns the same instance within a request).
+  def any_investment_accounts?
+    return @any_investment_accounts if defined?(@any_investment_accounts)
+    @any_investment_accounts = accounts.visible.where(accountable_type: %w[Investment Crypto]).exists?
+  end
+
+  def any_active_recurrings?
+    return @any_active_recurrings if defined?(@any_active_recurrings)
+    @any_active_recurrings = recurring_transactions.active.exists?
+  end
+
   # Used for invalidating entry related aggregation queries
   def entries_cache_version
     @entries_cache_version ||= begin

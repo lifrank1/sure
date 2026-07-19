@@ -25,8 +25,14 @@ nav_sections = [
     Current.user&.admin? ? {
       header: t(".advanced_section_title"),
       items: [
-        { label: t(".ai_prompts_label"), path: settings_ai_prompts_path, icon: "bot" },
-        { label: t(".llm_usage_label"), path: settings_llm_usage_path, icon: "activity" },
+        # Instance-operator infrastructure (AI config/costs, API keys, MCP) is
+        # super_admin-only — it's the operator's plumbing, not family admins'.
+        # Matching controller gates exist; nav `if:` must be literal false to
+        # hide (nil does not), hence the == true.
+        { label: t(".ai_prompts_label"), path: settings_ai_prompts_path, icon: "bot", if: Current.user&.super_admin? == true },
+        { label: t(".llm_usage_label"), path: settings_llm_usage_path, icon: "activity", if: Current.user&.super_admin? == true },
+        # API keys and MCP tokens are USER-OWNED credentials — every admin
+        # keeps create/revoke access (gating them orphans members' tokens).
         { label: t(".api_keys_label"), path: settings_api_key_path, icon: "key" },
         { label: t(".mcp_label"), path: settings_mcp_path, icon: "plug" },
         { label: t(".debug_label", default: "Debug"), path: settings_debug_path, icon: "bug", if: Current.user&.super_admin? },

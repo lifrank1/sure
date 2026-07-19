@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class Settings::AiPromptsTest < ApplicationSystemTestCase
   setup do
-    @user = users(:family_admin)
+    @user = users(:sure_support_staff)
     @user.update!(ai_enabled: true)
     login_as @user
   end

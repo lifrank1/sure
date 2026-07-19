@@ -13,7 +13,9 @@
       <%= t(".apply_notice_html", count: @rule.affected_resource_count, resource: @rule.resource_type.pluralize) %>
     </p>
 
-    <% if @rule.actions.any? { |a| a.action_type == "auto_categorize" } %>
+    <%# LLM costs land on the instance operator, not the user — only the
+        super_admin sees estimates and the usage link. %>
+    <% if Current.user.super_admin? && @rule.actions.any? { |a| a.action_type == "auto_categorize" } %>
       <% affected_count = @rule.affected_resource_count %>
       <div class="mb-4">
         <%= render DS::Alert.new(title: t(".ai_cost_title"), variant: :info) do %>

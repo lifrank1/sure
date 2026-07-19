@@ -18,6 +18,7 @@ class Settings::HostingsController < ApplicationController
   before_action :ensure_super_admin
 
   def show
+    @funnel = FunnelReport.new
     @breadcrumbs = [
       [ t("breadcrumbs.home"), root_path ],
       [ t("breadcrumbs.self_hosting"), nil ]
@@ -254,6 +255,7 @@ class Settings::HostingsController < ApplicationController
     @anthropic_base_url_input = hosting_params[:anthropic_base_url] if hosting_params.key?(:anthropic_base_url)
     @anthropic_model_input = hosting_params[:anthropic_model] if hosting_params.key?(:anthropic_model)
     flash.now[:alert] = error.message
+    @funnel = FunnelReport.new
     render :show, status: :unprocessable_entity
   end
 

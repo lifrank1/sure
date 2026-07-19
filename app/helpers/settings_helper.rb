@@ -15,11 +15,12 @@ module SettingsHelper
     { name: -> { t("settings.settings_nav.merchants_label") }, path: :family_merchants_path },
     { name: -> { t("settings.settings_nav.recurring_transactions_label") }, path: :recurring_transactions_path },
     { name: -> { t("settings.settings_nav.statement_vault_label") }, path: :account_statements_path, condition: :admin_user? },
-    # Advanced section
-    { name: -> { t("settings.settings_nav.ai_prompts_label") }, path: :settings_ai_prompts_path, condition: :admin_user? },
-    { name: -> { t("settings.settings_nav.llm_usage_label") }, path: :settings_llm_usage_path, condition: :admin_user? },
+    # Advanced section (operator plumbing = super_admin; keep in sync with
+    # _settings_nav conditions and the SuperAdminGated controllers)
+    { name: -> { t("settings.settings_nav.ai_prompts_label") }, path: :settings_ai_prompts_path, condition: :super_admin_user? },
+    { name: -> { t("settings.settings_nav.llm_usage_label") }, path: :settings_llm_usage_path, condition: :super_admin_user? },
     { name: -> { t("settings.settings_nav.api_key_label") }, path: :settings_api_key_path, condition: :admin_user? },
-    { name: -> { t("settings.settings_nav.self_hosting_label") }, path: :settings_hosting_path, condition: :self_hosted_and_admin? },
+    { name: -> { t("settings.settings_nav.self_hosting_label") }, path: :settings_hosting_path, condition: :self_hosted_and_super_admin? },
     { name: -> { t("settings.settings_nav.imports_label") }, path: :imports_path, condition: :admin_user? },
     { name: -> { t("settings.settings_nav.exports_label") }, path: :family_exports_path, condition: :admin_user? },
     # More section
@@ -221,7 +222,17 @@ module SettingsHelper
       Current.user&.admin?
     end
 
+    def super_admin_user?
+      Current.user&.super_admin?
+    end
+
     def self_hosted_and_admin?
       self_hosted? && admin_user?
+    end
+
+    # The hosting controller itself requires super_admin — the footer arrows
+    # must match or family admins get bounced with "Not authorized".
+    def self_hosted_and_super_admin?
+      self_hosted? && super_admin_user?
     end
 end

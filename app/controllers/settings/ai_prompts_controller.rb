@@ -1,4 +1,5 @@
 class Settings::AiPromptsController < ApplicationController
+  include SuperAdminGated
   layout "settings"
 
   def show

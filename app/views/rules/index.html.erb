@@ -38,7 +38,10 @@
   ) %>
 <% end %>
 
-<% if self_hosted? %>
+<%# Cost warnings are the instance operator's concern, not end users' —
+    on a self-hosted instance every user passes self_hosted?, so gate on
+    super_admin too. %>
+<% if self_hosted? && Current.user.super_admin? %>
   <div class="flex items-center gap-2 mb-2 py-4">
     <%= icon("circle-alert", size: "sm") %>
     <p class="text-sm text-secondary">

@@ -1,4 +1,5 @@
 class Settings::LlmUsagesController < ApplicationController
+  include SuperAdminGated
   layout "settings"
 
   def show
