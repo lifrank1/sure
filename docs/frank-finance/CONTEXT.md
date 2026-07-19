@@ -68,6 +68,17 @@ link. Push to BOTH remotes on every change.
 
 ## Current status (updated 2026-07-13)
 
+Shipped 2026-07-17 (114283e5): complexity pass — desktop nav collapses
+power surfaces into a "More" disclosure (Investments/Recurring hide until
+data exists; mobile bar unchanged); AI Prompts + LLM Usage settings are
+super_admin-only (API Key/MCP stay admin — user-owned credentials); AI
+on/off toggle lives on Preferences (writes the ai_enabled COLUMN);
+rules cost copy super_admin-gated; Weight→Share; retention funnel on the
+Instance page (user_days table, once-a-day request touch, FK cascades on
+user delete). Review fleet: 12/12 findings real, all fixed pre-deploy.
+Funnel day-one insight: brother + Jul-7 signup linked accounts then never
+returned — week-2 retention is the number to watch.
+
 Shipped 2026-07-14 (1eb335e8): 3-step onboarding for fresh signups
 (welcome/outcome + founder note -> personalize: age/metro/goal ->
 connect), reusing the upstream wizard rails; goal reorders the dashboard;

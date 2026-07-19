@@ -327,6 +327,30 @@ Fast-follows:
 - [ ] "Wrapped"-style shareable card (agent recommended deferring)
 - [ ] Expand metro list beyond 20; city typeahead → CBSA resolution
 
+## Simplification pass, shipped 2026-07-17 (114283e5)
+
+Progressive-disclosure nav (core: Home/Transactions/Budgets/Compare +
+"More" disclosure w/ localStorage memory; Investments/Recurring hidden at
+zero data via Family#any_investment_accounts?/any_active_recurrings?);
+operator plumbing gated (AI Prompts + LLM Usage super_admin via
+SuperAdminGated; API Key/MCP deliberately left admin — user-owned
+credentials, gating would orphan tokens); user-facing AI toggle on
+Preferences (writes ai_enabled column); rules AI-cost copy super_admin-
+gated; Weight→Share (EN); retention funnel: user_days (FK CASCADE, seeded
+from sessions) + once-daily request touch + FunnelReport panel on
+Instance page. Fixed pre-existing footer-arrow bug (Self-Hosting shown to
+admins who then got bounced). Review fleet confirmed 12/12 findings —
+notable: AI toggle first cut was a silent no-op (JSONB vs column),
+user_days FK RESTRICT would have broken account deletion, Instance page
+500 on validation errors, mobile tab-bar order regression.
+
+Fast-follows:
+- [ ] Funnel week-bucketing mixes timezone bases (day-granularity noise
+      only; revisit if user count ever makes it matter)
+- [ ] Consider consolidating the three divergent super_admin gate
+      implementations (Admin::BaseController / HostingsController /
+      SuperAdminGated)
+
 ## Onboarding flow, shipped 2026-07-14 (1eb335e8)
 
 3-step wizard for FRESH family creators only (invited/invite-only-default
