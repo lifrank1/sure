@@ -327,6 +327,24 @@ Fast-follows:
 - [ ] "Wrapped"-style shareable card (agent recommended deferring)
 - [ ] Expand metro list beyond 20; city typeahead → CBSA resolution
 
+## Dashboard de-noise, shipped 2026-07-20 (51bd0a21)
+
+Getting-started checklist collapsed to a single "Connect your first
+account" card (admins with zero accounts only; dismiss pref reused;
+review/budget steps deleted as noise per Frank). Uncategorized banner
+gained a "Categorize all with AI" primary button → POST /ai_categorize_all
+applies the family's auto-categorize rule (same RuleJob pipeline as
+nightly; double-click guard via pending rule_runs). Verified on prod
+end-to-end: click → run success → 17 LLM calls. HONEST RESULT: Frank's
+141 residual uncategorized didn't move — they're the AI-resistant long
+tail (ATM/checks/P2P) the model correctly nulls; wizard territory. The
+button's value is fresh backlogs (new imports; brother's nightly is
+still draining his: 294→282).
+
+Fast-follow:
+- [ ] When a run resolves ~0 transactions, follow up with a "these need
+      you — open the wizard" nudge instead of a silent no-op
+
 ## Simplification pass, shipped 2026-07-17 (114283e5)
 
 Progressive-disclosure nav (core: Home/Transactions/Budgets/Compare +
