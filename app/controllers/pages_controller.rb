@@ -98,11 +98,32 @@ class PagesController < ApplicationController
     @uncategorized_count = uncategorized.count
     @uncategorized_total = Money.new(uncategorized.sum("ABS(entries.amount)"), family_currency)
 
-    @getting_started_steps = build_getting_started_steps
+    @show_connect_prompt = show_connect_prompt?
 
     @dashboard_sections = build_dashboard_sections
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.dashboard"), nil ] ]
+  end
+
+  # One-click "Categorize all with AI" from the dashboard banner: applies
+  # the family's auto-categorize rule to its full backlog — the same
+  # pipeline the nightly sync runs, so results land in Rules > Recent Runs.
+  # Guarded so double-clicks don't queue duplicate runs.
+  def ai_categorize_all
+    rule = Current.family.rules
+      .where(active: true)
+      .joins(:actions)
+      .where(rule_actions: { action_type: "auto_categorize" })
+      .first
+
+    if rule.nil?
+      redirect_to root_path, alert: t("pages.dashboard.uncategorized_banner.no_rule", default: "No auto-categorize rule is set up yet — add one under Settings > Rules.")
+    elsif RuleRun.for_rule(rule).pending.exists?
+      redirect_to root_path, notice: t("pages.dashboard.uncategorized_banner.already_running", default: "AI categorization is already running — give it a few minutes.")
+    else
+      rule.apply_later
+      redirect_to root_path, notice: t("pages.dashboard.uncategorized_banner.ai_started", default: "AI categorization started — new labels will appear over the next few minutes.")
+    end
   end
 
   def dismiss_getting_started
@@ -179,29 +200,15 @@ class PagesController < ApplicationController
     # Goal-gradient getting-started checklist: pre-stamped (signup counts), so
     # a fresh account starts at 25% instead of 0. Hides once every step is
     # complete or the user dismisses it.
-    def build_getting_started_steps
-      return nil if Current.user.getting_started_dismissed?
+    # The old 4-step checklist compressed to its one load-bearing item:
+    # connect an account (user feedback 2026-07-19 — review/budget steps were
+    # noise; both are discoverable in-app). Non-admin members can't link
+    # accounts, so they never see the prompt.
+    def show_connect_prompt?
+      return false if Current.user.getting_started_dismissed?
+      return false unless Current.user.admin?
 
-      has_account = Current.family.accounts.visible.exists?
-      has_transactions = Current.family.transactions.visible.exists?
-      review_clear = has_transactions && Current.family.transactions.to_review.none?
-      has_budget = Current.family.budgets.includes(:budget_categories).any?(&:initialized?)
-
-      steps = [
-        { key: "signup", done: true, href: nil }
-      ]
-
-      # Only admins can link/add accounts; a non-admin member who followed a
-      # "connect" prompt would hit a method selector with no providers. Show the
-      # step (and count it toward progress) only when the user can complete it.
-      if Current.user.admin?
-        steps << { key: "connect", done: has_account, href: new_account_path(step: "method_select") }
-      end
-
-      steps << { key: "review", done: review_clear, href: transactions_path }
-      steps << { key: "budget", done: has_budget, href: budgets_path }
-
-      steps.all? { |s| s[:done] } ? nil : steps
+      !Current.family.accounts.visible.exists?
     end
 
     # Cumulative month-to-date spending vs an even pace toward the target.

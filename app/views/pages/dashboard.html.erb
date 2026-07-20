@@ -26,8 +26,8 @@
   </div>
 <% end %>
 
-<% if @getting_started_steps.present? %>
-  <%= render "pages/dashboard/getting_started", steps: @getting_started_steps %>
+<% if @show_connect_prompt %>
+  <%= render "pages/dashboard/connect_prompt" %>
 <% end %>
 
 <% if @uncategorized_count.to_i > 0 %>
@@ -40,9 +40,18 @@
         <span class="text-secondary"><%= t("pages.dashboard.uncategorized_banner.subtitle", default: "— your cashflow is only as accurate as its labels") %></span>
       </p>
     </div>
-    <%= link_to t("pages.dashboard.uncategorized_banner.cta", default: "Categorize →"),
-                transactions_categorize_path,
-                class: "shrink-0 text-sm font-medium text-primary underline hover:no-underline" %>
+    <div class="shrink-0 flex items-center gap-3">
+      <%= link_to t("pages.dashboard.uncategorized_banner.cta", default: "Categorize →"),
+                  transactions_categorize_path,
+                  class: "text-sm font-medium text-secondary underline hover:no-underline hover:text-primary" %>
+      <%= render DS::Button.new(
+        text: t("pages.dashboard.uncategorized_banner.ai_cta", default: "Categorize all with AI"),
+        variant: :primary,
+        size: "sm",
+        href: ai_categorize_all_path,
+        method: :post
+      ) %>
+    </div>
   </div>
 <% end %>
 

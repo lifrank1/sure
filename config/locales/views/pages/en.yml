@@ -38,15 +38,11 @@ en:
       heading: Terms of Service
       placeholder: Terms of service content will be displayed here.
     dashboard:
-      getting_started:
-        title: Getting started
-        progress: "%{pct}% complete"
+      connect_prompt:
+        title: Connect your first account
+        subtitle: Banks, cards, and brokerages sync automatically — takes about a minute.
+        cta: Connect account
         dismiss: Dismiss
-        steps:
-          signup: Create your account
-          connect: Connect your first account
-          review: Review your transactions
-          budget: Set a budget
       upcoming_recurrings:
         title: Next two weeks
       transactions_to_review:
