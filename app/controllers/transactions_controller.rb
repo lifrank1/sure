@@ -13,6 +13,9 @@ class TransactionsController < ApplicationController
 
   def index
     @q = search_params
+    # Review queue chip (SIMPLIFICATION_PLAN 1b — the dashboard widget's
+    # replacement; same to_review scope, bulk endpoint already view-agnostic)
+    @needs_review_count = Current.family.transactions.to_review.count
     accessible_account_ids = Current.user.accessible_accounts.pluck(:id)
     @search = Transaction::Search.new(Current.family, filters: @q, accessible_account_ids: accessible_account_ids)
 

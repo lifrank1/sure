@@ -10,7 +10,6 @@ class PagesController < ApplicationController
   DASHBOARD_SECTION_LAYOUTS = {
     "cashflow_sankey"    => { col_span: "full",   grow: false, min_height: 384, width_toggle: true },
     "outflows_donut"     => { col_span: "single", grow: false, min_height: 0 },
-    "transactions_to_review" => { col_span: "single", grow: false, min_height: 0 },
     "upcoming_recurrings" => { col_span: "single", grow: false, min_height: 0 },
     "investment_summary" => { col_span: "single", grow: false, min_height: 0, width_toggle: true },
     "net_worth_chart"    => { col_span: "single", grow: true,  min_height: 208, width_toggle: true }
@@ -77,6 +76,16 @@ class PagesController < ApplicationController
 
     @spending_pace = build_spending_pace(income_statement, current_month, family_currency)
 
+    # Cashflow sankey, returning home from Reports (SIMPLIFICATION_PLAN 1a).
+    # Fixed to the family's current month — a period picker is later polish.
+    @sankey_period = Period.current_month_for(Current.family)
+    @cashflow_sankey_data = build_cashflow_sankey_data(
+      income_statement.net_category_totals(period: @sankey_period),
+      income_statement.income_totals(period: @sankey_period),
+      income_statement.expense_totals(period: @sankey_period),
+      family_currency
+    )
+
     # Upcoming recurring charges (next two weeks, incl. overdue)
     @upcoming_recurrings = RecurringTransaction.for_family(Current.family)
                                                .active
@@ -84,11 +93,6 @@ class PagesController < ApplicationController
                                                .includes(:merchant)
                                                .order(:next_expected_date)
                                                .limit(6)
-
-    @transactions_to_review = Current.family.transactions.to_review
-                                     .includes(:category, :merchant, entry: :account)
-                                     .order("entries.date DESC")
-                                     .limit(6)
 
     # Uncategorized nudge banner
     uncategorized = Current.family.transactions.visible
@@ -279,12 +283,12 @@ class PagesController < ApplicationController
           collapsible: true
         },
         {
-          key: "transactions_to_review",
-          title: "pages.dashboard.transactions_to_review.title",
-          partial: "pages/dashboard/transactions_to_review",
-          layout: section_layout("transactions_to_review"),
-          locals: { transactions_to_review: @transactions_to_review },
-          visible: @accounts.any? && @transactions_to_review.any?,
+          key: "cashflow_sankey",
+          title: "pages.dashboard.cashflow_sankey.title",
+          partial: "pages/dashboard/cashflow_sankey",
+          layout: section_layout("cashflow_sankey"),
+          locals: { sankey_data: @cashflow_sankey_data, period: @sankey_period },
+          visible: @accounts.any? && @cashflow_sankey_data[:links].present?,
           collapsible: true
         },
         {

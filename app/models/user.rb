@@ -478,7 +478,7 @@ class User < ApplicationRecord
     end
 
     def default_dashboard_section_order
-      %w[spending_pace net_worth_chart outflows_donut transactions_to_review upcoming_recurrings investment_summary]
+      %w[spending_pace net_worth_chart outflows_donut cashflow_sankey upcoming_recurrings investment_summary]
     end
 
     def default_reports_section_order

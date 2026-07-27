@@ -176,6 +176,11 @@ en:
       edit_tags: Edit tags
       import: Import
     index:
+      needs_review_chip:
+        one: "1 new transaction from your bank to look over"
+        other: "%{count} new transactions from your bank to look over"
+      needs_review_show: "Show them"
+      needs_review_clear: "Mark all as reviewed"
       title: "Transactions"
       transaction: transaction
       transactions: transactions

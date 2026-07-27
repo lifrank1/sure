@@ -46,6 +46,22 @@
     </div>
   </header>
 
+  <% if @needs_review_count.to_i > 0 %>
+    <div class="mb-3 px-4 py-2.5 rounded-xl border border-secondary bg-container flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+      <div class="flex items-center gap-2 grow min-w-0">
+        <%= icon("eye", size: "sm", color: "default") %>
+        <p class="text-sm text-primary"><%= t(".needs_review_chip", count: @needs_review_count) %></p>
+      </div>
+      <div class="flex items-center gap-4 shrink-0">
+        <%= link_to t(".needs_review_show"), transactions_path(q: { needs_review: true }),
+              class: "text-sm font-medium text-primary underline hover:no-underline" %>
+        <%= button_to t(".needs_review_clear"), mark_all_reviewed_transactions_path,
+              method: :post,
+              class: "text-sm font-medium text-secondary underline hover:no-underline bg-transparent border-0 p-0 cursor-pointer" %>
+      </div>
+    </div>
+  <% end %>
+
   <%= render "summary", totals: @search.totals, search: @search %>
   <% if Current.family.recurring_transactions_disabled? %>
     <%= render "transactions/list", transactions: @transactions, projected_recurring: @projected_recurring, q: params[:q], pagy: @pagy %>
