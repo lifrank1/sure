@@ -13,7 +13,7 @@ group. One inbox, one spending engine, one vocabulary.
 
 ## Phase 1 — Nav consolidation
 
-- [ ] 1a. Sankey → Home dashboard widget; Reports nav entry dies.
+- [x] 1a. SHIPPED 6691be2a, prod-verified 2026-07-27. Sankey → Home dashboard widget; Reports nav entry dies.
       PRE-WIRED: PagesController already includes CashflowSankeyBuildable,
       DASHBOARD_SECTION_LAYOUTS has a cashflow_sankey entry, dashboard.html.erb
       has cashflow-expand + fullscreen conditionals, partials already under
@@ -21,7 +21,7 @@ group. One inbox, one spending engine, one vocabulary.
       period in #dashboard, add registry entry + default order append.
       /reports stays reachable as linkless power URL (CSV/Sheets export,
       trends table live there until missed/rescued).
-- [ ] 1b. To-review → Transactions "Needs review (N)" chip/filter + bulk
+- [x] 1b. SHIPPED 6691be2a, prod-verified 2026-07-27. To-review → Transactions "Needs review (N)" chip/filter + bulk
       mark-all in selection bar (endpoints are view-agnostic already:
       redirect_back_or_to + turbo_stream keyed review_row_<id>). Then the
       dashboard widget dies. Transaction::Search already supports
