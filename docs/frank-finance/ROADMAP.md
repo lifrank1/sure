@@ -327,6 +327,15 @@ Fast-follows:
 - [ ] "Wrapped"-style shareable card (agent recommended deferring)
 - [ ] Expand metro list beyond 20; city typeahead → CBSA resolution
 
+## Simplification program (approved 2026-07-27 — ACTIVE)
+
+Frank approved all 4 phases of the app-wide consolidation + human-UX
+review. THE EXECUTION CONTRACT LIVES IN
+[SIMPLIFICATION_PLAN.md](SIMPLIFICATION_PLAN.md) — read it before touching
+nav/IA/copy. End state: 4-surface nav (Home/Transactions/Budgets/Compare),
+one inbox, one spending engine, purged vocabulary. Sourced from two
+6-agent audit fleets, ~60 verified findings.
+
 ## Dashboard de-noise, shipped 2026-07-20 (51bd0a21)
 
 Getting-started checklist collapsed to a single "Connect your first
