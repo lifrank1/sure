@@ -3,8 +3,9 @@
     (SIMPLIFICATION_PLAN 1c). Paused rows stay visible + resumable here. %>
 <div class="space-y-4 flex flex-col mt-6">
   <% unless family.recurring_transactions_disabled? %>
-    <div class="flex items-center justify-between">
-      <h3 class="text-sm font-medium text-primary uppercase"><%= t("recurring_transactions.title") %></h3>
+    <%# No heading here — the list card below carries its own title; a bare
+        flush-left heading read as edge-hugging (Frank, 2026-07-27). %>
+    <div class="flex items-center justify-end">
       <div class="flex items-center gap-2">
         <%= render DS::Menu.new do |menu| %>
           <% menu.with_item(
