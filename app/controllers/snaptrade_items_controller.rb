@@ -117,7 +117,7 @@ class SnaptradeItemsController < ApplicationController
     redirect_to settings_providers_path, alert: t(".decryption_failed")
   rescue => e
     Rails.logger.error "SnapTrade connection error: #{e.class} - #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
-    redirect_to settings_providers_path, alert: t(".connection_failed", message: e.message)
+    redirect_to settings_providers_path, alert: t(".connection_failed_human", default: "We couldn't reach SnapTrade. Try again in a minute — if it keeps failing, your connection may need to be set up fresh.")
   end
 
   # Handle callback from SnapTrade after user connects brokerage
