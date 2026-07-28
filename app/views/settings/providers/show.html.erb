@@ -47,7 +47,8 @@
       </div>
     <% end %>
 
-    <% if @available.any? %>
+    <% if Current.user.super_admin? %>
+<% if @available.any? %>
       <div data-controller="providers-filter">
         <%= render "settings/providers/search_filters" %>
 
@@ -82,6 +83,7 @@
                   logo_text:    meta[:logo_text]
                 ) %>
           <% end %>
+<% end %>
         </div>
       </div>
     <% else %>

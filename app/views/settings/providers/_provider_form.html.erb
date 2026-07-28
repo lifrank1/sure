@@ -1,3 +1,8 @@
+<% unless Current.user.super_admin? %>
+  <%# Hosted instance: credentials are operator plumbing. Consumers get a
+      status line, never the operator's keys or an editable form. %>
+  <p class="text-sm text-secondary p-4"><%= t("settings.providers.managed_by_server", default: "Bank connections are managed by this server. Add or link accounts from the Accounts page.") %></p>
+<% else %>
 <%
   # Parameters:
   # - configuration: Provider::Configurable::Configuration object
@@ -68,3 +73,5 @@
     </div>
   <% end %>
 </div>
+
+<% end %>

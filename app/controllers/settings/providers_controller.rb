@@ -1,7 +1,11 @@
 class Settings::ProvidersController < ApplicationController
   layout -> { turbo_frame_request? ? "turbo_rails/frame" : "settings" }
 
-  before_action :ensure_admin, only: [ :show, :update, :sync_all, :sync, :connect_form ]
+  before_action :ensure_admin, only: [ :show, :sync_all, :sync ]
+  # Credential writes touch GLOBAL Setting rows that beat ENV — on a hosted
+  # instance a family admin could clobber production keys for every family
+  # (hosted-instance audit 2026-07-28). Operator-only.
+  before_action :ensure_super_admin, only: [ :update, :connect_form ]
 
   def show
     @breadcrumbs = [
@@ -145,6 +149,12 @@ class Settings::ProvidersController < ApplicationController
       end
 
       params.require(:setting).permit(*permitted_fields)
+    end
+
+    def ensure_super_admin
+      unless Current.user.super_admin?
+        redirect_to settings_providers_path, alert: t("settings.hostings.update.not_authorized", default: "Not authorized")
+      end
     end
 
     def ensure_admin

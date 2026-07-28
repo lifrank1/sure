@@ -109,6 +109,43 @@ group. One inbox, one spending engine, one vocabulary.
       enrichment; investment activity dropdown stays in investment
       surfaces only; nav appearance one-way (once shown, stays).
 
+
+## Hosted-instance audit (2026-07-28, 4-agent fleet — 8 high / ~15 med / lows)
+
+Shipped immediately (security batch):
+- [x] Family admins could OVERWRITE global production Plaid creds (Setting
+      beats ENV, form auto-expanded + prefilled with real client id,
+      values stored unencrypted): providers#update/#connect_form now
+      super_admin; provider form renders a read-only "managed by this
+      server" line for family admins
+- [x] SnapTrade credential form / dashboard.snaptrade.com setup steps
+      gated to super_admin; false "free tier covers 5 connections" banner
+      hidden whenever env creds configured (always on prod)
+- [x] Never-connected provider catalog + search: super_admin only
+- [x] "Reset and preload" demo wipe: super_admin only (controller + view)
+- [x] AI-consent OPENAI_ACCESS_TOKEN copy → consumer language
+- [x] SnapTrade maturity beta → stable; raw connect-exception toast
+      humanized (earlier commit)
+- [x] Stale test-pool SnapTrade user registration cleared via SQL — the
+      401 code-1083 that blocked Frank's reconnect for 3 weeks
+
+Queued into Phase 3 (add to 3d execution):
+- [ ] Guides page serves upstream self-host install guide → hosted rewrite
+- [ ] What's New / changelog: gate consistently (menu is gated, route isn't)
+- [ ] Security-page encryption-key setup banner → super_admin
+- [ ] Redis-outage page → generic maintenance copy (drop Docker guide link)
+- [ ] Raw e.message interpolations: SnapTrade card tooltip + importer error
+      lists + Plaid "check server logs" toast + convert-to-trade rescue →
+      generic copy + logs; map Plaid config errors to hosted-appropriate text
+- [ ] Pending-invitation token URLs shown to all members (self_hosted?
+      always true) → admins only
+- [ ] Trial page reachable by URL → redirect when self_hosted (also 3b)
+- [ ] "Paid" tier chip on Plaid cards; orphaned-registration "slots" copy;
+      "Credentials saved" status for users who never saved credentials;
+      encryption-error copy telling admins to edit Rails credentials
+- [ ] Per-account manual sync gated on self_hosted? (proxy for operator) →
+      deliberate decision + rate limit
+
 ## Full audit archives
 
 Raw fleet outputs (file:line evidence for every claim above), local paths:

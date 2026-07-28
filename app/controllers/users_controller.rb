@@ -1,6 +1,9 @@
 class UsersController < ApplicationController
   before_action :set_user
-  before_action :ensure_admin, only: %i[reset reset_with_sample_data]
+  before_action :ensure_admin, only: %i[reset]
+  # Demo-data preload is a dev/operator tool, not a consumer feature
+  # (hosted-instance audit 2026-07-28)
+  before_action :ensure_super_admin_for_sample_data, only: %i[reset_with_sample_data]
 
   def resend_confirmation_email
     if @user.resend_confirmation_email
@@ -77,6 +80,12 @@ class UsersController < ApplicationController
   end
 
   private
+
+    def ensure_super_admin_for_sample_data
+      unless Current.user.super_admin?
+        redirect_to settings_profile_path, alert: t("settings.hostings.update.not_authorized", default: "Not authorized")
+      end
+    end
     def handle_redirect(notice)
       case user_params[:redirect_to]
       when "onboarding_preferences"

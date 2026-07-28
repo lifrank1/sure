@@ -1,6 +1,9 @@
 <div class="space-y-4">
+<% if Current.user.super_admin? && !SnaptradeItem.env_credentials? %>
   <%= render DS::Alert.new(message: t("providers.snaptrade.free_tier_warning"), variant: :warning) %>
+<% end %>
 
+<% if Current.user.super_admin? %>
   <%= render "settings/providers/setup_steps",
              steps: [
                t("providers.snaptrade.step_1_html").html_safe,
@@ -41,6 +44,7 @@
       <%= form.submit is_new_record ? t("providers.snaptrade.save_button") : t("providers.snaptrade.update_button") %>
     </div>
   <% end %>
+<% end %>
 
   <% items = local_assigns[:snaptrade_items] || @snaptrade_items || Current.family.snaptrade_items.where.not(client_id: [nil, ""]) %>
 
