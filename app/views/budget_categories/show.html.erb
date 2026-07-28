@@ -26,6 +26,15 @@
   <% end %>
 
   <% dialog.with_body do %>
+
+    <% if @budget_category.category&.persisted? && !@budget_category.category.uncategorized? %>
+      <%# Category management moved here from the deleted Categories page
+          (SIMPLIFICATION_PLAN 1d) %>
+      <div class="flex items-center gap-2 mb-4">
+        <%= render DS::Link.new(text: t("budget_categories.show.edit_category", default: "Edit category"), variant: "outline", icon: "pencil", href: edit_category_path(@budget_category.category), frame: :modal) %>
+        <%= render DS::Link.new(text: t("budget_categories.show.delete_category", default: "Delete category"), variant: "ghost", icon: "trash-2", href: new_category_deletion_path(@budget_category.category), frame: :modal) %>
+      </div>
+    <% end %>
     <% dialog.with_section(title: t(".overview"), open: true) do %>
       <div class="pb-4">
         <dl class="space-y-3 px-3 py-2">

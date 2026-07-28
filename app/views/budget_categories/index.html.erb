@@ -23,6 +23,12 @@
         <div class="max-w-md mx-auto">
           <%= render "budget_categories/allocation_progress", budget: @budget %>
 
+          <div class="flex justify-end mb-2">
+            <%= render DS::Menu.new(variant: "icon") do |menu| %>
+              <% menu.with_item(variant: "link", text: t("budget_categories.index.new_category", default: "New category"), href: new_category_path, icon: "plus", data: { turbo_frame: :modal }) %>
+              <% menu.with_item(variant: "link", text: t("budget_categories.index.merge_categories", default: "Merge categories"), href: merge_categories_path, icon: "combine", data: { turbo_frame: :modal }) %>
+            <% end %>
+          </div>
           <div class="space-y-4 mb-4">
             <% BudgetCategory::Group.for(@budget_categories).sort_by(&:name).each do |group| %>
               <div class="space-y-4">

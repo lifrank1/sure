@@ -20,7 +20,6 @@ else
     # Investments/Recurring hide entirely until the family has such data —
     # index-only probes, memoized on Family for the request.
     (Current.family&.any_investment_accounts? ? { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true, more: true } : nil),
-    { name: t(".nav.categories"), path: categories_path, icon: "shapes", icon_custom: false, active: page_active?(categories_path), desktop_only: true, more: true },
     preview_gated_nav_item({ name: t(".nav.goals"), path: goals_path, icon: "piggy-bank", icon_custom: false, active: page_active?(goals_path) }),
     (ai_chat_ui_enabled? ? { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true } : nil)
   ].compact
