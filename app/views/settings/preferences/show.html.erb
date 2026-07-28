@@ -246,3 +246,24 @@
     </label>
   <% end %>
 <% end %>
+
+<%# Recurring-detection on/off — moved here from the deleted standalone
+    Recurring page (SIMPLIFICATION_PLAN 1c). %>
+<%= settings_section do %>
+  <%= form_with url: update_settings_recurring_transactions_path, method: :patch,
+        data: { turbo_frame: "_top", controller: "auto-submit-form" } do |f| %>
+    <%= f.hidden_field :recurring_transactions_disabled, value: Current.family.recurring_transactions_disabled? ? "false" : "true" %>
+    <label for="recurring_transactions_enabled" class="flex cursor-pointer items-center gap-4 justify-between">
+      <div class="text-sm space-y-1">
+        <p class="text-primary font-medium"><%= t("recurring_transactions.settings.enable_label") %></p>
+        <p class="text-secondary"><%= t("recurring_transactions.settings.enable_description") %></p>
+      </div>
+      <%= render DS::Toggle.new(
+            id: "recurring_transactions_enabled",
+            name: "toggle_display",
+            checked: !Current.family.recurring_transactions_disabled?,
+            data: { auto_submit_form_target: "auto" }
+      ) %>
+    </label>
+  <% end %>
+<% end %>

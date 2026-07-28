@@ -1,26 +1,8 @@
 class RecurringTransactionsController < ApplicationController
+  # The standalone page is gone (SIMPLIFICATION_PLAN 1c) — management
+  # lives on the Transactions "Upcoming" tab now.
   def index
-    @recurring_transactions = Current.family.recurring_transactions
-                                    .accessible_by(Current.user)
-                                    .includes(:merchant)
-                                    .order(status: :asc, next_expected_date: :asc)
-    @family = Current.family
-
-    # Headline stats: expected monthly outflow across active recurring charges
-    # (expenses only — recurring income/transfers don't belong in "you spend
-    # $X/month on subscriptions"), plus this month's paid vs still-to-pay
-    active_charges = @recurring_transactions.select { |rt| rt.active? && !rt.transfer? && rt.amount.positive? }
-    @monthly_recurring_total = Money.new(active_charges.sum(&:amount), Current.family.currency)
-    @monthly_recurring_count = active_charges.size
-
-    month_start = Date.current.beginning_of_month
-    month_end = Date.current.end_of_month
-    paid = active_charges.select { |rt| rt.last_occurrence_date.present? && rt.last_occurrence_date >= month_start }
-    due = active_charges.select { |rt| rt.next_expected_date.present? && rt.next_expected_date <= month_end }
-    @paid_so_far = Money.new(paid.sum(&:amount), Current.family.currency)
-    @left_to_pay = Money.new(due.sum(&:amount), Current.family.currency)
-
-    @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("recurring_transactions.title"), nil ] ]
+    redirect_to transactions_path(tab: "upcoming"), status: :moved_permanently
   end
 
   def update_settings
@@ -29,7 +11,7 @@ class RecurringTransactionsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = t("recurring_transactions.settings_updated")
-        redirect_to recurring_transactions_path
+        redirect_back_or_to transactions_path(tab: "upcoming")
       end
     end
   end
@@ -40,7 +22,7 @@ class RecurringTransactionsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = t("recurring_transactions.identified", count: count)
-        redirect_to recurring_transactions_path
+        redirect_to transactions_path(tab: "upcoming")
       end
     end
   end
@@ -51,7 +33,7 @@ class RecurringTransactionsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = t("recurring_transactions.cleaned_up", count: count)
-        redirect_to recurring_transactions_path
+        redirect_to transactions_path(tab: "upcoming")
       end
     end
   end
@@ -70,7 +52,7 @@ class RecurringTransactionsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = message
-        redirect_to recurring_transactions_path
+        redirect_to transactions_path(tab: "upcoming")
       end
     end
   end
@@ -80,7 +62,7 @@ class RecurringTransactionsController < ApplicationController
     @recurring_transaction.destroy!
 
     flash[:notice] = t("recurring_transactions.deleted")
-    redirect_to recurring_transactions_path
+    redirect_to transactions_path(tab: "upcoming")
   end
 
   private

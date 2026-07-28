@@ -27,3 +27,11 @@
 <% else %>
   <%= render "recurring_transactions/empty" %>
 <% end %>
+
+<%= render "recurring_transactions/manage",
+    family: Current.family,
+    recurring_transactions: @recurring_transactions,
+    monthly_recurring_total: @monthly_recurring_total,
+    monthly_recurring_count: @monthly_recurring_count,
+    paid_so_far: @paid_so_far,
+    left_to_pay: @left_to_pay %>

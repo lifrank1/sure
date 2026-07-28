@@ -1,53 +1,54 @@
-<div class="space-y-4 pb-6 lg:pb-12 flex flex-col">
-  <header class="flex justify-between items-center text-primary font-medium">
-    <h1 class="text-xl"><%= t("recurring_transactions.title") %></h1>
-    <div class="flex items-center gap-2">
-  <% unless @family.recurring_transactions_disabled? %>
-    <%= render DS::Menu.new do |menu| %>
-      <% menu.with_item(
-          variant: "button",
-          text: t("recurring_transactions.cleanup_stale"),
-          href: cleanup_recurring_transactions_path,
-          method: :post,
-          icon: "trash-2") %>
-    <% end %>
-
-    <%= render DS::Link.new(
-      text: t("recurring_transactions.identify_patterns"),
-      icon: "search",
-      variant: "outline",
-      href: identify_recurring_transactions_path,
-      method: :post
-    ) %>
-  <% end %>
+<%# locals: (family:, recurring_transactions:, monthly_recurring_total:, monthly_recurring_count:, paid_so_far:, left_to_pay:) %>
+<%# Recurring management, absorbed from the old /recurring_transactions page
+    (SIMPLIFICATION_PLAN 1c). Paused rows stay visible + resumable here. %>
+<div class="space-y-4 flex flex-col mt-6">
+  <% unless family.recurring_transactions_disabled? %>
+    <div class="flex items-center justify-between">
+      <h3 class="text-sm font-medium text-primary uppercase"><%= t("recurring_transactions.title") %></h3>
+      <div class="flex items-center gap-2">
+        <%= render DS::Menu.new do |menu| %>
+          <% menu.with_item(
+              variant: "button",
+              text: t("recurring_transactions.cleanup_stale"),
+              href: cleanup_recurring_transactions_path,
+              method: :post,
+              icon: "trash-2") %>
+        <% end %>
+        <%= render DS::Link.new(
+          text: t("recurring_transactions.identify_patterns"),
+          icon: "search",
+          variant: "outline",
+          href: identify_recurring_transactions_path,
+          method: :post
+        ) %>
+      </div>
     </div>
-  </header>
+  <% end %>
 
-<div class="space-y-4 flex flex-col">
-  <% unless @family.recurring_transactions_disabled? %>
+  <% unless family.recurring_transactions_disabled? %>
     <%# Data first: the numbers people come here for %>
-    <% if @monthly_recurring_count > 0 %>
+    <% if monthly_recurring_count > 0 %>
       <div class="bg-container rounded-xl shadow-border-xs p-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <p class="text-sm text-secondary"><%= t("recurring_transactions.monthly_total_label") %></p>
-            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@monthly_recurring_total) %><span class="text-base text-secondary font-normal"> / <%= t("recurring_transactions.per_month") %></span></p>
-            <p class="text-xs text-secondary mt-1"><%= t("recurring_transactions.monthly_total_count", count: @monthly_recurring_count) %></p>
+            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(monthly_recurring_total) %><span class="text-base text-secondary font-normal"> / <%= t("recurring_transactions.per_month") %></span></p>
+            <p class="text-xs text-secondary mt-1"><%= t("recurring_transactions.monthly_total_count", count: monthly_recurring_count) %></p>
           </div>
           <div>
             <p class="text-sm text-secondary"><%= t("recurring_transactions.paid_so_far") %></p>
-            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@paid_so_far) %></p>
+            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(paid_so_far) %></p>
           </div>
           <div>
             <p class="text-sm text-secondary"><%= t("recurring_transactions.left_to_pay") %></p>
-            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(@left_to_pay) %></p>
+            <p class="text-3xl font-medium text-primary privacy-sensitive"><%= format_money(left_to_pay) %></p>
           </div>
         </div>
       </div>
     <% end %>
 
     <div class="bg-container rounded-xl shadow-border-xs p-4">
-      <% if @recurring_transactions.empty? %>
+      <% if recurring_transactions.empty? %>
         <%= render DS::EmptyState.new(
           icon: "repeat",
           title: t("recurring_transactions.empty.title"),
@@ -68,7 +69,7 @@
         <div class="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-secondary uppercase">
           <p><%= t("recurring_transactions.title") %></p>
           <span class="text-subdued">&middot;</span>
-          <p><%= @recurring_transactions.count %></p>
+          <p><%= recurring_transactions.count %></p>
         </div>
 
         <div class="bg-container rounded-lg shadow-border-xs overflow-x-auto">
@@ -85,7 +86,7 @@
             </tr>
           </thead>
           <tbody>
-            <% @recurring_transactions.each do |recurring_transaction| %>
+            <% recurring_transactions.each do |recurring_transaction| %>
               <tr class="border-b border-subdued hover:bg-surface-hover <%= "opacity-60" unless recurring_transaction.active? %>">
                 <td class="py-3 px-2 text-sm">
                   <% row_label = recurring_transaction.merchant&.name.presence || recurring_transaction.name %>
@@ -205,24 +206,4 @@
       </div>
     </div>
   <% end %>
-
-  <%# Feature toggle is settings plumbing — footer, not headline %>
-  <div class="bg-container rounded-xl shadow-border-xs p-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-primary"><%= t("recurring_transactions.settings.enable_label") %></p>
-        <p class="text-xs text-secondary"><%= t("recurring_transactions.settings.enable_description") %></p>
-      </div>
-      <%= form_with url: update_settings_recurring_transactions_path, method: :patch, data: { turbo_frame: "_top", controller: "auto-submit-form" } do |f| %>
-        <%= f.hidden_field :recurring_transactions_disabled, value: @family.recurring_transactions_disabled? ? "false" : "true" %>
-        <%= render DS::Toggle.new(
-          id: "recurring_transactions_enabled",
-          name: "toggle_display",
-          checked: !@family.recurring_transactions_disabled?,
-          data: { auto_submit_form_target: "auto" }
-        ) %>
-      <% end %>
-    </div>
-  </div>
-</div>
 </div>

@@ -270,7 +270,7 @@ class PagesController < ApplicationController
           partial: "pages/dashboard/upcoming_recurrings",
           layout: section_layout("upcoming_recurrings"),
           locals: { upcoming_recurrings: @upcoming_recurrings },
-          visible: @accounts.any? && @upcoming_recurrings.any?,
+          visible: @accounts.any? && @upcoming_recurrings.any? && !Current.family.recurring_transactions_disabled?,
           collapsible: true
         },
         {

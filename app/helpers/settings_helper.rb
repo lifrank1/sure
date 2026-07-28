@@ -13,7 +13,6 @@ module SettingsHelper
     { name: -> { t("settings.settings_nav.tags_label") }, path: :tags_path },
     { name: -> { t("settings.settings_nav.rules_label") }, path: :rules_path },
     { name: -> { t("settings.settings_nav.merchants_label") }, path: :family_merchants_path },
-    { name: -> { t("settings.settings_nav.recurring_transactions_label") }, path: :recurring_transactions_path },
     { name: -> { t("settings.settings_nav.statement_vault_label") }, path: :account_statements_path, condition: :admin_user? },
     # Advanced section (operator plumbing = super_admin; keep in sync with
     # _settings_nav conditions and the SuperAdminGated controllers)

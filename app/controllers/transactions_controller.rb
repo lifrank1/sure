@@ -1,4 +1,5 @@
 class TransactionsController < ApplicationController
+  include RecurringManageable
   include EntryableResource
 
   before_action :set_entry_for_unlock, only: :unlock
@@ -64,6 +65,8 @@ class TransactionsController < ApplicationController
                                          10.days.from_now.to_date,
                                          Date.current)
                                   .includes(:merchant)
+
+    load_recurring_management
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.transactions"), nil ] ]
   end
