@@ -32,7 +32,7 @@ group. One inbox, one spending engine, one vocabulary.
       paused rows are ONLY resumable on the page today; feature on/off
       toggle only lives there (move to a small settings row); widget query
       ignores the disabled flag (fix). Home widget links to the tab.
-- [ ] 1d. Categories page dies → Budgets absorbs. Categories#index already
+- [x] 1d. SHIPPED bc5dd2d6, prod-verified 2026-07-28. Categories page dies → Budgets absorbs. Categories#index already
       loads the current Budget to render (it IS a read-only clone). Add
       edit/delete DS::Menu to budget category rows + allocation editor rows
       (modals are page-independent); merge + delete-all into a "Manage
