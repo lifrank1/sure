@@ -26,7 +26,7 @@ group. One inbox, one spending engine, one vocabulary.
       redirect_back_or_to + turbo_stream keyed review_row_<id>). Then the
       dashboard widget dies. Transaction::Search already supports
       q[needs_review] — it just has no UI control.
-- [ ] 1c. Recurring page dies → Transactions "Upcoming" tab absorbs
+- [x] 1c. SHIPPED e4005f35, prod-verified 2026-07-27. Recurring page dies → Transactions "Upcoming" tab absorbs
       management (pause/resume/delete/cleanup/identify/stats; tab already
       renders the SAME partials _projected_transaction/_empty). TRAPS:
       paused rows are ONLY resumable on the page today; feature on/off
