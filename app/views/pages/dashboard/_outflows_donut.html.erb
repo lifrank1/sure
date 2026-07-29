@@ -142,7 +142,8 @@
           <% end %>
         </div>
 
-        <% if outflows_data[:invested].present? %>
+        <p class="text-xs text-subdued px-4 py-1"><%= t("pages.dashboard.outflows_donut.gross_note", default: "Shows money out before refunds — matches the Monthly spending card.") %></p>
+<% if outflows_data[:invested].present? %>
           <%= link_to transactions_path(q: { categories: [outflows_data[:invested][:category_name]], start_date: period.date_range.first, end_date: period.date_range.last }),
               class: "flex items-center justify-between px-4 py-2 text-sm text-secondary hover:text-primary transition-colors",
               data: { turbo_frame: "_top", turbo_prefetch: false } do %>

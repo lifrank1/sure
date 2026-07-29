@@ -35,8 +35,6 @@ class PagesController < ApplicationController
 
     # Use IncomeStatement for all cashflow data (now includes categorized trades)
     income_statement = Current.family.income_statement
-    income_totals = income_statement.income_totals(period: @period)
-    expense_totals = income_statement.expense_totals(period: @period)
     # Outflows carries its own period selector. It defaults to the current
     # month (not the global period) so it answers "what am I spending right
     # now" alongside the Monthly spending card, even when the global period
@@ -54,9 +52,14 @@ class PagesController < ApplicationController
     else
       @period
     end
-    net_totals = income_statement.net_category_totals(period: @outflows_period)
-
-    @outflows_data = build_outflows_donut_data(net_totals)
+    # ONE SPENDING ENGINE (4a): the donut consumes the same gross
+    # expense_totals family as the pace card, so its total equals
+    # expense_split.spending for the same period by construction.
+    @outflows_data = build_outflows_donut_data(income_statement.expense_totals(period: @outflows_period))
+    donut_expected = income_statement.expense_split(period: @outflows_period).spending.amount.to_f
+    if (@outflows_data[:total] - donut_expected).abs > 0.05
+      Rails.logger.warn("[donut-reconciliation] drift: donut=#{@outflows_data[:total]} vs expense_split=#{donut_expected.round(2)} (family=#{Current.family.id})")
+    end
 
     # Budget context for the Spending card header. "Spent" is consumption
     # only (money moved to investments isn't spending) — same split as the
@@ -80,7 +83,6 @@ class PagesController < ApplicationController
     # Fixed to the family's current month — a period picker is later polish.
     @sankey_period = Period.current_month_for(Current.family)
     @cashflow_sankey_data = build_cashflow_sankey_data(
-      income_statement.net_category_totals(period: @sankey_period),
       income_statement.income_totals(period: @sankey_period),
       income_statement.expense_totals(period: @sankey_period),
       family_currency
@@ -345,27 +347,19 @@ class PagesController < ApplicationController
       Provider::Registry.get_provider(:github)
     end
 
-    # Nets subcategory expense and income totals, grouped by parent_id.
-    # Returns { parent_id => [ { category:, total: net_amount }, ... ] }
-    # Only includes subcategories with positive net (same direction as parent).
+    # GROSS spending per category — same engine as the pace card. The
+    # synthetic Uncategorized bucket becomes an explicit slice (stable id
+    # "uncategorized" — the donut JS reserves "unused"/"overage"), and
+    # invested stays split out as the secondary line. Identity:
+    # total == expense_split(period).spending.
+    def build_outflows_donut_data(expense_totals)
+      currency_symbol = Money::Currency.new(expense_totals.currency).symbol
 
-    # Builds sankey nodes/links for net categories with subcategory hierarchy.
-    # Subcategories matching the parent's flow direction are shown as children.
-    # Subcategories with opposite net direction appear on the OTHER side of the
-    # sankey (handled when the other side calls this method).
-    #
-    # flow_direction: :inbound  (subcategory -> parent -> cash_flow) for income
-    #                 :outbound (cash_flow -> parent -> subcategory) for expenses
+      top_level = expense_totals.category_totals
+        .reject { |ct| ct.category.subcategory? }
+        .reject { |ct| ct.total.to_f.round(2) <= 0 }
 
-    def build_outflows_donut_data(net_totals)
-      currency_symbol = Money::Currency.new(net_totals.currency).symbol
-
-      # Money moved into investments is savings, not spending — without this
-      # split it dwarfs every real spending category in the donut. It stays
-      # visible as a secondary "moved to investments" line under the list.
-      spending, invested = net_totals.net_expense_categories
-        .reject { |ct| ct.total.zero? }
-        .partition { |ct| !ct.category.investment_contributions? }
+      spending, invested = top_level.partition { |ct| !ct.category.investment_contributions? }
 
       total = spending.sum(&:total)
 
@@ -373,7 +367,7 @@ class PagesController < ApplicationController
         .sort_by { |ct| -ct.total }
         .map do |ct|
           {
-            id: ct.category.id,
+            id: ct.category.id || (ct.category.other_investments? ? "other_investments" : "uncategorized"),
             name: ct.category.name,
             amount: ct.total.to_f.round(2),
             currency: ct.currency,
@@ -393,7 +387,7 @@ class PagesController < ApplicationController
         categories: categories,
         total: total.to_f.round(2),
         invested: invested_data,
-        currency: net_totals.currency,
+        currency: expense_totals.currency,
         currency_symbol: currency_symbol
       }
     end

@@ -84,9 +84,21 @@ group. One inbox, one spending engine, one vocabulary.
 
 ## Phase 4 — De-redundancy mechanics (deepest surgery)
 
-- [ ] 4a. ONE spending engine: route every user-visible "spent" number
-      through IncomeStatement#expense_split (today 3 engines / 6 surfaces
-      disagree).
+- [x] 4a. SHIPPED 2026-07-29 (pulled forward — Frank caught the three
+      disagreeing Home cards himself). ONE definition: GROSS money-out
+      (expense_split family), no netting. Donut rebuilt from expense_totals
+      w/ explicit Uncategorized slice (stable id "uncategorized") — total
+      == pace card by construction + drift logger; Sankey rebuilt gross
+      both sides (opposite-direction machinery deleted), synthetic node
+      keys locale-independent, income nodes for spending categories
+      labeled "(refunds)", NEW Deficit balancing node, reconciliation
+      logger. Review fleet: 12 findings, 7 real, all fixed/documented.
+      Math-gated in container incl. deficit path.
+      FOLLOW-UP (queued): Budgets page engine — actual_spending includes
+      invested + nets refunds; exclude invested (real bug) and document
+      envelope net-of-refunds semantics vs the gross donut (defensible but
+      one click apart). Reports breakdown FX drift + AI chat
+      get_income_statement labeling also queued.
 - [ ] 4b. Period pickers: one behavior (widget-local, persisted per widget,
       never mutate other pages' default_period); cut 12 options → ~5
       (This month / Last month / 3 months / Year / All time; long horizons

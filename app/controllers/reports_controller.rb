@@ -15,7 +15,6 @@ class ReportsController < ApplicationController
     income_statement = Current.family.income_statement
     sankey_period = Period.custom(start_date: @start_date, end_date: @end_date)
     @cashflow_sankey_data = build_cashflow_sankey_data(
-      income_statement.net_category_totals(period: sankey_period),
       income_statement.income_totals(period: sankey_period),
       income_statement.expense_totals(period: sankey_period),
       Current.family.currency
