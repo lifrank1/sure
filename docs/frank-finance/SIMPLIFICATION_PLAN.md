@@ -39,7 +39,7 @@ group. One inbox, one spending engine, one vocabulary.
       categories" modal from Budgets; retarget ~4 inbound categories_path
       links (donut "All categories", transactions kebab); budget show
       uncategorized row gains wizard link.
-- [ ] 1e. Accounts TAB dies (page/routes stay — ~30 provider-flow return
+- [x] 1e. SHIPPED 6edb9d99, prod-verified 2026-07-29. Accounts TAB dies (page/routes stay — ~30 provider-flow return
       links + hardcoded Plaid JS redirect land on /accounts). Management
       console reframes as Settings → Connections (nav entry in settings
       sidebar); sidebar stays the viewing surface; per-account actions
