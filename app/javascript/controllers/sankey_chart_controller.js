@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import * as d3 from "d3";
 import { sankey } from "d3-sankey";
 import { CHART_TOOLTIP_CLASSES } from "utils/chart_tooltip";
+import { resolveToken, isTokenRef } from "utils/theme_tokens";
 import { sankeyNodeHasChildren, zoomSankeyData } from "utils/sankey_zoom";
 import {
   buildCategoryTransactionsUrl,
@@ -30,12 +31,6 @@ export default class extends Controller {
   static CORNER_RADIUS = 8;
   static ZOOM_TRANSITION_MS = 220;
   static DEFAULT_COLOR = "var(--color-gray-400)";
-  static CSS_VAR_MAP = {
-    "var(--color-success)": "#10A861",
-    "var(--color-destructive)": "#EC2222",
-    "var(--color-gray-400)": "#9E9E9E",
-    "var(--color-gray-500)": "#737373",
-  };
   static MIN_LABEL_SPACING = 28; // Minimum vertical space needed for labels (2 lines)
 
   connect() {
@@ -247,11 +242,16 @@ export default class extends Controller {
     const defaultColor = this.constructor.DEFAULT_COLOR;
     let colorStr = nodeColor || defaultColor;
 
-    // Map CSS variables to hex values for d3 color manipulation
-    colorStr = this.constructor.CSS_VAR_MAP[colorStr] || colorStr;
+    // d3.color() needs a concrete value to do opacity math. This used to be a
+    // hardcoded hex mirror of four tokens, which froze the sankey to the
+    // default palette; resolving live means it follows whichever palette is
+    // active (and dark mode).
+    if (isTokenRef(colorStr)) {
+      colorStr = resolveToken(colorStr, colorStr);
+    }
 
-    // Unmapped CSS vars cannot be manipulated, return as-is
-    if (colorStr.startsWith("var(--")) return colorStr;
+    // Still unresolvable (token missing) — hand it back for CSS to handle.
+    if (isTokenRef(colorStr)) return colorStr;
 
     const d3Color = d3.color(colorStr);
     return d3Color ? d3Color.copy({ opacity }) : defaultColor;

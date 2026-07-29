@@ -426,3 +426,36 @@ Fast-follows:
       test-client SnapTrade connection, 401s nightly) fails the ENTIRE
       family sync, so post-sync rule runs never fire for that family —
       rescue per-item and continue (also see CONTEXT "Waiting on Frank" #3)
+
+
+## Theme lab — three-axis look system, 2026-07-29
+
+10 color palettes x 10 typefaces x 10 structural skins (1,000 combinations),
+switchable from Settings > Appearance with instant preview, auto-save, a
+"Surprise me" randomizer and a reset. Applied purely via data attributes on
+<html>; `look_controller.js` re-applies them after Turbo visits because Turbo
+never re-renders the <html> element.
+
+Palettes are generated in OKLCH at the stock ramp's lightness steps and
+contrast-enforced at build time (AA for body text on both container and inset
+surfaces, 3:1 for accents, gains/losses always distinguishable) — which also
+lifted the shipped Graphite ramp, whose gray-500 sat at 4.43:1 on inset
+surfaces. Typefaces are 11 self-hosted latin-subset variable woff2 families
+(zero third-party requests; CSP font-src stays 'self').
+
+Also fixed as prerequisites: `goal_projection_chart` and `sankey_chart`
+hardcoded light/dark hex pairs and so ignored palettes entirely — both now
+resolve tokens at draw time via `utils/theme_tokens.js`, whose observer watches
+all three look attributes rather than only data-theme. The `theme-color` meta
+now follows the active palette.
+
+Full guide + authoring contract: docs/frank-finance/THEME_LAB.md
+
+Fast-follows:
+- [ ] PWA manifest still hardcodes theme_color/background_color (#F9F9F9) while
+      _head.html.erb now derives them from the palette — make the manifest
+      dynamic or accept the mismatch on installed PWAs
+- [ ] Mobile breakpoint for the skins was verified statically (Dense gates its
+      compressions behind pointer:fine + min-width:64rem; no skin touches the
+      bottom nav) but not visually — the Chrome automation could not resize the
+      viewport below 1440px

@@ -269,16 +269,19 @@
   */
   .chart-tooltip {
     background: var(--color-container);
-    border-radius: 10px;
+    /* Token-driven so the tooltip follows the active look (radius from the
+       skin axis, drop color from the palette) instead of a fixed 10px and a
+       hardcoded near-black shadow. */
+    border-radius: var(--radius-lg);
     padding: 10px 12px;
     box-shadow:
       0 0 0 1px var(--color-alpha-black-50),
-      0 8px 24px rgba(11, 11, 11, 0.12);
+      0 8px 24px color-mix(in oklab, var(--color-black) 12%, transparent);
 
     @variant theme-dark {
       box-shadow:
         0 0 0 1px var(--color-alpha-white-50),
-        0 8px 24px rgba(11, 11, 11, 0.12);
+        0 8px 24px color-mix(in oklab, var(--color-black) 40%, transparent);
     }
   }
 }

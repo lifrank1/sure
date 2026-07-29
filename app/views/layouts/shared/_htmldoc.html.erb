@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 
 <% theme = Current.user&.theme || "system" %>
+<%# Look system (UiTheme): three independent axes, server-rendered here so the
+    first paint is already themed. Turbo never re-renders the <html> element,
+    so `look_controller` (mounted in-body) re-applies these after navigations —
+    same two-instance pattern as data-theme. %>
+<% palette = Current.user&.ui_palette || UiTheme.default_for(:palette) %>
+<% typeface = Current.user&.ui_typeface || UiTheme.default_for(:typeface) %>
+<% ui_style = Current.user&.ui_style || UiTheme.default_for(:style) %>
 
 <html
   lang="en"
   data-theme="<%= theme %>"
+  data-palette="<%= palette %>"
+  data-typeface="<%= typeface %>"
+  data-ui-style="<%= ui_style %>"
   data-controller="theme viewport"
   data-theme-user-preference-value="<%= Current.user&.theme || "system" %>"
   class="h-[var(--app-height, 100dvh)] text-primary bg-surface overflow-hidden overscroll-none font-sans <%= @os %>">
@@ -14,6 +24,15 @@
   </head>
 
   <body class="h-[var(--app-height)] overflow-hidden antialiased">
+    <%# Re-applies the look axes to <html> on every Turbo navigation (Turbo
+        replaces <body> but never touches <html>, so the server-rendered
+        attributes above go stale after the first visit). %>
+    <div hidden
+         data-controller="look"
+         data-look-palette-value="<%= palette %>"
+         data-look-typeface-value="<%= typeface %>"
+         data-look-style-value="<%= ui_style %>"></div>
+
     <% if Rails.env.development? %>
       <button hidden data-controller="hotkey" data-hotkey="t t /" data-action="theme#toggle"></button>
     <% end %>

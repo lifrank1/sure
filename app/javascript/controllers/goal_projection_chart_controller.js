@@ -5,6 +5,7 @@ import {
   CHART_TOOLTIP_CONTEXT_CLASSES,
   CHART_TOOLTIP_VALUE_CLASSES,
 } from "utils/chart_tooltip";
+import { resolveToken, observeLookChanges } from "utils/theme_tokens";
 
 // Projection chart for a goal. Renders:
 //   - Saved area + line from goal creation → today (solid)
@@ -38,18 +39,10 @@ export default class extends Controller {
     } else {
       this._draw();
     }
-    // Repaint when the user toggles theme so SVG attributes (which bake
-    // light/dark hex values at draw time) follow data-theme. Lives here
-    // until theme_controller broadcasts a theme:change event upstream.
-    if (typeof MutationObserver !== "undefined") {
-      this._themeObserver = new MutationObserver((mutations) => {
-        if (mutations.some((m) => m.attributeName === "data-theme")) this._draw();
-      });
-      this._themeObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["data-theme"],
-      });
-    }
+    // Repaint when any look axis changes — SVG attributes bake their values at
+    // draw time, so a palette or skin switch needs a redraw exactly like a
+    // light/dark toggle does.
+    this._themeObserver = observeLookChanges(() => this._draw());
     // After a Turbo render (eg. after saving the goal from the edit modal
     // and redirecting back to show), the chart container can be left empty
     // its children may be wiped by the morph even though connect() was
@@ -81,11 +74,25 @@ export default class extends Controller {
     const height = root.clientHeight || 240;
     if (width <= 0 || height <= 0) return;
 
+    // Resolved from tokens rather than hardcoded light/dark hex, so the chart
+    // follows the active palette as well as light/dark.
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    const textPrimary = isDark ? "#ffffff" : "#171717";
-    const textSecondary = isDark ? "#cfcfcf" : "#737373";
-    const borderSubdued = isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.10)";
-    const containerBg = isDark ? "#0a0a0a" : "#ffffff";
+    const textPrimary = resolveToken(
+      isDark ? "--color-white" : "--color-gray-900",
+      isDark ? "#ffffff" : "#171717",
+    );
+    const textSecondary = resolveToken(
+      isDark ? "--color-gray-300" : "--color-gray-500",
+      isDark ? "#cfcfcf" : "#737373",
+    );
+    const borderSubdued = resolveToken(
+      isDark ? "--color-alpha-white-300" : "--color-alpha-black-200",
+      isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.10)",
+    );
+    const containerBg = resolveToken(
+      "--color-container",
+      isDark ? "#0a0a0a" : "#ffffff",
+    );
 
     // Reserve gutter for y-axis labels when there's room. Mobile (< 320)
     // keeps the tighter left margin and skips the y-axis entirely.

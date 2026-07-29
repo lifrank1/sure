@@ -1,5 +1,71 @@
 <%= content_for :page_title, t(".page_title") %>
 
+<%# ---------------------------------------------------------------- LOOK LAB
+    Three independent axes (UiTheme): palette, typeface, structural style.
+    Everything below previews live — the picker writes the attribute onto
+    <html> and the form saves in the background. %>
+<div data-controller="look"
+     data-look-palette-value="<%= @user.ui_palette %>"
+     data-look-typeface-value="<%= @user.ui_typeface %>"
+     data-look-style-value="<%= @user.ui_style %>">
+  <%= form_with model: @user, id: "look_form",
+        data: { controller: "auto-submit-form", auto_submit_form_trigger_event_value: "change" } do |form| %>
+    <%= form.hidden_field :redirect_to, value: "appearance" %>
+
+    <%= settings_section title: t(".look_title"), subtitle: t(".look_subtitle") do %>
+      <div class="p-3 space-y-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <%= render DS::Button.new(
+                text: t(".look_randomize"),
+                variant: :secondary,
+                size: "sm",
+                icon: "dices",
+                href: randomize_settings_appearance_path,
+                method: :post,
+                frame: :_top
+              ) %>
+          <%= render DS::Button.new(
+                text: t(".look_reset"),
+                variant: :ghost,
+                size: "sm",
+                icon: "rotate-ccw",
+                href: reset_settings_appearance_path,
+                method: :post,
+                frame: :_top
+              ) %>
+          <p class="text-xs text-secondary">
+            <%= t(".look_combination_count", count: UiTheme::PALETTES.size * UiTheme::TYPEFACES.size * UiTheme::STYLES.size) %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <%= settings_section title: t(".palette_title"), subtitle: t(".palette_subtitle") do %>
+      <div class="p-3">
+        <%= render "settings/appearances/look_axis",
+              form: form, axis: "palette",
+              options: UiTheme::PALETTES, current: @user.ui_palette %>
+      </div>
+    <% end %>
+
+    <%= settings_section title: t(".typeface_title"), subtitle: t(".typeface_subtitle") do %>
+      <div class="p-3">
+        <%= render "settings/appearances/look_axis",
+              form: form, axis: "typeface",
+              options: UiTheme::TYPEFACES, current: @user.ui_typeface %>
+      </div>
+    <% end %>
+
+    <%= settings_section title: t(".style_title"), subtitle: t(".style_subtitle") do %>
+      <div class="p-3">
+        <%= render "settings/appearances/look_axis",
+              form: form, axis: "style",
+              options: UiTheme::STYLES, current: @user.ui_style %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
 <%= settings_section title: t(".theme_title"), subtitle: t(".theme_subtitle") do %>
   <div data-controller="theme" data-theme-user-preference-value="<%= @user.theme %>">
     <%= form_with model: @user, class: "flex flex-col md:flex-row justify-between items-center gap-4", id: "theme_form",

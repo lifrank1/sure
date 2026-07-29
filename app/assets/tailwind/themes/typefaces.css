@@ -1,0 +1,354 @@
+/*
+ * THEME AXIS 2 — TYPEFACES
+ *
+ * Ten typographic pairings, each switched by `data-typeface` on <html>.
+ * A pairing sets three tokens:
+ *   --font-sans     body / UI text (Tailwind's `font-sans`)
+ *   --font-display  headings + display numbers (see the h1..h3 rule below)
+ *   --font-mono     tabular / code (Tailwind's `font-mono`)
+ *
+ * All faces are self-hosted latin-subset variable woff2 under
+ * app/assets/fonts/** (Propshaft resolves the `./dir/file.woff2` logical
+ * paths). Nothing is fetched from a third party — this is a finance app and
+ * the CSP font-src stays `:self`. Every family is OFL-1.1 licensed; see
+ * app/assets/fonts/OFL-NOTICE.md.
+ */
+
+/* ---------------------------------------------------------------- @font-face */
+
+@font-face {
+  font-family: 'Instrument Sans';
+  src: url('./instrument_sans/instrument_sans-normal.woff2') format('woff2-variations');
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Instrument Sans';
+  src: url('./instrument_sans/instrument_sans-italic.woff2') format('woff2-variations');
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('./instrument_serif/instrument_serif-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('./instrument_serif/instrument_serif-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('./fraunces/fraunces-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('./fraunces/fraunces-italic.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./bricolage/bricolage-normal.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./plex_sans/plex_sans-normal.woff2') format('woff2-variations');
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./plex_sans/plex_sans-italic.woff2') format('woff2-variations');
+  font-weight: 100 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./plex_mono/plex_mono-normal-1.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./plex_mono/plex_mono-normal-2.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./plex_mono/plex_mono-normal-3.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./plex_mono/plex_mono-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sora';
+  src: url('./sora/sora-normal.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  src: url('./newsreader/newsreader-normal.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Newsreader';
+  src: url('./newsreader/newsreader-italic.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('./archivo/archivo-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Archivo';
+  src: url('./archivo/archivo-italic.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./jetbrains_mono/jetbrains_mono-normal.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./jetbrains_mono/jetbrains_mono-italic.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('./atkinson/atkinson-normal.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('./atkinson/atkinson-italic.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ------------------------------------------------------------- the 10 pairings */
+
+@layer base {
+  /* Display face falls back to the body face for pairings that use one voice. */
+  :root {
+    --font-display: var(--font-sans);
+    /* Per-pairing optical corrections. Serif and hyperlegible faces run large
+       at the same px size, so each pairing can nudge the root scale rather
+       than every view fighting its own type size. */
+    --type-scale: 1;
+    --display-tracking: -0.01em;
+    --display-weight: 500;
+  }
+
+  /* 1. GEIST — the house voice: neutral Swiss-modern, tight and quiet. */
+  [data-typeface="geist"] {
+    --font-sans: 'Geist', system-ui, sans-serif;
+    --font-display: 'Geist', system-ui, sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, monospace;
+  }
+
+  /* 2. INSTRUMENT — editorial contrast: a high-contrast serif headline over a
+        cool neutral sans. The pairing a magazine masthead would use. */
+  [data-typeface="instrument"] {
+    --font-sans: 'Instrument Sans', system-ui, sans-serif;
+    --font-display: 'Instrument Serif', Georgia, serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --display-tracking: -0.015em;
+    --display-weight: 400;
+  }
+
+  /* 3. FRAUNCES — warm and wonky: an old-style serif with soft/wonk axes dialed
+        up for character, grounded by Archivo's flat grotesque. */
+  [data-typeface="fraunces"] {
+    --font-sans: 'Archivo', system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --display-tracking: -0.02em;
+    --display-weight: 600;
+  }
+
+  /* 4. BRICOLAGE — one voice, deliberately imperfect: contemporary grotesque
+        with irregular details that keep a dashboard from feeling corporate. */
+  [data-typeface="bricolage"] {
+    --font-sans: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --display-tracking: -0.025em;
+    --display-weight: 700;
+  }
+
+  /* 5. PLEX — engineered: IBM's institutional voice, rational and slightly
+        technical. Reads like instrumentation, which suits ledgers. */
+  [data-typeface="plex"] {
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-display: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --display-tracking: -0.01em;
+    --display-weight: 600;
+  }
+
+  /* 6. SORA — geometric futurist: wide apertures, circular bowls, a little
+        sci-fi. Pairs with the glass and aurora skins. */
+  [data-typeface="sora"] {
+    --font-sans: 'Sora', system-ui, sans-serif;
+    --font-display: 'Sora', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --type-scale: 0.97;
+    --display-tracking: -0.03em;
+    --display-weight: 600;
+  }
+
+  /* 7. NEWSREADER — broadsheet: serif body text, the Financial Times reading
+        experience. Unusual for an app; excellent for long tables of numbers. */
+  [data-typeface="newsreader"] {
+    --font-sans: 'Newsreader', Georgia, serif;
+    --font-display: 'Newsreader', Georgia, serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --type-scale: 0.96;
+    --display-tracking: -0.005em;
+    --display-weight: 500;
+  }
+
+  /* 8. ARCHIVO — utility/sport: tight grotesque with a width axis, headlines
+        set wide and heavy like a scoreboard. */
+  [data-typeface="archivo"] {
+    --font-sans: 'Archivo', system-ui, sans-serif;
+    --font-display: 'Archivo', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --display-tracking: -0.03em;
+    --display-weight: 800;
+  }
+
+  /* 9. MONO — everything monospaced: the whole UI on a fixed grid. Numbers
+        align by construction. */
+  [data-typeface="mono"] {
+    --font-sans: 'JetBrains Mono', ui-monospace, monospace;
+    --font-display: 'JetBrains Mono', ui-monospace, monospace;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --type-scale: 0.94;
+    --display-tracking: -0.04em;
+    --display-weight: 700;
+  }
+
+  /* 10. ATKINSON — legibility first: Braille Institute's face, designed so
+        similar glyphs (0/O, 1/l/I, 5/S) stay distinguishable. The safest
+        choice when the numbers actually matter. */
+  [data-typeface="atkinson"] {
+    --font-sans: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+    --font-display: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --type-scale: 0.97;
+    --display-tracking: 0;
+    --display-weight: 700;
+  }
+
+  /* Apply the display face + per-pairing tracking to headings and the big
+     dashboard figures. Scoped to [data-typeface] so the untouched default
+     (no attribute) renders exactly as it did before this feature existed. */
+  [data-typeface] {
+    h1, h2, h3,
+    .font-display {
+      font-family: var(--font-display);
+      letter-spacing: var(--display-tracking);
+    }
+
+    h1, h2 {
+      font-weight: var(--display-weight);
+    }
+
+    /* Money and tabular data get lining tabular figures so columns line up
+       and digits don't jitter as values change. */
+    .privacy-sensitive,
+    table td,
+    table th,
+    .font-mono {
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+  }
+
+  /* Optical size correction, applied to the root font size so every rem-based
+     size in the app scales together. */
+  [data-typeface] body {
+    font-size: calc(1rem * var(--type-scale));
+  }
+
+  /* Fraunces' personality axes — soft terminals, "wonky" alternates — only on
+     display text, where character reads as intent rather than noise. */
+  [data-typeface="fraunces"] {
+    h1, h2, h3, .font-display {
+      font-variation-settings: "SOFT" 40, "WONK" 1, "opsz" 96;
+    }
+  }
+
+  /* Archivo/Bricolage width axes: stretch headlines, leave body at normal. */
+  [data-typeface="archivo"] h1,
+  [data-typeface="archivo"] h2 {
+    font-stretch: 112%;
+  }
+
+  [data-typeface="newsreader"] {
+    h1, h2, h3, .font-display {
+      font-variation-settings: "opsz" 60;
+    }
+  }
+}

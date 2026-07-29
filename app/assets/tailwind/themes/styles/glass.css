@@ -1,0 +1,220 @@
+/*
+ * SKIN: LIQUID GLASS — frosted panes floating in a lit room.
+ *
+ * The page ground carries two offset pools of light; every card is a translucent
+ * pane that blurs and saturates whatever passes behind it, edged by a luminous
+ * 1px rim along its top (light catching the glass) over a wide ambient pool.
+ * Hover sweeps a specular highlight across the pane. Legibility is the hard
+ * constraint: the fill never drops below ~76% of --color-container (which sits
+ * within a few percent of --color-surface in every palette, so contrast barely
+ * moves), and a @supports fallback goes solid where blur is missing.
+ */
+
+[data-ui-style="glass"] {
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  /* Glass reads as depth through footprint, not darkness: wide, soft, offset. */
+  --shadow-xs: 0 1px 2px 0 color-mix(in oklab, var(--color-black) 5%, transparent);
+  --shadow-sm: 0 2px 10px -2px color-mix(in oklab, var(--color-black) 9%, transparent);
+  --shadow-md: 0 10px 28px -10px color-mix(in oklab, var(--color-black) 13%, transparent);
+  --shadow-lg: 0 20px 44px -14px color-mix(in oklab, var(--color-black) 17%, transparent);
+  --shadow-xl: 0 32px 64px -18px color-mix(in oklab, var(--color-black) 20%, transparent);
+  /* The hairline inside every shadow-border-* becomes a lens edge — a
+     translucent fill needs a firmer boundary than the house 5% to read. */
+  --color-alpha-black-50: color-mix(in oklab, var(--color-black) 11%, transparent);
+
+  --glass-fill: color-mix(in oklab, var(--color-container) 80%, transparent);
+  --glass-chrome: color-mix(in oklab, var(--color-surface) 88%, transparent);
+  --glass-panel: color-mix(in oklab, var(--color-surface) 82%, transparent);
+  --glass-well: color-mix(in oklab, var(--color-container-inset) 58%, transparent);
+  --glass-ring: color-mix(in oklab, var(--color-black) 11%, transparent);
+  --glass-ambient: color-mix(in oklab, var(--color-black) 15%, transparent);
+  --glass-underline: color-mix(in oklab, var(--color-black) 7%, transparent);
+  /* Rim / sheen / specular are all "light", and --color-white is the bright
+     anchor in BOTH themes — only the alphas need a dark twin. */
+  --glass-rim: color-mix(in oklab, var(--color-white) 90%, transparent);
+  --glass-sheen: color-mix(in oklab, var(--color-white) 45%, transparent);
+  --glass-spec: color-mix(in oklab, var(--color-white) 60%, transparent);
+  --glass-blur: saturate(180%) blur(20px);
+}
+
+[data-ui-style="glass"][data-theme="dark"] {
+  /* On a dark ground an ambient pool is invisible: rim and ring carry depth. */
+  --shadow-xs: 0 1px 2px 0 color-mix(in oklab, var(--color-white) 7%, transparent);
+  --shadow-sm: 0 2px 10px -2px color-mix(in oklab, var(--color-white) 8%, transparent);
+  --shadow-md: 0 10px 28px -10px color-mix(in oklab, var(--color-white) 10%, transparent);
+  --shadow-lg: 0 20px 44px -14px color-mix(in oklab, var(--color-white) 12%, transparent);
+  --shadow-xl: 0 32px 64px -18px color-mix(in oklab, var(--color-white) 14%, transparent);
+  --color-alpha-white-50: color-mix(in oklab, var(--color-white) 13%, transparent);
+
+  --glass-fill: color-mix(in oklab, var(--color-container) 76%, transparent);
+  --glass-chrome: color-mix(in oklab, var(--color-surface) 84%, transparent);
+  --glass-panel: color-mix(in oklab, var(--color-surface) 78%, transparent);
+  --glass-well: color-mix(in oklab, var(--color-container-inset) 62%, transparent);
+  --glass-ring: color-mix(in oklab, var(--color-white) 13%, transparent);
+  --glass-ambient: color-mix(in oklab, var(--color-black) 60%, transparent);
+  --glass-underline: color-mix(in oklab, var(--color-black) 40%, transparent);
+  --glass-rim: color-mix(in oklab, var(--color-white) 24%, transparent);
+  --glass-sheen: color-mix(in oklab, var(--color-white) 9%, transparent);
+  --glass-spec: color-mix(in oklab, var(--color-white) 16%, transparent);
+}
+
+/* ── the lit ground ───────────────────────────────────────────────────────────
+   Painted on the shell (which never scrolls) not #main, so the light source
+   stays fixed in the room while the page slides past underneath. */
+[data-ui-style="glass"] [data-controller~="app-layout"] {
+  background-image:
+    radial-gradient(115% 95% at 10% -18%, color-mix(in oklab, var(--color-white) 92%, transparent), transparent 60%),
+    radial-gradient(85% 75% at 94% 2%, color-mix(in oklab, var(--color-white) 50%, transparent), transparent 58%);
+}
+[data-ui-style="glass"][data-theme="dark"] [data-controller~="app-layout"] {
+  background-image:
+    radial-gradient(115% 95% at 10% -18%, color-mix(in oklab, var(--color-white) 11%, transparent), transparent 60%),
+    radial-gradient(85% 75% at 94% 2%, color-mix(in oklab, var(--color-white) 6%, transparent), transparent 58%);
+}
+
+/* ── panes ────────────────────────────────────────────────────────────────────
+   `.bg-container[class*="shadow-border"]` is the card set (~150 of the 479
+   .bg-container uses); the plain ones are list rows, menu items and
+   .form-field__input, which must NOT each get a blur layer. The only variant
+   form is the skip link's `focus:shadow-border-xs`, and it carries
+   `focus:bg-container` — a different class token — so it cannot match. Layer 1
+   of the background is the specular sweep, parked with its highlight off the
+   right edge; layer 2 is the standing top sheen. Both are BACKGROUND layers,
+   not pseudo-elements, so they clip to the pane without overflow:hidden, which
+   would swallow the dashboard widget-size popover. */
+[data-ui-style="glass"] .bg-container[class*="shadow-border"] {
+  background-color: var(--glass-fill);
+  background-image:
+    linear-gradient(102deg, transparent 36%, var(--glass-spec) 50%, transparent 64%),
+    linear-gradient(to bottom, var(--glass-sheen), transparent 42%);
+  background-size: 260% 100%, 100% 100%;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 1px 0 0 var(--glass-rim), inset 0 -1px 0 0 var(--glass-underline), 0 0 0 1px var(--glass-ring), 0 12px 32px -14px var(--glass-ambient), 0 2px 6px -4px var(--glass-ambient);
+}
+/* Edge brightening is the reduced-motion-safe half of hover: no travel. */
+[data-ui-style="glass"] .bg-container[class*="shadow-border"]:hover {
+  box-shadow: inset 0 1px 0 0 var(--glass-rim), inset 0 0 0 1px var(--glass-sheen), 0 0 0 1px var(--glass-ring), 0 20px 44px -16px var(--glass-ambient), 0 3px 8px -4px var(--glass-ambient);
+}
+/* Everything rendering INSIDE a pane is deliberately blur-free: stacking
+   backdrop-filter inside backdrop-filter costs a layer each and glitches on
+   runtime theme switches (Chrome repaints the stale blur — it flashed form
+   fields near-white in dark mode). Wells thin out; tooltips stay opaque, since
+   a number read off a chart is the last place to spend contrast. */
+[data-ui-style="glass"] :is(.bg-container-inset, .bg-surface-inset) {
+  background-color: var(--glass-well);
+}
+[data-ui-style="glass"] .chart-tooltip {
+  background-color: var(--color-container);
+  box-shadow: inset 0 1px 0 0 var(--glass-rim), 0 0 0 1px var(--glass-ring), 0 12px 32px -14px var(--glass-ambient);
+}
+
+/* ── the shell: a detached nav rail ───────────────────────────────────────────
+   The rail's WIDTH belongs to the app-layout Stimulus classes, so the float is
+   insetting its padding and glazing the inner wrapper instead (h-full resolves
+   against the padded content box, so nothing overflows). `:not(.w-0)` is not
+   cosmetic: the collapse class is `w-0`, and border-box padding on a zero-width
+   box still claims its 1.5rem, which left a dead gutter when the rail hid. */
+[data-ui-style="glass"] [data-app-layout-target="leftSidebar"]:not(.w-0) {
+  padding: 0.75rem;
+  border-right-width: 0;
+}
+[data-ui-style="glass"] [data-app-layout-target="leftSidebar"] > div {
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
+  border-radius: var(--radius-2xl);
+  background-color: var(--glass-panel);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 1px 0 0 var(--glass-rim), 0 0 0 1px var(--glass-ring), 0 18px 44px -20px var(--glass-ambient);
+}
+[data-ui-style="glass"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  background-color: var(--glass-fill);
+  box-shadow: inset 0 1px 0 0 var(--glass-rim), 0 0 0 1px var(--glass-ring), 0 2px 8px -5px var(--glass-ambient);
+}
+/* Frosted chrome: the page header and mobile tab bar let blurred content pass
+   beneath them instead of hiding it. 88% backing keeps their small
+   secondary-color labels above AA; the blur stops text reading through. */
+[data-ui-style="glass"] :is(#main .sticky, nav[data-viewport-target="bottomNav"]) {
+  background-color: var(--glass-chrome);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-ring);
+}
+
+/* ── buttons: glossed pills ───────────────────────────────────────────────────
+   Both bevel lines are drawn in both themes on purpose: bg-inverse is dark ink
+   in light mode (the white top rim reads) and bright paper in dark mode (the
+   black underline reads). One construction, both directions. */
+[data-ui-style="glass"] :is(.bg-inverse, .button-bg-primary, .button-bg-destructive, button.bg-gray-200) {
+  box-shadow: inset 0 1px 0 0 color-mix(in oklab, var(--color-white) 32%, transparent), inset 0 -1px 0 0 color-mix(in oklab, var(--color-black) 18%, transparent), 0 2px 6px -3px var(--glass-ambient);
+}
+[data-ui-style="glass"] :is(.bg-inverse, .button-bg-primary, .button-bg-destructive, button.bg-gray-200):hover {
+  box-shadow: inset 0 1px 0 0 color-mix(in oklab, var(--color-white) 55%, transparent), inset 0 -1px 0 0 color-mix(in oklab, var(--color-black) 18%, transparent), 0 4px 12px -4px var(--glass-ambient);
+}
+
+/* ── forms ────────────────────────────────────────────────────────────────────
+   Background and border only — .form-field's focus recipe is
+   `focus-within:shadow-none` + `ring-4`, and a box-shadow here would delete the
+   halo. A lit top border is the rim that leaves it alone. */
+[data-ui-style="glass"] .form-field {
+  background-color: var(--glass-fill);
+  border-color: var(--glass-ring);
+  border-top-color: var(--glass-rim);
+}
+/* The input would otherwise paint opaque bg-container over the field's tint.
+   Only the color is cleared, so select's chevron background-image survives. */
+[data-ui-style="glass"] :is(.form-field__input, .form-field :is(input, select, textarea)) {
+  background-color: transparent;
+}
+/* ── tables & tabs ────────────────────────────────────────────────────────── */
+[data-ui-style="glass"] table thead {
+  border-bottom: 1px solid var(--glass-ring);
+}
+[data-ui-style="glass"] table tbody tr:hover {
+  background-color: var(--glass-sheen);
+}
+[data-ui-style="glass"] .segmented-control {
+  background-color: var(--glass-well);
+  box-shadow: inset 0 1px 0 0 var(--glass-underline), 0 0 0 1px var(--glass-ring);
+}
+
+/* No backdrop-filter: translucency alone is washed-out contrast, so go solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-ui-style="glass"] :is(.bg-container[class*="shadow-border"], .form-field, [data-app-layout-target="leftSidebar"] a.bg-container) {
+    background-color: var(--color-container);
+  }
+  [data-ui-style="glass"] :is([data-app-layout-target="leftSidebar"] > div, #main .sticky, nav[data-viewport-target="bottomNav"]) {
+    background-color: var(--color-surface);
+  }
+  [data-ui-style="glass"] :is(.bg-container-inset, .segmented-control) {
+    background-color: var(--color-container-inset);
+  }
+  [data-ui-style="glass"] .bg-surface-inset {
+    background-color: var(--color-surface-inset);
+  }
+}
+
+/* ── motion ───────────────────────────────────────────────────────────────────
+   The sweep: layer 1 is 260% wide with its highlight at the midpoint, so 0%
+   parks it off the right edge and 100% drags it off the left. Layer 2 is
+   exactly 100% wide, so its position is a no-op and the sheen holds still. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="glass"] .bg-container[class*="shadow-border"] {
+    transition: background-position 700ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 260ms ease;
+  }
+  [data-ui-style="glass"] .bg-container[class*="shadow-border"]:hover {
+    background-position: 100% 0, 0 0;
+  }
+  [data-ui-style="glass"] :is(.bg-inverse, .button-bg-primary, .button-bg-destructive, button.bg-gray-200, .form-field) {
+    transition: box-shadow 200ms ease, border-color 200ms ease, background-color 200ms ease;
+  }
+}

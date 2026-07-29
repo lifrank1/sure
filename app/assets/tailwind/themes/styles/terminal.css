@@ -1,0 +1,230 @@
+/*
+ * SKIN: TERMINAL — a CRT console that happens to hold your money.
+ *
+ * Chrome speaks monospace: nav rows, table headers, field labels, buttons and
+ * headings run in var(--font-mono), uppercased and letter-spaced, while body
+ * prose and every figure stay in the body face so amounts remain scannable.
+ * Corners are square and depth is refused — cards are drawn with real 3px
+ * `double` borders (CSS renders those as line/gap/line, the nearest thing to a
+ * box-drawing rule) instead of shadows. A 1px scanline raster lies over the page
+ * ground at 3% ink, the active nav row burns with a phosphor glow, and focusing a
+ * text field parks a blinking block caret in its right gutter.
+ */
+
+[data-ui-style="terminal"] {
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+
+  /* No blur: a console has no lighting model. xs/sm collapse so shadow-border-*
+     degenerates into its 1px ring alone; md+ keep a hard offset so menus still
+     detach from the page behind them. */
+  --shadow-xs: 0 0 0 0 transparent;
+  --shadow-sm: 0 0 0 0 transparent;
+  --shadow-md: 2px 2px 0 0 color-mix(in oklab, var(--color-black) 22%, transparent);
+  --shadow-lg: 3px 3px 0 0 color-mix(in oklab, var(--color-black) 26%, transparent);
+  --shadow-xl: 4px 4px 0 0 color-mix(in oklab, var(--color-black) 30%, transparent);
+
+  /* That ring is the only edge left on the handful of shadow-border-* surfaces
+     this file doesn't border explicitly (bare wells, the bg-surface popover), so
+     it has to be visible — but not so strong that it reads as a fourth line
+     against the 3px double border on cards, which keep their ring too. */
+  --color-alpha-black-50: color-mix(in oklab, var(--color-black) 30%, transparent);
+
+  --term-rule: color-mix(in oklab, var(--color-black) 55%, transparent);
+  --term-rule-faint: color-mix(in oklab, var(--color-black) 22%, transparent);
+  /* The phosphor. --color-link is the one accent all 10 palettes guarantee, so
+     the glow is CRT green under Phosphor, indigo under Tokyo Night, rust under
+     Sequoia — always the palette's own voice, never a hardcoded green. */
+  --term-glow: var(--color-link);
+  --term-scan: color-mix(in oklab, var(--color-black) 3%, transparent);
+}
+
+[data-ui-style="terminal"][data-theme="dark"] {
+  --shadow-md: 2px 2px 0 0 color-mix(in oklab, var(--color-white) 24%, transparent);
+  --shadow-lg: 3px 3px 0 0 color-mix(in oklab, var(--color-white) 28%, transparent);
+  --shadow-xl: 4px 4px 0 0 color-mix(in oklab, var(--color-white) 32%, transparent);
+  --color-alpha-white-50: color-mix(in oklab, var(--color-white) 28%, transparent);
+  --term-rule: color-mix(in oklab, var(--color-white) 48%, transparent);
+  --term-rule-faint: color-mix(in oklab, var(--color-white) 20%, transparent);
+  /* The raster has to lighten here: black lines on a near-black page vanish. */
+  --term-scan: color-mix(in oklab, var(--color-white) 3%, transparent);
+}
+
+/* `rounded-full` compiles to calc(infinity * 1px), not a token, so a square skin
+   flattens it by hand. Scoped to button/a so avatars, merchant logos and status
+   dots — which read as data, not chrome — stay round. */
+[data-ui-style="terminal"] :is(button, a).rounded-full { border-radius: 0; }
+
+/* ── monospace chrome ───────────────────────────────────────────────────────
+   Labels, nav, headers and controls only; body copy keeps the typeface axis's
+   body face. Mono on figures is welcome (fixed advance widths align columns for
+   free) — uppercase and tracking on figures are not, hence the split below. */
+[data-ui-style="terminal"] :is(
+  [data-app-layout-target="leftSidebar"] a, #main > .sticky, thead, table th,
+  .form-field__label, .segmented-control__segment, button, a[role="button"],
+  h1, h2, h3
+) {
+  font-family: var(--font-mono);
+}
+
+/* `.form-field__input` is sometimes a <button> holding a chosen value (the
+   multiselect trigger), and any control wrapping an amount is excluded by :has()
+   — recasing a number is how you make a ledger unreadable. */
+[data-ui-style="terminal"] :is(
+  [data-app-layout-target="leftSidebar"] a, table th, .form-field__label,
+  h1, h2, h3, a[role="button"],
+  button:not(:where(.form-field__input, :has(.privacy-sensitive)))
+) {
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Hard guard: money is never tracked or recased, whatever ancestor styled it. */
+[data-ui-style="terminal"] :is(.privacy-sensitive, table td) {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Decorative shell markers — headings only, and only headings with no figure
+   inside. CSS cannot set aria-hidden, so a prefix must never land somewhere a
+   screen reader would read it as part of a value. */
+[data-ui-style="terminal"] #main h1:not(:has(.privacy-sensitive))::before {
+  content: "$ ";
+  color: var(--term-glow);
+}
+
+[data-ui-style="terminal"] #main :is(h2, h3):not(:has(.privacy-sensitive))::before {
+  content: "\25B8\00A0";
+  color: var(--term-glow);
+}
+
+/* ── surfaces + shell rules ────────────────────────────────────────────────
+   3px `double` renders as 1px ink / 1px of the element's own background / 1px
+   ink: a box-drawing double rule for free. Link and button surfaces are excluded
+   so the active nav row and pill buttons stay single-ruled. */
+[data-ui-style="terminal"] .bg-container:not(a):not(button) { border: 3px double var(--term-rule); }
+[data-ui-style="terminal"] :is(.bg-container-inset, .bg-surface-inset) { border: 1px solid var(--term-rule-faint); }
+[data-ui-style="terminal"] [data-app-layout-target="leftSidebar"] { border-right: 1px solid var(--term-rule); }
+[data-ui-style="terminal"] #main > .sticky { border-bottom: 3px double var(--term-rule); }
+
+/* The raster goes on the shell (which already carries bg-surface), not on #main:
+   it stays put instead of scrolling with content, and #main's overflow is never
+   touched. Cards paint opaque backgrounds over it, so the only text sitting on
+   the raster is large headings, over a 3% tint. */
+[data-ui-style="terminal"] :is([data-controller~="app-layout"], #main > .sticky) {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--term-scan) 0px,
+    var(--term-scan) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ── nav: the active line is lit ───────────────────────────────────────────
+   A phosphor bloom plus a solid left bar, so the state survives for anyone who
+   can't see the glow. The label sits on an opaque tint, never on the bloom. */
+[data-ui-style="terminal"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  border-left: 3px solid var(--term-glow);
+  background-color: color-mix(in oklab, var(--term-glow) 12%, var(--color-container));
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--term-glow) 55%, transparent),
+    0 0 14px -3px color-mix(in oklab, var(--term-glow) 60%, transparent);
+}
+
+[data-ui-style="terminal"][data-theme="dark"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  background-color: color-mix(in oklab, var(--term-glow) 18%, var(--color-container));
+}
+
+/* ── buttons: keycaps that invert on hover ─────────────────────────────────
+   The descendant `*` in the hover rules is load-bearing, not decoration: most
+   buttons here are an icon carrying its own `text-secondary`, and a gray-500
+   glyph left on a gray-900 block would fail contrast. Forcing the foreground on
+   every child keeps the inverted state legible across all 10 palettes. */
+[data-ui-style="terminal"] :is(button:not(:where(.form-field__input, [data-action*="privacy"])), a[role="button"]) {
+  border: 1px solid var(--term-rule);
+}
+
+[data-ui-style="terminal"] :is(.button-bg-primary, .bg-inverse) { border: 1px solid var(--color-black); }
+[data-ui-style="terminal"][data-theme="dark"] :is(.button-bg-primary, .bg-inverse) { border-color: var(--color-white); }
+
+[data-ui-style="terminal"] button:not(:where(.form-field__input, [data-action*="privacy"])):hover:not(:disabled),
+[data-ui-style="terminal"] button:not(:where(.form-field__input, [data-action*="privacy"])):hover:not(:disabled) * {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+[data-ui-style="terminal"][data-theme="dark"] button:not(:where(.form-field__input, [data-action*="privacy"])):hover:not(:disabled),
+[data-ui-style="terminal"][data-theme="dark"] button:not(:where(.form-field__input, [data-action*="privacy"])):hover:not(:disabled) * {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+/* ── forms: the blinking block caret ──────────────────────────────────────
+   .form-field is already position:relative. The caret parks inside the field's
+   own 12px right padding so it never overlaps typed text, and it is purely
+   additive — the design system's focus halo is untouched. :has() limits it to
+   text entry; a <select> owns that corner with its chevron. */
+[data-ui-style="terminal"] .form-field:focus-within:has(input:focus, textarea:focus)::after {
+  content: "";
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.5rem;
+  width: 0.4rem;
+  height: 0.95rem;
+  background-color: var(--term-glow);
+  pointer-events: none;
+}
+
+@keyframes terminal-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ── tables + tabs ────────────────────────────────────────────────────────── */
+[data-ui-style="terminal"] table thead { border-bottom: 3px double var(--term-rule); }
+[data-ui-style="terminal"] table tbody tr + tr { border-top: 1px solid var(--term-rule-faint); }
+[data-ui-style="terminal"] .segmented-control { border: 1px solid var(--term-rule); }
+
+[data-ui-style="terminal"] .segmented-control__segment--active {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  box-shadow: none;
+}
+
+[data-ui-style="terminal"][data-theme="dark"] .segmented-control__segment--active {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+/* .chart-tooltip hardcodes a 10px radius in the components layer, so the radius
+   token sweep misses it. */
+[data-ui-style="terminal"] .chart-tooltip {
+  border-radius: 0;
+  font-family: var(--font-mono);
+  box-shadow: 0 0 0 1px var(--term-rule),
+    2px 2px 0 0 color-mix(in oklab, var(--color-black) 20%, transparent);
+}
+
+[data-ui-style="terminal"][data-theme="dark"] .chart-tooltip {
+  box-shadow: 0 0 0 1px var(--term-rule),
+    2px 2px 0 0 color-mix(in oklab, var(--color-white) 22%, transparent);
+}
+
+/* ── motion: quantized, like a character grid ─────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  /* steps() rather than an ease: states land on frames, the way a console
+     repaints, instead of gliding between them. */
+  [data-ui-style="terminal"] :is(button, a[role="button"], [data-app-layout-target="leftSidebar"] a) {
+    transition: background-color 90ms steps(3, end), color 90ms steps(3, end),
+      box-shadow 90ms steps(3, end);
+  }
+
+  [data-ui-style="terminal"] .form-field:focus-within::after {
+    animation: terminal-caret 1.06s linear infinite;
+  }
+}

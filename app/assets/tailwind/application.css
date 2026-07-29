@@ -14,6 +14,13 @@
 @import "./print-report.css";
 @import "./privacy-mode.css";
 
+/* Look system (UiTheme) — imported AFTER the design system so its
+   [data-palette] / [data-typeface] / [data-ui-style] blocks override the
+   default tokens. See app/models/ui_theme.rb for the registry. */
+@import "./themes/palettes.css";
+@import "./themes/typefaces.css";
+@import "./themes/styles.css";
+
 @layer components {
   .pcr-app{
     position: static !important;

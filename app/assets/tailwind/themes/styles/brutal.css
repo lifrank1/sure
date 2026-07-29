@@ -1,0 +1,165 @@
+/*
+ * SKIN: BRUTALIST — ink on paper, nothing hidden.
+ *
+ * Zero radius, 2px structural rules, and shadows that are pure offset blocks
+ * rather than blur. Interactive things move: hover lifts a card up-left and
+ * the shadow grows to match; pressing collapses it flat against the page.
+ * Palette-agnostic — every rule is expressed in --color-black / --color-white,
+ * so Brutalist over Sequoia is bark-brown on cream and over Tokyo Night is
+ * white on indigo.
+ */
+
+[data-ui-style="brutal"] {
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+
+  /* Offset blocks, no blur. The hairline ring in shadow-border-* becomes a
+     structural 2px rule via the alpha tokens below. */
+  --shadow-xs: 3px 3px 0px 0px var(--color-black);
+  --shadow-sm: 4px 4px 0px 0px var(--color-black);
+  --shadow-md: 6px 6px 0px 0px var(--color-black);
+  --shadow-lg: 8px 8px 0px 0px var(--color-black);
+  --shadow-xl: 10px 10px 0px 0px var(--color-black);
+
+  /* shadow-border-* draws `0 0 0 1px var(--color-alpha-black-50)` — push that
+     token to full ink so all 154 card surfaces gain a hard outline. */
+  --color-alpha-black-50: var(--color-black);
+  --brutal-rule: 2px solid var(--color-black);
+}
+
+[data-ui-style="brutal"][data-theme="dark"] {
+  --shadow-xs: 3px 3px 0px 0px var(--color-white);
+  --shadow-sm: 4px 4px 0px 0px var(--color-white);
+  --shadow-md: 6px 6px 0px 0px var(--color-white);
+  --shadow-lg: 8px 8px 0px 0px var(--color-white);
+  --shadow-xl: 10px 10px 0px 0px var(--color-white);
+  --color-alpha-white-50: var(--color-white);
+  --brutal-rule: 2px solid var(--color-white);
+}
+
+/* `rounded-full` compiles to calc(infinity * 1px), not a token — a sharp skin
+   has to flatten it directly. Avatars and dots stay circular on purpose
+   (they read as data, not chrome), so only pills/buttons are squared. */
+[data-ui-style="brutal"] button.rounded-full,
+[data-ui-style="brutal"] a.rounded-full {
+  border-radius: 0;
+}
+
+/* ── surfaces ─────────────────────────────────────────────────────────────── */
+[data-ui-style="brutal"] .bg-container,
+[data-ui-style="brutal"] .bg-container-inset,
+[data-ui-style="brutal"] .bg-surface-inset {
+  border: var(--brutal-rule);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="brutal"] .bg-container {
+    transition: transform 120ms cubic-bezier(0.2, 0, 0, 1), box-shadow 120ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* ── the shell ────────────────────────────────────────────────────────────── */
+[data-ui-style="brutal"] [data-app-layout-target="leftSidebar"] {
+  border-right: var(--brutal-rule);
+}
+
+[data-ui-style="brutal"] #main .sticky {
+  border-bottom: var(--brutal-rule);
+}
+
+/* Nav labels shout; numbers never do (they have to stay scannable). */
+[data-ui-style="brutal"] [data-app-layout-target="leftSidebar"] a {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+[data-ui-style="brutal"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  box-shadow: none;
+}
+
+[data-ui-style="brutal"][data-theme="dark"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+[data-ui-style="brutal"] h1,
+[data-ui-style="brutal"] h2 {
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+/* ── buttons: hard block, physical press ──────────────────────────────────── */
+[data-ui-style="brutal"] button:not(.rounded-full):not([data-action*="privacy"]),
+[data-ui-style="brutal"] a[role="button"],
+[data-ui-style="brutal"] .button-bg-primary,
+[data-ui-style="brutal"] .bg-inverse {
+  border: var(--brutal-rule);
+  box-shadow: 3px 3px 0 0 var(--color-black);
+}
+
+[data-ui-style="brutal"][data-theme="dark"] button:not(.rounded-full):not([data-action*="privacy"]),
+[data-ui-style="brutal"][data-theme="dark"] a[role="button"],
+[data-ui-style="brutal"][data-theme="dark"] .button-bg-primary,
+[data-ui-style="brutal"][data-theme="dark"] .bg-inverse {
+  box-shadow: 3px 3px 0 0 var(--color-white);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="brutal"] button,
+  [data-ui-style="brutal"] a[role="button"] {
+    transition: transform 90ms linear, box-shadow 90ms linear;
+  }
+
+  [data-ui-style="brutal"] button:hover:not(:disabled),
+  [data-ui-style="brutal"] a[role="button"]:hover {
+    transform: translate(-2px, -2px);
+  }
+
+  [data-ui-style="brutal"] button:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 0 var(--color-black);
+  }
+}
+
+/* ── inputs: hard focus, no soft ring ─────────────────────────────────────── */
+[data-ui-style="brutal"] .form-field {
+  border: var(--brutal-rule);
+  box-shadow: 3px 3px 0 0 var(--color-black);
+}
+
+[data-ui-style="brutal"][data-theme="dark"] .form-field {
+  box-shadow: 3px 3px 0 0 var(--color-white);
+}
+
+[data-ui-style="brutal"] .form-field:focus-within {
+  box-shadow: 0 0 0 0 transparent;
+  transform: translate(3px, 3px);
+  /* The design system's soft focus ring would fight the offset block; the
+     transform + retained 2px border keeps focus unmistakable. */
+  --tw-ring-shadow: 0 0 #0000;
+}
+
+/* ── tables: rules instead of tints ──────────────────────────────────────── */
+[data-ui-style="brutal"] table thead {
+  border-bottom: var(--brutal-rule);
+}
+
+[data-ui-style="brutal"] table tbody tr + tr {
+  border-top: 1px solid color-mix(in oklab, var(--color-black) 25%, transparent);
+}
+
+[data-ui-style="brutal"][data-theme="dark"] table tbody tr + tr {
+  border-top: 1px solid color-mix(in oklab, var(--color-white) 25%, transparent);
+}
+
+/* ── tabs / segmented control ─────────────────────────────────────────────── */
+[data-ui-style="brutal"] .segmented-control {
+  border: var(--brutal-rule);
+}

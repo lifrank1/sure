@@ -1,0 +1,220 @@
+/*
+ * SKIN: AURORA — a slow gradient mesh behind everything.
+ *
+ * Two oversized clouds built from --color-info / --color-success /
+ * --color-destructive drift across the page ground on 26s and 34s loops, and
+ * every card is washed with one of those three hues — cycled by position in the
+ * widget grid — so the mesh reads as light passing through the panels. Hover
+ * blooms a colored halo; the dashboard grid rises in a staggered reveal. Every
+ * hue enters the ground at 11-16%, low enough that text keeps the palette's AA
+ * contrast, and prefers-reduced-motion freezes the mesh into a static wash.
+ */
+
+[data-ui-style="aurora"] {
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2.25rem;
+  /* The light in this room is colored, so what it occludes is too. */
+  --shadow-xs: 0 1px 2px 0 color-mix(in oklab, var(--color-black) 6%, transparent);
+  --shadow-sm: 0 2px 10px -3px color-mix(in oklab, var(--color-info) 22%, transparent);
+  --shadow-md: 0 10px 26px -10px color-mix(in oklab, var(--color-info) 26%, transparent);
+  --shadow-lg: 0 20px 44px -16px color-mix(in oklab, var(--color-info) 30%, transparent);
+  --shadow-xl: 0 34px 66px -20px color-mix(in oklab, var(--color-info) 34%, transparent);
+  --color-alpha-black-50: color-mix(in oklab, var(--color-black) 9%, transparent);
+
+  /* Hues are pre-mixed into tokens, never mixed at the use site: a color-mix
+     whose color OR percentage is an author custom property can't be resolved at
+     build time, so the compiler's pre-color-mix fallback degrades to the OPAQUE
+     base hue — an accent-colored blackout. Mixed here, it stays a real rgba(). */
+  --aurora-cloud-1: color-mix(in oklab, var(--color-info) 14%, transparent);
+  --aurora-cloud-2: color-mix(in oklab, var(--color-success) 11%, transparent);
+  --aurora-cloud-3: color-mix(in oklab, var(--color-destructive) 11%, transparent);
+  /* Inherited by every card; the widget grid re-points the set per position. */
+  --aurora-wash: color-mix(in oklab, var(--color-info) 7%, transparent);
+  --aurora-ring: color-mix(in oklab, var(--color-info) 42%, transparent);
+  --aurora-glow: color-mix(in oklab, var(--color-info) 26%, transparent);
+  --aurora-seam: color-mix(in oklab, var(--color-info) 22%, transparent);
+  --aurora-shade: color-mix(in oklab, var(--color-black) 16%, transparent);
+  --aurora-edge: color-mix(in oklab, var(--color-black) 9%, transparent);
+  --aurora-chrome: color-mix(in oklab, var(--color-surface) 84%, transparent);
+}
+
+/* Accents sit at the bright end of a dark ramp: mesh hotter, shadow blacker. */
+[data-ui-style="aurora"][data-theme="dark"] {
+  --shadow-sm: 0 2px 12px -3px color-mix(in oklab, var(--color-info) 26%, transparent);
+  --shadow-md: 0 10px 30px -10px color-mix(in oklab, var(--color-info) 30%, transparent);
+  --shadow-lg: 0 20px 48px -16px color-mix(in oklab, var(--color-info) 34%, transparent);
+  --shadow-xl: 0 34px 70px -20px color-mix(in oklab, var(--color-info) 38%, transparent);
+  --color-alpha-white-50: color-mix(in oklab, var(--color-white) 11%, transparent);
+  --aurora-cloud-1: color-mix(in oklab, var(--color-info) 16%, transparent);
+  --aurora-cloud-2: color-mix(in oklab, var(--color-success) 13%, transparent);
+  --aurora-cloud-3: color-mix(in oklab, var(--color-destructive) 13%, transparent);
+  --aurora-wash: color-mix(in oklab, var(--color-info) 9%, transparent);
+  --aurora-shade: color-mix(in oklab, var(--color-black) 60%, transparent);
+  --aurora-edge: color-mix(in oklab, var(--color-white) 12%, transparent);
+  --aurora-chrome: color-mix(in oklab, var(--color-surface) 80%, transparent);
+}
+
+/* ── the mesh ─────────────────────────────────────────────────────────────────
+   `isolation: isolate` is load-bearing, not decoration: without a stacking
+   context here the z-index:-1 clouds fall into the ROOT negative layer and
+   paint behind the shell's own bg-surface, i.e. vanish. The shell never
+   scrolls, so the mesh stays put while #main slides past. Modals, drawers and
+   the tray are siblings of the shell in <body>, so confining z-index here
+   cannot trap them. Clouds overhang the edges (clipped by <body>) so rotation
+   never exposes a boundary. */
+[data-ui-style="aurora"] [data-controller~="app-layout"] {
+  position: relative;
+  isolation: isolate;
+}
+[data-ui-style="aurora"] [data-controller~="app-layout"]::before,
+[data-ui-style="aurora"] [data-controller~="app-layout"]::after {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  z-index: -1;
+  pointer-events: none;
+}
+[data-ui-style="aurora"] [data-controller~="app-layout"]::before {
+  background-image:
+    radial-gradient(38% 34% at 22% 26%, var(--aurora-cloud-1), transparent 70%),
+    radial-gradient(32% 30% at 74% 18%, var(--aurora-cloud-2), transparent 70%);
+}
+[data-ui-style="aurora"] [data-controller~="app-layout"]::after {
+  background-image:
+    radial-gradient(34% 32% at 62% 74%, var(--aurora-cloud-3), transparent 72%),
+    radial-gradient(40% 36% at 12% 82%, var(--aurora-cloud-1), transparent 72%);
+}
+/* ── cards: lit from within ───────────────────────────────────────────────────
+   `.bg-container[class*="shadow-border"]` is the card set (~150 of the 479
+   .bg-container uses); the plain ones are list rows, menu items and
+   .form-field__input, which stay flat. The skip link's `focus:shadow-border-xs`
+   can't match: it carries `focus:bg-container`, a different class token. */
+[data-ui-style="aurora"] :is(.bg-container[class*="shadow-border"], .chart-tooltip) {
+  background-image: linear-gradient(152deg, var(--aurora-wash), transparent 58%);
+  box-shadow: 0 0 0 1px var(--aurora-edge), 0 1px 2px 0 var(--aurora-shade), 0 14px 34px -18px var(--aurora-shade);
+}
+/* Halo outside the motion query: reduced-motion keeps the affordance. */
+[data-ui-style="aurora"] .bg-container[class*="shadow-border"]:hover {
+  box-shadow: 0 0 0 1px var(--aurora-ring), 0 0 26px -2px var(--aurora-glow), 0 20px 44px -18px var(--aurora-shade);
+}
+/* Cycled by grid position so the dashboard reads as a spectrum, not one tint. */
+[data-ui-style="aurora"] #main section.bg-container:nth-child(3n + 2) {
+  --aurora-wash: color-mix(in oklab, var(--color-success) 7%, transparent);
+  --aurora-ring: color-mix(in oklab, var(--color-success) 42%, transparent);
+  --aurora-glow: color-mix(in oklab, var(--color-success) 26%, transparent);
+}
+[data-ui-style="aurora"] #main section.bg-container:nth-child(3n + 3) {
+  --aurora-wash: color-mix(in oklab, var(--color-destructive) 7%, transparent);
+  --aurora-ring: color-mix(in oklab, var(--color-destructive) 42%, transparent);
+  --aurora-glow: color-mix(in oklab, var(--color-destructive) 26%, transparent);
+}
+[data-ui-style="aurora"] :is(.bg-container-inset, .bg-surface-inset) {
+  background-image: linear-gradient(to bottom, var(--aurora-wash), transparent 70%);
+}
+/* ── the shell ────────────────────────────────────────────────────────────────
+   Chrome goes translucent so the mesh runs continuously behind it — a solid
+   bg-surface bar punches a flat rectangle out of the gradient. 84% backing
+   keeps small secondary labels above AA; the blur stops text reading through. */
+[data-ui-style="aurora"] :is(#main .sticky, nav[data-viewport-target="bottomNav"]) {
+  background-color: var(--aurora-chrome);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-color: var(--aurora-seam);
+}
+/* A vertical light leak down the rail's inner edge instead of a hairline. Its
+   WIDTH belongs to the app-layout Stimulus classes, so this paints only a 1px
+   background strip pinned to the right edge. */
+[data-ui-style="aurora"] [data-app-layout-target="leftSidebar"] {
+  border-right-color: transparent;
+  background: linear-gradient(to bottom, transparent, var(--aurora-seam) 45%, transparent) 100% 0 / 1px 100% no-repeat;
+}
+[data-ui-style="aurora"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  /* seam/cloud, not ring: at 42% the active row went muddy under the earthier
+     palettes and started competing with the page's own content. */
+  background-image: linear-gradient(100deg, var(--aurora-seam), var(--aurora-cloud-2));
+  box-shadow: 0 0 0 1px var(--aurora-seam), 0 0 18px -6px var(--aurora-glow);
+}
+/* ── buttons ──────────────────────────────────────────────────────────────────
+   A thin wash over the solid ink/paper fill: light enough that text-inverse
+   keeps its contrast, strong enough to read as tinted glass. */
+[data-ui-style="aurora"] :is(.bg-inverse, .button-bg-primary, .segmented-control__segment--active) {
+  background-image: linear-gradient(100deg, var(--aurora-seam), transparent 70%);
+}
+[data-ui-style="aurora"] :is(.bg-inverse, .button-bg-primary):hover {
+  box-shadow: 0 0 20px -4px var(--aurora-glow);
+}
+/* ── forms ────────────────────────────────────────────────────────────────────
+   Background and border only — .form-field's focus recipe is
+   `focus-within:shadow-none` + `ring-4`, and a box-shadow here would delete the
+   halo. Brightening the border rides along with it instead. */
+[data-ui-style="aurora"] .form-field {
+  background-image: linear-gradient(to bottom, var(--aurora-wash), transparent 60%);
+  border-color: var(--aurora-seam);
+}
+[data-ui-style="aurora"] .form-field:focus-within {
+  border-color: var(--aurora-ring);
+}
+/* ── tables & tabs ────────────────────────────────────────────────────────────
+   The header rule is a 1px gradient background layer, so it composes with the
+   table's own border. Longhand on purpose: some theads carry a bg-* utility a
+   `background` shorthand would erase. No letter-spacing near a cell. */
+[data-ui-style="aurora"] table thead {
+  background-image: linear-gradient(to right, var(--aurora-ring), var(--aurora-cloud-2) 45%, transparent);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+[data-ui-style="aurora"] table tbody tr:hover {
+  background-image: linear-gradient(to right, var(--aurora-wash), transparent 60%);
+}
+
+/* ── motion ───────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes aurora-drift-a {
+    0% { transform: translate3d(-4%, -3%, 0) rotate(0deg) scale(1.04); }
+    50% { transform: translate3d(5%, 4%, 0) rotate(7deg) scale(1.16); }
+    100% { transform: translate3d(-2%, 6%, 0) rotate(-5deg) scale(1.08); }
+  }
+  @keyframes aurora-drift-b {
+    0% { transform: translate3d(3%, 5%, 0) rotate(-4deg) scale(1.1); }
+    50% { transform: translate3d(-6%, -4%, 0) rotate(5deg) scale(1.02); }
+    100% { transform: translate3d(4%, -2%, 0) rotate(8deg) scale(1.12); }
+  }
+  /* Transform-only, so the clouds stay on the compositor — no page repaint. */
+  [data-ui-style="aurora"] [data-controller~="app-layout"]::before {
+    will-change: transform;
+    animation: aurora-drift-a 34s ease-in-out infinite alternate;
+  }
+  [data-ui-style="aurora"] [data-controller~="app-layout"]::after {
+    will-change: transform;
+    animation: aurora-drift-b 26s ease-in-out infinite alternate;
+  }
+
+  /* Staggered reveal. Translate + opacity only: a scale would change
+     getBoundingClientRect().height and corrupt the row-span math in
+     dashboard_masonry_controller, which measures on these same frames. The last
+     card starts at 210ms and lands at 470ms — a beat, not a wait. */
+  @keyframes aurora-rise {
+    from { opacity: 0; transform: translate3d(0, 12px, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  [data-ui-style="aurora"] #main section.bg-container {
+    animation: aurora-rise 260ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(2) { animation-delay: 30ms; }
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(3) { animation-delay: 60ms; }
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(4) { animation-delay: 90ms; }
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(5) { animation-delay: 120ms; }
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(6) { animation-delay: 150ms; }
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(7) { animation-delay: 180ms; }
+  /* Past the 7th all share the last slot; an unbounded ladder feels slow. */
+  [data-ui-style="aurora"] #main section.bg-container:nth-child(n + 8) { animation-delay: 210ms; }
+
+  [data-ui-style="aurora"] :is(.bg-container[class*="shadow-border"], .bg-inverse, .button-bg-primary, .form-field, table tbody tr) {
+    transition: box-shadow 260ms ease, border-color 260ms ease, background-color 260ms ease;
+  }
+}

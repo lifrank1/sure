@@ -1,0 +1,219 @@
+/*
+ * SKIN: EDITORIAL — a printed section front, not an app screen.
+ *
+ * The card disappears completely: no panel fills, no shadows, no hairline rings.
+ * Content is separated by rules and whitespace instead, set in a narrow measure
+ * that centers in the window while widget grids and wide tables break out.
+ * Widget titles become letterspaced department eyebrows sitting on a rule, and the
+ * page header becomes a masthead closed by a thin/thick double rule. Every value
+ * is a --color-white / --color-black mix: cream paper under Sequoia, near-black
+ * under Tokyo Night.
+ */
+
+[data-ui-style="editorial"] {
+  /* Print has no rounded corners; 1px on the smallest step so checkboxes and
+     swatches don't read as cut-out squares. */
+  --radius-sm: 1px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  /* No depth language: this empties the blur half of all 154 shadow-border-*. */
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 0 #0000;
+  --shadow-xl: 0 0 #0000;
+  /* One continuous sheet — the ground becomes the paper, so an emptied card is
+     genuinely invisible instead of a slightly-off rectangle. */
+  --color-surface: var(--color-white);
+  /* Rules in three weights — the entire visual vocabulary of the skin. */
+  --ed-hair: color-mix(in oklab, var(--color-black) 16%, transparent);
+  --ed-rule: color-mix(in oklab, var(--color-black) 38%, transparent);
+  --ed-heavy: color-mix(in oklab, var(--color-black) 82%, transparent);
+  --ed-measure: 88ch;   /* the reading column */
+  --ed-wide: 118ch;     /* the breakout for grids, tables, charts */
+}
+/* In dark, --color-white is the brightest ink and --color-black the ground. */
+[data-ui-style="editorial"][data-theme="dark"] {
+  --color-surface: var(--color-black);
+  --ed-hair: color-mix(in oklab, var(--color-white) 18%, transparent);
+  --ed-rule: color-mix(in oklab, var(--color-white) 38%, transparent);
+  --ed-heavy: color-mix(in oklab, var(--color-white) 80%, transparent);
+}
+/* `rounded-full` is calc(infinity * 1px), not a token. Flatten pills and round
+   icon buttons; leave avatars, dots and bar tracks circular (they are data). */
+[data-ui-style="editorial"] button.rounded-full,
+[data-ui-style="editorial"] a.rounded-full { border-radius: 0; }
+
+/* ── the measure ──────────────────────────────────────────────────────────────
+   #main is the scroll container and stays full-width, so the column lives on its
+   children. The masthead is excluded so its rule still spans the window. */
+[data-ui-style="editorial"] #main > *:not(.sticky),
+[data-ui-style="editorial"] #main > turbo-frame > * {
+  max-width: var(--ed-measure);
+  margin-inline: auto;
+}
+/* Wide content breaks out. The :has() arms out-specify the rule above. */
+[data-ui-style="editorial"] #main > *:not(.sticky):has(table, .table-scroll, [data-controller~="dashboard-sortable"]),
+[data-ui-style="editorial"] #main > turbo-frame:has([data-controller~="dashboard-sortable"]) > *,
+[data-ui-style="editorial"] #main > turbo-frame > *:has(table, .table-scroll) {
+  max-width: var(--ed-wide);
+}
+
+/* ── no cards ─────────────────────────────────────────────────────────────── */
+[data-ui-style="editorial"] #main .bg-container,
+[data-ui-style="editorial"] #main .bg-container-inset,
+[data-ui-style="editorial"] #main .bg-surface-inset { background-color: transparent; }
+/* Drop the hairline ring shadow-border-* composes over --shadow-*. The ring
+   custom properties are re-emitted so `focus-visible:ring-2` — the widgets' only
+   focus indicator — survives; a bare `box-shadow: none` would delete it. */
+[data-ui-style="editorial"] #main .shadow-border-xs,
+[data-ui-style="editorial"] #main .shadow-border-sm,
+[data-ui-style="editorial"] #main .shadow-border-md,
+[data-ui-style="editorial"] #main .shadow-border-lg,
+[data-ui-style="editorial"] #main .shadow-border-xl {
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000);
+}
+/* Floating UI is exempt: menus/selects/popovers carry z-50 and MUST stay opaque
+   with a visible edge, or they're unreadable over page text. */
+[data-ui-style="editorial"] #main .z-50 .bg-container,
+[data-ui-style="editorial"] #main .z-50.bg-container,
+[data-ui-style="editorial"] #main .z-50 .shadow-border-lg,
+[data-ui-style="editorial"] #main .z-50 .shadow-border-xs {
+  background-color: var(--color-container);
+  box-shadow: 0 0 0 1px var(--ed-rule),
+              0 12px 28px -10px color-mix(in oklab, var(--color-black) 45%, transparent);
+}
+/* Circles are exempt too: `rounded-full` on a div is a progress track, initials
+   badge or status dot — emptying those loses information, not decoration. */
+[data-ui-style="editorial"] #main .z-50 .bg-container-inset,
+[data-ui-style="editorial"] #main .bg-container.rounded-full,
+[data-ui-style="editorial"] #main .bg-container-inset.rounded-full,
+[data-ui-style="editorial"] #main .bg-surface-inset.rounded-full {
+  background-color: var(--color-container-inset);
+}
+/* The tooltip floats over data, so give it back a real edge. */
+[data-ui-style="editorial"] .chart-tooltip { border-radius: 0; box-shadow: 0 0 0 1px var(--ed-rule); }
+
+/* ── section fronts ───────────────────────────────────────────────────────────
+   A widget is now a heavy rule, an eyebrow, a hairline and content — flush to the
+   column edge, since text indented inside nothing is the tell a card was here. */
+[data-ui-style="editorial"] #main section.bg-container {
+  border-top: 2px solid var(--ed-heavy);
+  padding-top: 0.875rem;
+}
+[data-ui-style="editorial"] #main section.bg-container > div { padding-inline: 0; }
+[data-ui-style="editorial"] #main section.bg-container > div:first-child {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ed-hair);
+}
+/* Eyebrow / department label; the guard below keeps caps out of the figures. */
+[data-ui-style="editorial"] #main h2 {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+[data-ui-style="editorial"] #main h3 { letter-spacing: 0.04em; }
+/* Headline a step larger and tighter; the rule goes under the whole block. */
+[data-ui-style="editorial"] #main h1 {
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+  font-weight: 700;
+}
+[data-ui-style="editorial"] #main > div:has(> div > h1),
+[data-ui-style="editorial"] #main header:has(> h1) {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--ed-rule);
+}
+/* Masthead: thin over thick, the oldest trick in the newspaper. */
+[data-ui-style="editorial"] #main > .sticky { border-bottom: 3px double var(--ed-rule); padding-bottom: 0.625rem; }
+
+/* ── the rail as a table of contents ─────────────────────────────────────── */
+[data-ui-style="editorial"] [data-app-layout-target="leftSidebar"] a {
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+/* The active row was a card; make it a marked entry. --tw-shadow is set because
+   `shadow-xs` is a bare utility whose geometry is baked at build time. */
+[data-ui-style="editorial"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  background-color: transparent;
+  --tw-shadow: 0 0 #0000;
+  border-left: 2px solid var(--ed-heavy);
+  border-radius: 0;
+  font-weight: 800;
+}
+
+/* ── buttons: type, not chrome ────────────────────────────────────────────── */
+[data-ui-style="editorial"] .bg-inverse,
+[data-ui-style="editorial"] .button-bg-primary,
+[data-ui-style="editorial"] .button-bg-secondary,
+[data-ui-style="editorial"] a[role="button"] {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+/* Secondary loses its fill; primary stays a solid ink slab (contrast). */
+[data-ui-style="editorial"] .button-bg-secondary {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--ed-rule);
+}
+
+/* ── forms: a rule to write on ────────────────────────────────────────────── */
+[data-ui-style="editorial"] .form-field {
+  --tw-shadow: 0 0 #0000;
+  background-color: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ed-rule);
+  border-radius: 0;
+  padding-inline: 0;
+}
+/* The halo has nothing left to hug: focus doubles the baseline instead, which
+   is heavier and more obvious than the ring it replaces. */
+[data-ui-style="editorial"] .form-field:focus-within {
+  border-bottom: 2px solid var(--ed-heavy);
+  padding-bottom: calc(0.5rem - 1px);
+}
+[data-ui-style="editorial"] .form-field__input,
+[data-ui-style="editorial"] .form-field__input:focus { background-color: transparent; }
+[data-ui-style="editorial"] .form-field__label,
+[data-ui-style="editorial"] #main table thead th {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+/* ── tables & tabs: column heads as labels, rows on hairlines ────────────── */
+[data-ui-style="editorial"] #main table thead { border-bottom: 1px solid var(--ed-heavy); }
+[data-ui-style="editorial"] #main table tbody tr + tr { border-top: 1px solid var(--ed-hair); }
+[data-ui-style="editorial"] .segmented-control {
+  background-color: transparent;
+  border-bottom: 1px solid var(--ed-rule);
+  border-radius: 0;
+  padding: 0;
+  gap: 0;
+}
+/* Guard: no tracking or caps in money, cells or tabular data. */
+[data-ui-style="editorial"] .privacy-sensitive,
+[data-ui-style="editorial"] table td,
+[data-ui-style="editorial"] .font-mono {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ── motion: almost none, on purpose ─────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="editorial"] #main section.bg-container { transition: border-color 200ms ease; }
+  [data-ui-style="editorial"] #main section.bg-container:hover { border-top-color: var(--color-black); }
+  [data-ui-style="editorial"][data-theme="dark"] #main section.bg-container:hover { border-top-color: var(--color-white); }
+  [data-ui-style="editorial"] .form-field { transition: border-color 160ms ease; }
+}

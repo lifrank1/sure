@@ -21,10 +21,13 @@
   <meta name="apple-mobile-web-app-title" content="<%= product_name %>">
   <meta name="color-scheme" content="dark light">
 
-  <%# Use theme colors that match both light and dark modes %>
-  <meta name="msapplication-TileColor" content="#0B0B0B">
-  <meta name="theme-color" content="#F9F9F9" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0B0B0B" media="(prefers-color-scheme: dark)">
+  <%# Mobile browser / PWA chrome, sourced from the active palette (UiTheme) so
+      the status bar matches the app instead of always being graphite. Still
+      keyed on prefers-color-scheme because these can't follow a CSS attribute. %>
+  <% palette_meta = UiTheme.find(:palette, Current.user&.ui_palette).meta %>
+  <meta name="msapplication-TileColor" content="<%= palette_meta[:ground_dark] %>">
+  <meta name="theme-color" content="<%= palette_meta[:paper] %>" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="<%= palette_meta[:ground_dark] %>" media="(prefers-color-scheme: dark)">
 
   <link rel="manifest" href="<%= pwa_manifest_path %>">
   <%# Provide multiple iOS icons (standard 180x180 and larger) %>

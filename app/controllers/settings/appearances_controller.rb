@@ -16,4 +16,21 @@ class Settings::AppearancesController < ApplicationController
     end
     redirect_to settings_appearance_path
   end
+
+  # "Surprise me" — every axis combination is valid by construction, so this is
+  # just a sample. Server-side so the pickers, the <html> attributes and the
+  # persisted record can never disagree.
+  def randomize
+    Current.user.update!(UiTheme.random_combination.transform_keys { |axis| :"ui_#{axis}" })
+    redirect_to settings_appearance_path, notice: t(".randomized")
+  end
+
+  def reset
+    Current.user.update!(
+      ui_palette: UiTheme.default_for(:palette),
+      ui_typeface: UiTheme.default_for(:typeface),
+      ui_style: UiTheme.default_for(:style)
+    )
+    redirect_to settings_appearance_path, notice: t(".reset")
+  end
 end

@@ -1,0 +1,75 @@
+<%# locals: (form:, axis:, options:, current:, columns: nil) %>
+<%#
+  One picker for one look axis (palette | typeface | style). Radios are
+  visually hidden and the label is the card. Clicking previews instantly —
+  look#preview writes the attribute onto <html> so the whole app re-skins
+  under you — and auto-submits so the choice persists. No save button.
+%>
+<% columns ||= "sm:grid-cols-2 xl:grid-cols-3" %>
+<div class="grid grid-cols-1 <%= columns %> gap-3">
+  <% options.each do |option| %>
+    <%= form.label :"ui_#{axis}_#{option.id}",
+          class: "group cursor-pointer rounded-xl p-3 bg-container shadow-border-xs transition-all
+                  hover:bg-container-hover has-[input:checked]:shadow-border-md
+                  has-[input:checked]:outline has-[input:checked]:outline-2 has-[input:checked]:outline-primary" do %>
+      <%= form.radio_button :"ui_#{axis}", option.id,
+            checked: current == option.id,
+            class: "sr-only",
+            data: {
+              axis: axis,
+              value: option.id,
+              action: "look#preview",
+              auto_submit_form_target: "auto"
+            } %>
+
+      <% case axis.to_sym %>
+      <% when :palette %>
+        <%# Miniature of the real thing: page ground, a card on top, ink line,
+            and the two colors that carry meaning in a finance app. %>
+        <div class="h-20 rounded-lg overflow-hidden flex" style="background-color: <%= option.meta[:paper] %>">
+          <div class="flex-1 p-2 flex flex-col justify-between">
+            <div class="space-y-1">
+              <div class="h-1.5 w-10 rounded-full" style="background-color: <%= option.meta[:ink] %>"></div>
+              <div class="h-1 w-14 rounded-full opacity-40" style="background-color: <%= option.meta[:ink] %>"></div>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="h-3 w-3 rounded-full" style="background-color: <%= option.meta[:positive] %>"></span>
+              <span class="h-3 w-3 rounded-full" style="background-color: <%= option.meta[:accent] %>"></span>
+              <span class="h-3 w-3 rounded-full" style="background-color: <%= option.meta[:ink] %>"></span>
+            </div>
+          </div>
+          <div class="w-8" style="background-color: <%= option.meta[:ink] %>"></div>
+        </div>
+
+      <% when :typeface %>
+        <%# Live specimen in the actual face — a number, because that is what
+            this app mostly renders. %>
+        <div class="h-20 rounded-lg bg-container-inset flex flex-col items-center justify-center gap-0.5 px-2 overflow-hidden"
+             style="font-family: <%= option.meta[:css_stack] %>">
+          <span class="text-[11px] text-secondary tracking-wide"><%= option.meta[:sample] %></span>
+          <span class="text-2xl text-primary leading-none whitespace-nowrap" style="font-variant-numeric: tabular-nums">$12,480</span>
+        </div>
+
+      <% when :style %>
+        <div class="h-20 rounded-lg bg-container-inset flex flex-col justify-center gap-1.5 px-3 overflow-hidden">
+          <span class="text-xs font-medium text-primary"><%= option.meta[:vibe] %></span>
+          <span class="flex flex-wrap gap-1">
+            <% option.meta[:tags].each do |tag| %>
+              <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-inset text-secondary"><%= tag %></span>
+            <% end %>
+          </span>
+        </div>
+      <% end %>
+
+      <div class="mt-2.5 flex items-start gap-2">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-primary truncate"><%= option.name %></p>
+          <p class="text-xs text-secondary mt-0.5 line-clamp-2"><%= option.blurb %></p>
+        </div>
+        <span class="shrink-0 mt-0.5 text-primary opacity-0 group-has-[input:checked]:opacity-100 transition-opacity">
+          <%= icon("check", size: "sm", color: "current") %>
+        </span>
+      </div>
+    <% end %>
+  <% end %>
+</div>

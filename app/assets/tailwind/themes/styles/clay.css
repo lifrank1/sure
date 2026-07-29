@@ -1,0 +1,248 @@
+/*
+ * SKIN: CLAY — soft solids you could squeeze.
+ *
+ * Everything is a fat-cornered lump of the same material: 28-36px radii, thick
+ * dual-tone shadows (a light bloom up-left, a heavy dark one down-right) and a
+ * bright lip along the top edge. Inputs and the selected nav row are pressed
+ * INTO the page instead of floating above it, and pushing a button swaps its
+ * outer shadow for an inset one so it visibly dents. The playfulness stops at
+ * legibility: small icon buttons, checkboxes and table wrappers get their radii
+ * clamped so a 36px corner never turns a 28px control into a blob or eats the
+ * first cell of a table.
+ */
+
+[data-ui-style="clay"] {
+  /* ── shape: fat, with a hard floor for small controls ───────────────────── */
+  --radius-sm: 0.75rem;   /* 12px */
+  --radius-md: 1.25rem;   /* 20px — form fields, md icon buttons */
+  --radius-lg: 1.75rem;   /* 28px — buttons, nav rows, table wrappers */
+  --radius-xl: 2rem;      /* 32px — cards, dashboard widgets */
+  --radius-2xl: 2.25rem;  /* 36px */
+  --radius-3xl: 2.5rem;
+
+  /* ── the dual-tone recipe, written once ──────────────────────────────────── */
+  /* One light source, up and to the left. --clay-hi is the palette's paper
+     (bright in light mode, brightest ink in dark), --clay-lo its ink. */
+  --clay-hi: color-mix(in oklab, var(--color-white) 85%, transparent);
+  --clay-lo: color-mix(in oklab, var(--color-black) 16%, transparent);
+  --clay-lip:  inset 0 2px 1px -1px color-mix(in oklab, var(--color-white) 90%, transparent);
+  --clay-roll: inset 0 -5px 9px -5px var(--clay-lo);
+
+  --shadow-xs: var(--clay-lip), var(--clay-roll), -3px -3px 8px -3px var(--clay-hi), 4px 5px 11px -3px var(--clay-lo);
+  --shadow-sm: var(--clay-lip), var(--clay-roll), -5px -5px 13px -4px var(--clay-hi), 6px 8px 17px -4px var(--clay-lo);
+  --shadow-md: var(--clay-lip), var(--clay-roll), -8px -8px 19px -6px var(--clay-hi), 10px 13px 25px -6px var(--clay-lo);
+  --shadow-lg: var(--clay-lip), var(--clay-roll), -12px -12px 27px -8px var(--clay-hi), 14px 18px 35px -8px var(--clay-lo);
+  --shadow-xl: var(--clay-lip), var(--clay-roll), -16px -16px 36px -10px var(--clay-hi), 20px 26px 50px -10px var(--clay-lo);
+
+  /* The dent. Same light source, mirrored: dark where the surface falls away
+     from the light (top-left), bright where it rises back (bottom-right). */
+  --clay-press: inset 6px 7px 13px -3px var(--clay-lo), inset -5px -6px 12px -3px var(--clay-hi);
+
+  /* The 1px ring inside every shadow-border-* becomes a highlight rim rather
+     than a dark hairline — a dark outline would fight the soft mass. The edge
+     is still fully defined, just by the shadow pair instead of a stroke. */
+  --color-alpha-black-50: color-mix(in oklab, var(--color-white) 55%, transparent);
+
+  /* ── ground: two full steps below the cards, so the lumps really sit on it ── */
+  --color-surface: var(--color-gray-200);
+  --color-surface-hover: var(--color-gray-300);
+  --color-surface-inset: var(--color-gray-300);
+  --color-surface-inset-hover: var(--color-gray-300);
+  --color-container-inset: var(--color-gray-100);
+  --color-container-inset-hover: var(--color-gray-200);
+}
+
+/* Dark twin. Every semantic alias set unlayered above must be restated here —
+   unlayered wins over the design system's layered [data-theme="dark"] block,
+   so anything left out would leak its light-mode value into dark mode. */
+[data-ui-style="clay"][data-theme="dark"] {
+  --clay-hi: color-mix(in oklab, var(--color-white) 9%, transparent);
+  --clay-lo: color-mix(in oklab, var(--color-black) 60%, transparent);
+  --clay-lip: inset 0 2px 1px -1px color-mix(in oklab, var(--color-white) 14%, transparent);
+  --clay-roll: inset 0 -5px 9px -5px var(--clay-lo);
+  --clay-press: inset 6px 7px 13px -3px var(--clay-lo), inset -5px -6px 12px -3px var(--clay-hi);
+  --color-alpha-white-50: color-mix(in oklab, var(--color-white) 11%, transparent);
+
+  /* The up-left bloom becomes a rim light on near-black clay — the same
+     physics, read the other way round. */
+  --color-surface: var(--color-black);
+  --color-surface-hover: var(--color-gray-800);
+  --color-surface-inset: var(--color-gray-900);
+  --color-surface-inset-hover: var(--color-gray-800);
+  --color-container: var(--color-gray-800);
+  --color-container-hover: var(--color-gray-700);
+  --color-container-inset: var(--color-gray-900);
+  --color-container-inset-hover: var(--color-gray-800);
+}
+
+/* Bare Tailwind .shadow-* utilities bake their geometry at build time; only the
+   --tw-shadow variable their box-shadow composes is late-bound. Re-point it at
+   the token so nav rows (.shadow-xs) and the selected segment (.shadow-sm) join
+   the material, without clobbering the ring slots focus halos use. */
+[data-ui-style="clay"] .shadow-xs { --tw-shadow: var(--shadow-xs); }
+[data-ui-style="clay"] .shadow-sm { --tw-shadow: var(--shadow-sm); }
+[data-ui-style="clay"] .shadow-md { --tw-shadow: var(--shadow-md); }
+
+/* ── radius clamps (the part that keeps this usable) ────────────────────────── */
+/* DS icon buttons are fixed 28/36px squares. A 20-28px radius clamps to a
+   circle on those, which erases the difference between an icon button and an
+   avatar or a status dot. Pin them to a squircle instead. */
+[data-ui-style="clay"] :is(button, a, summary, label).w-7 { border-radius: 0.625rem; }
+[data-ui-style="clay"] :is(button, a, summary, label).w-9 { border-radius: 0.875rem; }
+
+/* rounded-sm would round a 16px checkbox into something that reads as a radio.
+   Radios are left alone — they are supposed to be circles. */
+[data-ui-style="clay"] input[type="checkbox"] { border-radius: 0.375rem; }
+
+/* Tables get clamped wrappers: at 32px the corner curve reaches x≈16px at the
+   header's baseline, exactly where the first cell's text starts. */
+[data-ui-style="clay"] :is(div, section):has(> table) { border-radius: 1.125rem; }
+
+/* ── shell: one continuous slab of ground ──────────────────────────────────── */
+[data-ui-style="clay"] [data-app-layout-target="leftSidebar"] {
+  border-right-color: transparent;
+  padding-inline: 0.375rem;
+}
+
+[data-ui-style="clay"] #main .sticky {
+  border-bottom-color: transparent;
+  box-shadow: 0 10px 20px -16px var(--clay-lo);
+}
+
+/* ── the widget grid: chunky gutters ───────────────────────────────────────── */
+/* dashboard-masonry derives the vertical gutter from computed columnGap, so
+   bumping column-gap widens both axes. Row-gap is ours only until masonry
+   stamps its spans — after that it must return to 0 or the JS double-counts. */
+[data-ui-style="clay"] #main [data-controller~="dashboard-masonry"] {
+  column-gap: 2.5rem;
+  row-gap: 2.5rem;
+}
+
+[data-ui-style="clay"] #main [data-controller~="dashboard-masonry"]:has([data-masonry-span]) {
+  row-gap: 0;
+}
+
+[data-ui-style="clay"] #main section[data-section-key] > div:first-of-type {
+  padding: 1.125rem 1.5rem 0.625rem;
+}
+
+[data-ui-style="clay"] #main section[data-section-key] > [data-dashboard-section-target="content"] {
+  padding-block: 0.625rem 1.5rem;
+}
+
+/* ── chunky controls ───────────────────────────────────────────────────────── */
+/* Keying off the DS's own padding utilities keeps fixed-size icon buttons (which
+   carry width/height instead of padding) out of it, so none of them overflow. */
+[data-ui-style="clay"] :is(button, a[role="button"], input[type="submit"]).px-3.py-2 {
+  padding: 0.625rem 1.125rem;
+}
+
+[data-ui-style="clay"] :is(button, a[role="button"], input[type="submit"]).px-4.py-3 {
+  padding: 0.875rem 1.5rem;
+}
+
+[data-ui-style="clay"] [data-app-layout-target="leftSidebar"] ul > li > a {
+  padding-block: 0.625rem;
+}
+
+[data-ui-style="clay"] [data-app-layout-target="leftSidebar"] ul > li + li {
+  margin-top: 0.375rem;
+}
+
+/* The selected nav row stays dented — the state you are "in" is the one you
+   have pushed in. */
+[data-ui-style="clay"] [data-app-layout-target="leftSidebar"] a[aria-current="page"] {
+  background-color: var(--color-surface-inset);
+  --tw-shadow: var(--clay-press);
+}
+
+/* ── segmented control: dented track, dented selection ─────────────────────── */
+[data-ui-style="clay"] .segmented-control {
+  padding: 0.3125rem;
+  background-color: var(--color-container-inset);
+  box-shadow: var(--clay-press);
+}
+
+/* Dented, not raised. Its background matches the inactive hover tint, so the
+   dent plus the weight bump — not color alone — marks the selection. */
+[data-ui-style="clay"] .segmented-control__segment--active {
+  --tw-shadow: var(--clay-press);
+  background-color: var(--color-container-inset-hover);
+  font-weight: 600;
+}
+
+/* ── forms: carved out of the surface, not stuck on top of it ──────────────── */
+[data-ui-style="clay"] .form-field {
+  background-color: var(--color-container-inset);
+  border-color: transparent;
+  padding: 0.625rem 1.125rem;
+  --tw-shadow: var(--clay-press);
+}
+
+/* The field is now tinted, so the input's own bg-container would draw a bright
+   rectangle inside the dent. */
+[data-ui-style="clay"] .form-field__input,
+[data-ui-style="clay"] .combobox .hw-combobox__input {
+  background-color: transparent;
+}
+
+/* focus-within:shadow-none would flatten the dent (and our unlayered
+   --tw-shadow beats it anyway) — deepen it instead, on top of the ring-4 halo
+   the design system already adds. */
+[data-ui-style="clay"] .form-field:focus-within {
+  --tw-shadow: var(--clay-press);
+}
+
+/* Fat radii swallow a 2px hugging outline, so the keyboard indicator gets
+   thicker and steps outside the shape. Strictly more visible, never less. */
+[data-ui-style="clay"] .focus-ring,
+[data-ui-style="clay"] .focus-ring-within {
+  outline-width: 3px;
+  outline-offset: 2px;
+}
+
+/* ── tables: soft container, ordinary insides ──────────────────────────────── */
+[data-ui-style="clay"] table thead {
+  background-color: var(--color-container-inset);
+}
+
+[data-ui-style="clay"] table tbody tr:hover {
+  background-color: var(--color-container-inset);
+}
+
+/* ── chart tooltip: a small lump ───────────────────────────────────────────── */
+[data-ui-style="clay"] .chart-tooltip {
+  border-radius: 1.25rem;
+  padding: 12px 16px;
+  box-shadow: var(--shadow-md);
+}
+
+/* ── motion: squeeze ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="clay"] button,
+  [data-ui-style="clay"] a[role="button"],
+  [data-ui-style="clay"] .segmented-control__segment,
+  [data-ui-style="clay"] .bg-container {
+    transition: box-shadow 180ms cubic-bezier(0.34, 1.4, 0.64, 1),
+                transform 140ms cubic-bezier(0.34, 1.4, 0.64, 1),
+                background-color 180ms ease,
+                color 180ms ease,
+                outline-color 150ms ease;
+  }
+
+  [data-ui-style="clay"] button:hover:not(:disabled):not([aria-disabled="true"]),
+  [data-ui-style="clay"] a[role="button"]:hover {
+    --tw-shadow: var(--shadow-md);
+  }
+
+  /* Press: the lump takes the dent, drops 2px and shrinks a hair, as if your
+     thumb were in it. Deliberately NOT applied to dashboard widgets — they are
+     draggable, and a scale on pointer-down would be baked into the drag ghost. */
+  [data-ui-style="clay"] button:active:not(:disabled),
+  [data-ui-style="clay"] a[role="button"]:active,
+  [data-ui-style="clay"] .segmented-control__segment:active {
+    transform: translateY(2px) scale(0.99);
+    --tw-shadow: var(--clay-press);
+    box-shadow: var(--clay-press);
+  }
+}

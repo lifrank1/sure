@@ -163,7 +163,16 @@ reversals) — Categorize-wizard territory, not a bug.
 - SnapTrade balance rule: prefer API total unless it's below holdings value
   (Fidelity sweeps cash into SPAXX → double-count guard in
   SnaptradeAccount::Processor#calculate_total_balance).
-- Local dev DB (Docker, port 5433) is Frank's PERSONAL data — do not wipe.
-  Tests must run on host with separate test DB (see CLAUDE.md warnings).
+- Local dev DB (Docker, port 5433) currently holds the repo's SEEDED demo data
+  (bob@bobdylan.com, 3 families, 34 accounts) — verified 2026-07-29, not Frank's
+  personal finances. Reads/migrations/logins are fine; the hazard that remains is
+  the mechanism: POSTGRES_DB=sure_production applies to every env inside those
+  containers, so any in-container RAILS_ENV=test run or db:schema:load still
+  overwrites it. Tests must run on host with a separate test DB (see CLAUDE.md).
+  Throwaway admin for visual work: theme-preview@local.test / themelab12345.
+- Look system ("theme lab"): 10 palettes x 10 typefaces x 10 structural skins,
+  all switchable in Settings > Appearance. Architecture, authoring contract and
+  the Tailwind traps are in docs/frank-finance/THEME_LAB.md — READ IT before
+  touching design tokens, app/assets/tailwind/themes/**, or adding a look.
 - Upstream merges: `git fetch upstream && git merge upstream/main` — our changes
   are deliberately additive/env-gated to minimize conflicts.

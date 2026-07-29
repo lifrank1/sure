@@ -1,0 +1,62 @@
+/*
+ * THEME AXIS 3 — STRUCTURAL STYLES ("skins")
+ *
+ * Each skin restyles shape, depth, density, motion and placement for the whole
+ * app, keyed on `data-ui-style` on <html>. Palette and typeface are separate
+ * axes — a skin must therefore be COLOR-AGNOSTIC and FONT-AGNOSTIC: express
+ * everything through tokens (var(--color-*), var(--font-*)) so all 10 palettes
+ * and all 10 typefaces keep working underneath it.
+ *
+ * ── AUTHORING CONTRACT ──────────────────────────────────────────────────────
+ *
+ * 1. CASCADE. Skin rules live OUTSIDE any @layer. Unlayered declarations beat
+ *    layered ones, so a skin overrides Tailwind utilities (which live in
+ *    @layer utilities) without a single !important. Token overrides go in a
+ *    plain `[data-ui-style="x"] { --token: ... }` block.
+ *
+ * 2. TOKENS worth re-pointing (this is where most of a skin's identity lives):
+ *      --radius-sm|md|lg|xl|2xl|3xl   shape language
+ *      --shadow-xs|sm|md|lg|xl        depth language (the card chrome utility
+ *                                     shadow-border-* is built from these)
+ *      --color-alpha-black-50         the hairline ring on every card (light)
+ *      --color-alpha-white-50         ... and in dark mode
+ *
+ * 3. SELECTOR SURFACE — the hooks that already exist app-wide:
+ *      .bg-container            every card / panel (the main surface)
+ *      .bg-container-inset      nested panels, list wells
+ *      .bg-surface              the page ground
+ *      [data-controller~="app-layout"]        the shell flex row
+ *      [data-app-layout-target="leftSidebar"] the nav rail
+ *      [data-app-layout-target="content"], #main   the page content column
+ *      #main .sticky            the desktop page header bar
+ *      .button-bg-primary / .button-bg-secondary / button   buttons
+ *      .form-field, input, select, textarea   form controls
+ *      table, tbody tr          tabular data
+ *      .segmented-control       tab groups
+ *
+ * 4. NON-NEGOTIABLES (a finance app people actually use):
+ *      - Never reduce text contrast below the palette's AA baseline.
+ *      - Keep focus indicators visible; never `outline: none` without a
+ *        replacement.
+ *      - All motion inside @media (prefers-reduced-motion: no-preference).
+ *      - No layout traps: don't add overflow:hidden to scroll containers,
+ *        don't position:fixed a card, don't break the sticky header.
+ *      - Leave .privacy-sensitive blurring and print-report.css alone.
+ *      - Numbers must stay scannable: no letter-spacing on tabular figures.
+ *
+ * 5. DARK MODE. Compose with the existing attribute:
+ *      [data-ui-style="x"][data-theme="dark"] { ... }
+ *
+ * See docs/frank-finance/THEME_LAB.md for the full guide.
+ */
+
+@import "./styles/refined.css";
+@import "./styles/brutal.css";
+@import "./styles/glass.css";
+@import "./styles/editorial.css";
+@import "./styles/terminal.css";
+@import "./styles/bento.css";
+@import "./styles/dense.css";
+@import "./styles/aurora.css";
+@import "./styles/deco.css";
+@import "./styles/clay.css";

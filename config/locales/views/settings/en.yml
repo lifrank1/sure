@@ -100,8 +100,23 @@ en:
         choose_level: "Choose level"
         payment_via_stripe: "Payment via Stripe"
     appearances:
+      randomize:
+        randomized: "New look rolled. Not for you? Roll again or reset."
+      reset:
+        reset: "Back to the house look."
       show:
         page_title: Appearance
+        look_title: Look lab
+        look_subtitle: Three independent dials — color, type, and structure. Changes preview instantly and save themselves.
+        look_randomize: Surprise me
+        look_reset: Reset to default
+        look_combination_count: "%{count} combinations"
+        palette_title: Color
+        palette_subtitle: Palettes retune the whole app, not just accents. Every one is contrast-checked in light and dark.
+        typeface_title: Typeface
+        typeface_subtitle: Body, heading, and numeral pairings. All self-hosted — nothing is fetched from a third party.
+        style_title: Style
+        style_subtitle: The structural skin — shape, depth, density, motion, and where things sit.
         theme_title: Theme
         theme_subtitle: Choose a preferred theme for the app
         theme_dark: Dark

@@ -1,0 +1,228 @@
+/*
+ * SKIN: BENTO — pillowed tiles on a recessed ground.
+ *
+ * The page ground steps one shade darker than the cards, so every panel reads
+ * as a soft-edged tile resting *on* the page rather than a box drawn into it.
+ * Depth is a four-part recipe baked straight into the --shadow-* tokens: a
+ * bright inset lip along the top edge, a faint dark roll along the bottom, a
+ * tight contact shadow and a wide ambient drop. Dashboard widgets sit in
+ * noticeably wider gutters, and anything clickable settles a pixel into the
+ * page when you touch it. Restrained on purpose — a table inside a tile still
+ * looks like a table.
+ */
+
+[data-ui-style="bento"] {
+  /* ── shape: generous, not cartoonish ─────────────────────────────────────── */
+  --radius-sm: 0.5rem;    /*  8px — checkboxes, tiny chips */
+  --radius-md: 0.75rem;   /* 12px — form fields, sm icon buttons */
+  --radius-lg: 1.125rem;  /* 18px — buttons, nav rows (429 usages) */
+  --radius-xl: 1.375rem;  /* 22px — cards, dashboard widgets (206 usages) */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-3xl: 1.75rem;
+
+  /* ── the depth recipe, written once ──────────────────────────────────────── */
+  /* Light comes from directly above. In LIGHT mode the tile is already the
+     brightest thing on screen, so the inset lip barely registers on white
+     cards and the read comes from the ambient drop; on tinted/inset surfaces
+     the lip does the work. Dark mode inverts that (see the twin below). */
+  --bento-lip:     inset 0 1px 0 0 color-mix(in oklab, var(--color-white) 75%, transparent);
+  --bento-roll:    inset 0 -1px 0 0 color-mix(in oklab, var(--color-black) 5%, transparent);
+  --bento-contact: color-mix(in oklab, var(--color-black) 5%, transparent);
+  --bento-ambient: color-mix(in oklab, var(--color-black) 9%, transparent);
+
+  --shadow-xs: var(--bento-lip), var(--bento-roll), 0 1px 2px 0 var(--bento-contact), 0 5px 12px -5px var(--bento-ambient);
+  --shadow-sm: var(--bento-lip), var(--bento-roll), 0 2px 4px -1px var(--bento-contact), 0 10px 20px -8px var(--bento-ambient);
+  --shadow-md: var(--bento-lip), var(--bento-roll), 0 3px 6px -2px var(--bento-contact), 0 16px 30px -10px var(--bento-ambient);
+  --shadow-lg: var(--bento-lip), var(--bento-roll), 0 5px 10px -3px var(--bento-contact), 0 26px 46px -14px var(--bento-ambient);
+  --shadow-xl: var(--bento-lip), var(--bento-roll), 0 8px 16px -4px var(--bento-contact), 0 40px 70px -20px var(--bento-ambient);
+
+  /* Press state: keep the lip and roll (the tile is still a tile), collapse the
+     drop so it reads as having sunk toward the page. */
+  --bento-pressed: var(--bento-lip), var(--bento-roll), 0 1px 1px 0 var(--bento-contact), 0 2px 5px -3px var(--bento-ambient);
+  /* Wells: recessed, no drop at all. */
+  --bento-well: inset 0 1px 3px 0 var(--bento-ambient), inset 0 -1px 0 0 color-mix(in oklab, var(--color-white) 50%, transparent);
+
+  /* The hairline ring inside every shadow-border-* — a touch stronger so a
+     tile keeps a defined edge where its drop shadow lands on another tile.
+     --bento-ring aliases whichever of the two is live, so rules below that need
+     the ring don't each require a dark twin. */
+  --color-alpha-black-50: color-mix(in oklab, var(--color-black) 7%, transparent);
+  --bento-ring: var(--color-alpha-black-50);
+
+  /* ── the recessed ground ─────────────────────────────────────────────────── */
+  /* Cards stay --color-white (the palette's paper); the page drops a step.
+     Hover/inset rungs move with it so nav hover stays visible against it. */
+  --color-surface: var(--color-gray-100);
+  --color-surface-hover: var(--color-gray-200);
+  --color-surface-inset: var(--color-gray-200);
+  --color-surface-inset-hover: var(--color-gray-300);
+}
+
+/* Dark twin. These semantic aliases are set unlayered above, which beats the
+   design system's layered [data-theme="dark"] block — so every one of them has
+   to be restated here or light surfaces leak into dark mode. */
+[data-ui-style="bento"][data-theme="dark"] {
+  /* Dark mode has no "brighter than paper" to give away, so the tile is lifted
+     a full ramp step off the ground and the top lip becomes the loud part.
+     A black drop shadow is nearly invisible on a black ground, which is fine:
+     it only has to register where a tile overlaps another tile or a well. */
+  --bento-lip:     inset 0 1px 0 0 color-mix(in oklab, var(--color-white) 12%, transparent);
+  --bento-roll:    inset 0 -1px 0 0 color-mix(in oklab, var(--color-black) 45%, transparent);
+  --bento-contact: color-mix(in oklab, var(--color-black) 45%, transparent);
+  --bento-ambient: color-mix(in oklab, var(--color-black) 35%, transparent);
+  --bento-well: inset 0 1px 3px 0 var(--bento-contact), inset 0 -1px 0 0 color-mix(in oklab, var(--color-white) 8%, transparent);
+  --color-alpha-white-50: color-mix(in oklab, var(--color-white) 9%, transparent);
+  --bento-ring: var(--color-alpha-white-50);
+
+  --color-surface: var(--color-black);
+  --color-surface-hover: var(--color-gray-800);
+  --color-surface-inset: var(--color-gray-900);
+  --color-surface-inset-hover: var(--color-gray-800);
+  /* Tile a step brighter than stock, and nested wells go DARKER than the tile
+     rather than lighter — recessed means recessed in both themes. */
+  --color-container: var(--color-gray-800);
+  --color-container-hover: var(--color-gray-700);
+  --color-container-inset: var(--color-gray-900);
+  --color-container-inset-hover: var(--color-gray-800);
+}
+
+/* Bare Tailwind .shadow-* utilities bake their geometry at build time, so the
+   token overrides above do not reach them. Re-point --tw-shadow (the variable
+   their box-shadow composes) at the token, leaving the ring/inset-ring slots
+   intact so focus halos still compose. */
+[data-ui-style="bento"] .shadow-xs { --tw-shadow: var(--shadow-xs); }
+[data-ui-style="bento"] .shadow-sm { --tw-shadow: var(--shadow-sm); }
+[data-ui-style="bento"] .shadow-md { --tw-shadow: var(--shadow-md); }
+
+/* ── shell ──────────────────────────────────────────────────────────────────── */
+/* The rail is part of the ground, so its divider goes away and the nav pills
+   float on it instead. */
+[data-ui-style="bento"] [data-app-layout-target="leftSidebar"] {
+  border-right-color: transparent;
+  padding-inline: 0.25rem;
+}
+
+/* The page header stops being a ruled band and becomes a floating shelf.
+   Still opaque (bg-surface) and still sticky — only the chrome changes. */
+[data-ui-style="bento"] #main .sticky {
+  border-bottom-color: transparent;
+  box-shadow: 0 6px 14px -10px var(--bento-ambient), 0 1px 0 0 var(--bento-ring);
+}
+
+/* ── the widget grid: wider gutters ─────────────────────────────────────────── */
+/* dashboard-masonry reads computed columnGap and pads each card's row span by
+   that many 1px tracks, so bumping column-gap widens the vertical gutter too.
+   Row-gap is only ours in single-column mode; once masonry has stamped spans
+   it must go back to 0 or the JS double-counts the gutter. */
+[data-ui-style="bento"] #main [data-controller~="dashboard-masonry"] {
+  column-gap: 2.25rem;
+  row-gap: 2.25rem;
+}
+
+[data-ui-style="bento"] #main [data-controller~="dashboard-masonry"]:has([data-masonry-span]) {
+  row-gap: 0;
+}
+
+/* Tiles get room to breathe. Padding-block only on the content well — the
+   partials inside own their own horizontal padding. */
+[data-ui-style="bento"] #main section[data-section-key] > div:first-of-type {
+  padding: 0.875rem 1.25rem 0.5rem;
+}
+
+[data-ui-style="bento"] #main section[data-section-key] > [data-dashboard-section-target="content"] {
+  padding-block: 0.5rem 1.25rem;
+}
+
+/* ── nav ────────────────────────────────────────────────────────────────────── */
+[data-ui-style="bento"] [data-app-layout-target="leftSidebar"] ul > li + li {
+  margin-top: 0.25rem;
+}
+
+[data-ui-style="bento"] [data-app-layout-target="leftSidebar"] a[aria-current="page"] {
+  --tw-shadow: var(--shadow-sm);
+}
+
+/* ── segmented control: a well, with the selection riding on top ────────────── */
+/* container-inset, not surface-inset: the segment hover tint is gray-200, so a
+   gray-200 track would swallow it. */
+[data-ui-style="bento"] .segmented-control {
+  padding: 0.25rem;
+  background-color: var(--color-container-inset);
+  box-shadow: var(--bento-well);
+}
+
+[data-ui-style="bento"] .segmented-control__segment--active {
+  --tw-shadow: var(--shadow-xs);
+}
+
+/* ── forms: shallow tiles that sink when focused ────────────────────────────── */
+[data-ui-style="bento"] .form-field {
+  border-color: transparent;
+  padding: 0.5rem 0.875rem;
+}
+
+/* The design system clears the field's shadow on focus (focus-within:shadow-none)
+   and adds a ring-4 halo. Our unlayered --tw-shadow would win that race and
+   leave the field looking unfocused, so swap it to the well recipe instead:
+   the field visibly presses in AND keeps the halo. Focus gets louder, not
+   quieter. */
+[data-ui-style="bento"] .form-field:focus-within {
+  --tw-shadow: var(--bento-well);
+}
+
+/* ── tables: legible, only lightly tiled ───────────────────────────────────── */
+[data-ui-style="bento"] table thead {
+  background-color: var(--color-container-inset);
+}
+
+[data-ui-style="bento"] table tbody tr:hover {
+  background-color: var(--color-container-inset);
+}
+
+/* ── chart tooltip: a small tile, same recipe ──────────────────────────────── */
+[data-ui-style="bento"] .chart-tooltip {
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--bento-ring);
+}
+
+/* ── motion: the gentle press ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="bento"] .bg-container,
+  [data-ui-style="bento"] button,
+  [data-ui-style="bento"] a[role="button"],
+  [data-ui-style="bento"] .segmented-control__segment {
+    /* color + outline-color are carried over from the `transition-colors` these
+       controls ship with — replacing the shorthand would otherwise drop them. */
+    transition: box-shadow 160ms cubic-bezier(0.2, 0, 0, 1),
+                transform 120ms cubic-bezier(0.2, 0, 0, 1),
+                background-color 160ms ease,
+                color 160ms ease,
+                outline-color 150ms ease;
+  }
+
+  /* Controls press on hover — they are small, and the 1px dip is the whole
+     point of the skin. */
+  [data-ui-style="bento"] button:hover:not(:disabled):not([aria-disabled="true"]),
+  [data-ui-style="bento"] a[role="button"]:hover,
+  [data-ui-style="bento"] [data-app-layout-target="leftSidebar"] a:hover {
+    transform: translateY(1px);
+    --tw-shadow: var(--bento-pressed);
+  }
+
+  /* Tiles only settle their shadow on hover — no transform. A dashboard widget
+     is tall enough that a 1px shift under the cursor can bounce the :hover
+     state on and off along its top edge; the pointer-down press below is
+     immune to that because :active does not depend on hover. */
+  [data-ui-style="bento"] #main section[data-section-key]:hover {
+    --tw-shadow: var(--bento-pressed);
+    box-shadow: var(--bento-pressed), 0 0 0 1px var(--bento-ring);
+  }
+
+  [data-ui-style="bento"] button:active:not(:disabled),
+  [data-ui-style="bento"] a[role="button"]:active,
+  [data-ui-style="bento"] #main section[data-section-key]:active {
+    transform: translateY(1px);
+    --tw-shadow: var(--bento-well);
+  }
+}

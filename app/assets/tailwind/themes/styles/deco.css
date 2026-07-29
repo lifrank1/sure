@@ -1,0 +1,219 @@
+/*
+ * SKIN: DECO — a 1930s lobby directory board.
+ *
+ * Every panel is framed twice — a one-pixel metallic edge outside, a gap, then an
+ * inner hairline rule — with a diagonal stroke chamfering each corner. Headings
+ * and nav labels are small-caps and widely letterspaced; separators are
+ * diamond-lattice grilles drawn from gradients, never images. "Metal" is a
+ * light-to-dark ramp mixed from the palette's own warm token against
+ * --color-white / --color-black: brass over Vellum, amber over Phosphor, old gold
+ * over Tokyo Night. Restrained, and never a literal hex.
+ */
+
+[data-ui-style="deco"] {
+  /* Hard-edged geometry: the chamfer motif supplies the corner interest. */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  /* Light falls from the top-left, so depth is a short offset down and right. */
+  --shadow-xs: 1px 1px 2px 0 color-mix(in oklab, var(--color-black) 12%, transparent);
+  --shadow-sm: 2px 2px 6px -1px color-mix(in oklab, var(--color-black) 16%, transparent);
+  --shadow-md: 3px 6px 14px -3px color-mix(in oklab, var(--color-black) 20%, transparent);
+  --shadow-lg: 4px 14px 28px -8px color-mix(in oklab, var(--color-black) 26%, transparent);
+  --shadow-xl: 6px 24px 48px -12px color-mix(in oklab, var(--color-black) 30%, transparent);
+  /* The metal ramp. --color-gray-400 in the midtone is what keeps the palette's
+     warm token from going saccharine. */
+  --deco-metal-hi: color-mix(in oklab, var(--color-yellow-400) 42%, var(--color-white));
+  --deco-metal-mid: color-mix(in oklab, var(--color-yellow-500) 62%, var(--color-gray-400));
+  --deco-metal-lo: color-mix(in oklab, var(--color-yellow-800) 55%, var(--color-black));
+  --deco-hair: color-mix(in oklab, var(--color-yellow-700) 45%, var(--color-black));
+  /* Brighter at top-left: the reason this is a gradient, not a border-color. */
+  --deco-edge: linear-gradient(135deg, var(--deco-metal-hi) 0%, var(--deco-metal-mid) 44%, var(--deco-metal-lo) 100%);
+  /* Corner chamfers. 135deg draws `/` (TL, BR); 45deg draws `\` (TR, BL). */
+  --deco-notch-fwd: linear-gradient(135deg, transparent calc(50% - 0.5px), var(--deco-hair) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  --deco-notch-bwd: linear-gradient(45deg, transparent calc(50% - 0.5px), var(--deco-hair) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  /* Diamond grille — two crossed hairline sets; stands in for every divider. */
+  --deco-grille:
+    repeating-linear-gradient(135deg, var(--deco-metal-mid) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(45deg, var(--deco-metal-mid) 0 1px, transparent 1px 7px);
+  /* Lit from above: a veil that brightens the top of a filled control. */
+  --deco-sheen: linear-gradient(to bottom, color-mix(in oklab, var(--color-white) 22%, transparent) 0%, transparent 58%);
+  /* The ring in every shadow-border-* becomes a gold hairline, metal-washing the
+     ~150 surfaces this file doesn't frame individually. */
+  --color-alpha-black-50: color-mix(in oklab, var(--color-yellow-600) 55%, transparent);
+}
+[data-ui-style="deco"][data-theme="dark"] {
+  /* --color-black is the page ground in dark, so black shadows vanish. */
+  --shadow-xs: 1px 1px 2px 0 color-mix(in oklab, var(--color-white) 10%, transparent);
+  --shadow-sm: 2px 2px 6px -1px color-mix(in oklab, var(--color-white) 12%, transparent);
+  --shadow-md: 3px 6px 14px -3px color-mix(in oklab, var(--color-white) 14%, transparent);
+  --shadow-lg: 4px 14px 28px -8px color-mix(in oklab, var(--color-white) 16%, transparent);
+  --shadow-xl: 6px 24px 48px -12px color-mix(in oklab, var(--color-white) 18%, transparent);
+  --deco-hair: color-mix(in oklab, var(--color-yellow-400) 48%, var(--color-white));
+  /* A white veil over a light fill is invisible; shade the bottom instead. */
+  --deco-sheen: linear-gradient(to bottom, transparent 42%, color-mix(in oklab, var(--color-black) 20%, transparent) 100%);
+  --color-alpha-white-50: color-mix(in oklab, var(--color-yellow-400) 50%, transparent);
+}
+/* `rounded-full` is calc(infinity * 1px), not a token. Square the pills and round
+   icon buttons; avatars and status dots stay circular. */
+[data-ui-style="deco"] button.rounded-full,
+[data-ui-style="deco"] a.rounded-full { border-radius: 0; }
+
+/* ── the framed panel ─────────────────────────────────────────────────────────
+   The container fill is clipped to the padding box and the metal gradient to the
+   border box, so a transparent 1px border shows metal while text still sits on a
+   solid fill. The inset rings then paint 3px of container plus a 1px rule — the
+   second symmetrical frame. Ring custom properties lead the box-shadow list so
+   the widget grid's `focus-visible:ring-2` survives this override. */
+[data-ui-style="deco"] .bg-container.rounded-xl,
+[data-ui-style="deco"] #main section.bg-container,
+[data-ui-style="deco"] .z-50 .bg-container {
+  border: 1px solid transparent;
+  background-image: var(--deco-notch-fwd), var(--deco-notch-bwd),
+    var(--deco-notch-bwd), var(--deco-notch-fwd),
+    linear-gradient(var(--color-container), var(--color-container)), var(--deco-edge);
+  background-position: left 7px top 7px, right 7px top 7px,
+    left 7px bottom 7px, right 7px bottom 7px, 0 0, 0 0;
+  background-size: 13px 13px, 13px 13px, 13px 13px, 13px 13px, auto, auto;
+  background-repeat: no-repeat;
+  background-origin: padding-box, padding-box, padding-box, padding-box, padding-box, border-box;
+  background-clip: padding-box, padding-box, padding-box, padding-box, padding-box, border-box;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    inset 0 0 0 3px var(--color-container), inset 0 0 0 4px var(--deco-hair),
+    var(--shadow-sm);
+}
+/* Section titles sit over a grille band rather than a plain divider. */
+[data-ui-style="deco"] #main section.bg-container > div:first-child {
+  padding-bottom: 0.75rem;
+  background-image: var(--deco-grille);
+  background-repeat: no-repeat;
+  background-position: bottom left;
+  background-size: 100% 4px;
+}
+
+/* ── the shell ────────────────────────────────────────────────────────────────
+   The rail's edge is a vertical metal strip. Width/overflow belong to the
+   app-layout controller, so it's drawn as a background, not a border. */
+[data-ui-style="deco"] [data-app-layout-target="leftSidebar"] {
+  border-right-color: transparent;
+  background: linear-gradient(to bottom, var(--deco-metal-hi), var(--deco-metal-mid) 45%, var(--deco-metal-lo)) right center / 2px 100% no-repeat;
+}
+/* Masthead: a double rule plus a grille frieze tucked inside its own padding, so
+   it never overlays the page content scrolling underneath. */
+[data-ui-style="deco"] #main > .sticky {
+  border-bottom: 3px double var(--deco-hair);
+  padding-bottom: 0.75rem;
+}
+[data-ui-style="deco"] #main > .sticky::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 2px 0;
+  height: 5px;
+  background-image: var(--deco-grille);
+  pointer-events: none;
+}
+[data-ui-style="deco"] hr { border: 0; height: 5px; background-image: var(--deco-grille); }
+
+/* ── nav: engraved directory listing ─────────────────────────────────────── */
+[data-ui-style="deco"] [data-app-layout-target="leftSidebar"] a {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.13em;
+  font-weight: 600;
+}
+/* The active row becomes a metal plaque with a lit top edge. --tw-shadow is
+   cleared because `shadow-xs` bakes its geometry at build time. */
+[data-ui-style="deco"] [data-app-layout-target="leftSidebar"] a.bg-container {
+  --tw-shadow: 0 0 #0000;
+  border: 1px solid transparent;
+  background-image: linear-gradient(var(--color-container), var(--color-container)), var(--deco-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: inset 0 1px 0 0 var(--deco-metal-hi);
+}
+
+/* ── headings & plaques ───────────────────────────────────────────────────── */
+[data-ui-style="deco"] h1 { font-variant-caps: all-small-caps; letter-spacing: 0.06em; }
+[data-ui-style="deco"] h2,
+[data-ui-style="deco"] h3,
+[data-ui-style="deco"] #main table thead th,
+[data-ui-style="deco"] .form-field__label {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.13em;
+  font-weight: 600;
+}
+[data-ui-style="deco"] .bg-inverse,
+[data-ui-style="deco"] .button-bg-primary,
+[data-ui-style="deco"] .button-bg-secondary,
+[data-ui-style="deco"] a[role="button"] {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.11em;
+  font-weight: 600;
+}
+[data-ui-style="deco"] .bg-inverse,
+[data-ui-style="deco"] .button-bg-primary {
+  background-image: var(--deco-sheen);
+  box-shadow: inset 0 0 0 1px var(--deco-metal-mid), var(--shadow-xs);
+}
+[data-ui-style="deco"] .button-bg-secondary { background-image: var(--deco-sheen); box-shadow: inset 0 0 0 1px var(--deco-hair); }
+/* Focus clears the metal frame: same recipe, heavier stroke, pushed 2px out. */
+[data-ui-style="deco"] .focus-ring:focus-visible,
+[data-ui-style="deco"] .focus-ring-within:focus-within {
+  outline-width: 2px;
+  outline-offset: 2px;
+  outline-color: var(--deco-hair);
+}
+
+/* ── forms ────────────────────────────────────────────────────────────────── */
+[data-ui-style="deco"] .form-field {
+  --tw-shadow: 0 0 #0000;
+  border-color: transparent;
+  background-image: linear-gradient(var(--color-container), var(--color-container)), var(--deco-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+/* Replaces the soft 4px halo, which reads as mush against a metal edge. */
+[data-ui-style="deco"] .form-field:focus-within { box-shadow: 0 0 0 2px var(--deco-hair); }
+
+/* ── tables & tabs ────────────────────────────────────────────────────────── */
+[data-ui-style="deco"] #main table thead { border-bottom: 3px double var(--deco-hair); }
+[data-ui-style="deco"] #main table tbody tr + tr { border-top: 1px solid color-mix(in oklab, var(--deco-metal-mid) 40%, transparent); }
+[data-ui-style="deco"] .segmented-control {
+  background-color: transparent;
+  border: 1px solid transparent;
+  background-image: linear-gradient(var(--color-surface), var(--color-surface)), var(--deco-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+[data-ui-style="deco"] .segmented-control__segment--active { background-image: var(--deco-sheen); box-shadow: inset 0 0 0 1px var(--deco-metal-mid); }
+
+/* Guard: small-caps and tracking stop at the numbers, so money and table cells
+   stay scannable and column-aligned. */
+[data-ui-style="deco"] .privacy-sensitive,
+[data-ui-style="deco"] table td,
+[data-ui-style="deco"] .font-mono {
+  font-variant-caps: normal;
+  letter-spacing: normal;
+}
+
+/* ── motion ───────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui-style="deco"] .bg-container.rounded-xl,
+  [data-ui-style="deco"] #main section.bg-container,
+  [data-ui-style="deco"] .bg-inverse,
+  [data-ui-style="deco"] .button-bg-primary {
+    transition: box-shadow 200ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  /* Hover brings the inner rule up to full metal, as if the light moved. */
+  [data-ui-style="deco"] .bg-container.rounded-xl:hover,
+  [data-ui-style="deco"] #main section.bg-container:hover {
+    box-shadow:
+      var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+      inset 0 0 0 3px var(--color-container),
+      inset 0 0 0 4px var(--deco-metal-mid),
+      var(--shadow-md);
+  }
+}

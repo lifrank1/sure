@@ -248,7 +248,12 @@ Rails.application.routes.draw do
   namespace :settings do
     resource :profile, only: [ :show, :destroy ]
     resource :preferences, only: %i[show update]
-    resource :appearance, only: %i[show update]
+    resource :appearance, only: %i[show update] do
+      # Look system shortcuts (UiTheme): sample a random combination, or go
+      # back to the house look.
+      post :randomize, on: :collection
+      post :reset, on: :collection
+    end
     resource :debug, only: :show
     resource :hosting, only: %i[show update] do
       delete :clear_cache, on: :collection
