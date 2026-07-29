@@ -1,4 +1,6 @@
-class AlertComponentPreview < Lookbook::Preview
+# Lookbook is development-only; ViewComponent still loads preview paths in
+# the test env, so fall back to its own base class there.
+class AlertComponentPreview < (defined?(Lookbook) ? Lookbook::Preview : ViewComponent::Preview)
   # @param message text
   # @param title text
   # @param variant select [info, success, warning, error]

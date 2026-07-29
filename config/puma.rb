@@ -36,6 +36,12 @@ if rails_env == "production"
   workers workers_count if workers_count > 1
 
   preload_app!
+
+  # Bound the HTTP drain so total shutdown (embedded Sidekiq stop ≤20s + this)
+  # fits inside RAILWAY_DEPLOYMENT_DRAINING_SECONDS=45 — otherwise one
+  # long-lived streaming request at SIGTERM pushes past the window and the
+  # container is SIGKILLed instead of exiting cleanly.
+  force_shutdown_after 20
 end
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
@@ -48,6 +54,13 @@ environment rails_env
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
+
+# Optionally run Sidekiq inside this process (replaces the separate worker
+# service). Gated on SIDEKIQ_EMBEDDED=true; see lib/puma/plugin/sidekiq_embed.rb.
+# require_relative is mandatory: Puma resolves `plugin :name` via require
+# "puma/plugin/name", and the app's lib/ is not on $LOAD_PATH here.
+require_relative "../lib/puma/plugin/sidekiq_embed"
+plugin :sidekiq_embed
 
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
 

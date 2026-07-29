@@ -26,7 +26,11 @@ gem "view_component"
 
 # https://github.com/lookbook-hq/lookbook/issues/712
 # TODO: Remove max version constraint when fixed
-gem "lookbook", "2.3.11"
+# Development-only: the engine is only mounted outside production
+# (config/routes.rb), but outside :development it still loaded ~15 MB into
+# every production process. BUNDLE_WITHOUT="development" (Dockerfile) now
+# excludes it.
+gem "lookbook", "2.3.11", group: :development
 
 gem "hotwire_combobox"
 
@@ -34,7 +38,10 @@ gem "hotwire_combobox"
 gem "connection_pool", "~> 2.5" # pin to 2.x; 3.0 breaks sidekiq 8.x
 gem "sidekiq"
 gem "sidekiq-cron"
-gem "sidekiq-unique-jobs"
+# sidekiq-unique-jobs was removed 2026-07: its middleware was never installed
+# (no SidekiqUniqueJobs reference anywhere in config), so the `lock:` options
+# on jobs have always been inert — the gem only cost boot memory. The options
+# remain on jobs as documentation of intent; Sidekiq ignores unknown keys.
 
 # Monitoring
 gem "vernier"
@@ -44,11 +51,12 @@ gem "sentry-rails"
 gem "sentry-sidekiq"
 gem "posthog-ruby"
 gem "logtail-rails"
-if ENV["SKYLIGHT_ENABLED"] == "true"
-  gem "skylight", group: :development, require: false
-else
-  gem "skylight", group: :production
-end
+# Development-only: production boots logged "[SKYLIGHT] Unable to start"
+# on every deploy (no SKYLIGHT_AUTHENTICATION configured) while still paying
+# the gem's load + skylightd cost in both processes. require: false — to
+# profile locally, `require "skylight"` explicitly (there is no automatic
+# env-var opt-in).
+gem "skylight", group: :development, require: false
 
 # Active Storage
 gem "aws-sdk-s3", "~> 1.208.0", require: false

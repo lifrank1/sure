@@ -1,7 +1,11 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 3 } %>
+  <%# Pool covers Puma's request threads plus, when Sidekiq runs embedded in
+      the same process, its job threads and the cron poller (+1). Without the
+      extra headroom embedded jobs exhaust the pool and requests raise
+      ActiveRecord::ConnectionTimeoutError. %>
+  pool: <%= Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) + (ENV["SIDEKIQ_EMBEDDED"] == "true" ? Integer(ENV.fetch("SIDEKIQ_EMBEDDED_CONCURRENCY", 2)) + 1 : 0) %>
   host: <%= ENV.fetch("DB_HOST") { "127.0.0.1" } %>
   port: <%= ENV.fetch("DB_PORT") { "5432" } %>
   user: <%= ENV.fetch("POSTGRES_USER") { nil } %>

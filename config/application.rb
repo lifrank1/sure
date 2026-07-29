@@ -14,7 +14,10 @@ module Sure
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks generators])
+    # puma: lib/puma/plugin/* are Puma plugins loaded by config/puma.rb via
+    # require_relative — they define no matching constants, so Zeitwerk must
+    # not manage them.
+    config.autoload_lib(ignore: %w[assets tasks generators puma])
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -34,10 +37,14 @@ module Sure
       config.active_record.encryption = Rails.application.credentials.active_record_encryption
     end
 
-    config.view_component.preview_controller = "LookbooksController"
-    config.lookbook.preview_display_options = {
-      theme: [ "light", "dark" ] # available in view as params[:theme]
-    }
+    # Lookbook is a development-only gem now (Gemfile); config.lookbook would
+    # raise NoMethodError in environments where it isn't loaded.
+    if defined?(Lookbook)
+      config.view_component.preview_controller = "LookbooksController"
+      config.lookbook.preview_display_options = {
+        theme: [ "light", "dark" ] # available in view as params[:theme]
+      }
+    end
 
     # Enable Skylight instrumentation for ActiveJob (background workers)
     # Developers can opt-in to Skylight locally by setting SKYLIGHT_ENABLED=true

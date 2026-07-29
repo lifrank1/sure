@@ -41,7 +41,10 @@ class Family::DataExporter
 
       # Add all.ndjson
       zipfile.put_next_entry("all.ndjson")
-      zipfile.write generate_ndjson
+      # Stream lines straight into the (compressed) zip entry instead of
+      # accumulating the whole ndjson in an array + join — for a large family
+      # that intermediate was 100x the size of the finished zip.
+      generate_ndjson(NdjsonZipWriter.new(zipfile))
     end
 
     # Rewind and return the StringIO
@@ -220,9 +223,9 @@ class Family::DataExporter
       }.merge(extra)
     end
 
-    def generate_ndjson
-      lines = []
-
+    # `lines` is any `<<`-able sink; production passes NdjsonZipWriter so
+    # each line is compressed into the zip as it is produced.
+    def generate_ndjson(lines)
       # Export accounts with full accountable data
       @family.accounts.includes(:accountable).find_each do |account|
         lines << {
@@ -235,10 +238,12 @@ class Family::DataExporter
         }.to_json
       end
 
+      # find_each: batches of 1000 instead of every balance row in memory at
+      # once (the largest table in the export). Import upserts by
+      # (account, date), so ndjson line order does not matter.
       Balance.joins(:account)
         .where(accounts: { family_id: @family.id })
-        .chronological
-        .each do |balance|
+        .find_each do |balance|
         lines << {
           type: "Balance",
           data: {
@@ -460,7 +465,23 @@ class Family::DataExporter
         }.to_json
       end
 
-      lines.join("\n")
+      nil
+    end
+
+    # `<<`-compatible sink that writes each ndjson line into the current zip
+    # entry, so the export never holds more than one line in memory.
+    class NdjsonZipWriter
+      def initialize(zipfile)
+        @zipfile = zipfile
+        @first = true
+      end
+
+      def <<(json_line)
+        @zipfile.write("\n") unless @first
+        @first = false
+        @zipfile.write(json_line)
+        self
+      end
     end
 
     def exportable_transactions

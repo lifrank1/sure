@@ -1,3 +1,7 @@
+# NOTE: this file only configures STANDALONE `bundle exec sidekiq` (local
+# dev / docker-compose worker). Production runs Sidekiq embedded in Puma,
+# which ignores this file — keep the queue list in sync with
+# lib/puma/plugin/sidekiq_embed.rb.
 concurrency: <%= ENV.fetch("RAILS_MAX_THREADS") { 3 } %>
 queues:
   - [scheduled, 10] # For cron-like jobs (e.g. "daily market data sync")

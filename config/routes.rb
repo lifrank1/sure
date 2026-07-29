@@ -173,7 +173,9 @@ Rails.application.routes.draw do
     delete :disable
   end
 
-  mount Lookbook::Engine, at: "/design-system" unless Rails.env.production?
+  # Gate on the gem, not the env: lookbook is a development-group gem now, so
+  # any bundle built with BUNDLE_WITHOUT=development lacks the constant.
+  mount Lookbook::Engine, at: "/design-system" if defined?(Lookbook)
 
   if Rails.env.development?
     mount Rswag::Api::Engine => "/api-docs"
