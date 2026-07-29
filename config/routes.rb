@@ -297,7 +297,6 @@ Rails.application.routes.draw do
     get :merge, on: :collection
     post :perform_merge, on: :collection
     post :bootstrap, on: :collection
-    delete :destroy_all, on: :collection
   end
 
   resources :reports, only: %i[index] do

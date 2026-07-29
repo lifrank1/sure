@@ -52,5 +52,9 @@ class BudgetCategoriesController < ApplicationController
     def set_budget
       start_date = Budget.param_to_date(params[:budget_month_year], family: Current.family)
       @budget = Current.family.budgets.find_by(start_date: start_date)
+      # The wizard is the app's only "New category" surface now — a category
+      # created mid-wizard must appear when the page re-renders
+      # (phase-1 closing review: only budgets#show used to sync).
+      @budget&.sync_budget_categories
     end
 end

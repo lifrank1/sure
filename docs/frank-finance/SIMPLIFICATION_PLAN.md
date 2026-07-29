@@ -46,6 +46,23 @@ group. One inbox, one spending engine, one vocabulary.
       already live on account show/drawer. Archived-accounts listing must
       stay reachable (only place they're visible).
 
+
+## Phase 1 closing review (2026-07-29, 28-agent fleet over the cumulative diff)
+
+Findings only visible IN COMBINATION across the five slices — all fixed
+same-day (see commit for details): budget-wizard New-category was
+invisible (set_budget never synced budget_categories — the wizard is the
+ONLY creation surface post-1d); onboarding goal presets wrote the dead
+transactions_to_review key and omitted cashflow_sankey; perform_merge
+redirected into the 301'd categories index; orphaned mass-delete endpoint
+DELETE /categories/destroy_all removed; Accounts index joined the
+settings layout it now lives in; stale categories tests rewritten; dead
+partials/predicates/locale keys pruned; recurring management load gated
+off when the feature is disabled. Translated locale files keep orphan
+keys until the Phase 3 sweep.
+
+PHASE 1 STAMPED COMPLETE.
+
 ## Phase 2 — Lost moments (the retention fixes; funnel-verified churn)
 
 - [ ] 2a. Post-Plaid-link redirect → root (not /accounts), and sync-aware

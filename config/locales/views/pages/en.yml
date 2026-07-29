@@ -45,8 +45,6 @@ en:
         dismiss: Dismiss
       upcoming_recurrings:
         title: Next two weeks
-      transactions_to_review:
-        title: To review
       welcome: "Welcome back, %{name}"
       new: "Add account"
       sections_aria_label: "Dashboard sections"

@@ -8,46 +8,10 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
     ensure_tailwind_build
   end
 
-  test "index" do
+  test "index permanently redirects to budgets (page absorbed — SIMPLIFICATION_PLAN 1d)" do
     get categories_url
-    assert_response :success
-    assert_select "#category_#{categories(:food_and_drink).id} > [data-testid='category-content']", count: 1
-    assert_select "#category_#{categories(:food_and_drink).id} > [data-testid='category-actions']", count: 1
-    assert_select "#category_#{categories(:food_and_drink).id} [data-testid='category-name']", text: categories(:food_and_drink).name
-  end
-
-  test "index avoids per-category subcategory and transaction existence queries" do
-    4.times do |idx|
-      parent = @family.categories.create!(
-        name: "Performance Parent #{idx}",
-        color: "#000000",
-        lucide_icon: "folder"
-      )
-      child = @family.categories.create!(
-        name: "Performance Child #{idx}",
-        color: "#111111",
-        lucide_icon: "folder",
-        parent: parent
-      )
-      transaction = Transaction.create!(category: child)
-      Entry.create!(
-        account: accounts(:depository),
-        entryable: transaction,
-        name: "Performance transaction #{idx}",
-        date: Date.current,
-        amount: 10,
-        currency: "USD"
-      )
-    end
-
-    queries = capture_sql_queries { get categories_url }
-
-    assert_response :success
-    assert_select "[data-testid='category-name']", text: "Performance Parent 0"
-    assert_select "[data-testid='category-name']", text: "Performance Child 0"
-
-    assert_empty queries.grep(/FROM "categories" WHERE "categories"\."parent_id" =/)
-    assert_empty queries.grep(/FROM "transactions" WHERE "transactions"\."category_id" =/)
+    assert_response :moved_permanently
+    assert_redirected_to budgets_url
   end
 
   test "new" do
@@ -175,7 +139,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to categories_path
+    assert_redirected_to budgets_path
     assert_equal target, transaction.reload.category
     assert_not Category.exists?(source.id)
   end
@@ -280,7 +244,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
       source_ids: [ source.id ]
     }
 
-    assert_redirected_to categories_path
+    assert_redirected_to budgets_path
     assert_equal target.id, child.reload.parent_id
     assert_not Category.exists?(source.id)
   end

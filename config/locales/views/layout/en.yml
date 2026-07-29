@@ -6,15 +6,11 @@ en:
       skip_to_main: Skip to main content
       nav:
         assistant: Assistant
-        accounts: Accounts
         budgets: Budgets
-        categories: Categories
         compare: Compare
         home: Home
         investments: Investments
         more: More
-        recurrings: Recurring
-        reports: Reports
         goals: Goals
         transactions: Transactions
     auth:

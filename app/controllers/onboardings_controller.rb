@@ -9,8 +9,8 @@ class OnboardingsController < ApplicationController
   # "see_everything" deliberately maps to nil: the default order stays the
   # default unless the user expressed a leaning.
   GOAL_SECTION_ORDERS = {
-    "overspending"   => %w[spending_pace outflows_donut transactions_to_review net_worth_chart upcoming_recurrings investment_summary],
-    "grow_wealth"    => %w[net_worth_chart spending_pace investment_summary outflows_donut transactions_to_review upcoming_recurrings],
+    "overspending"   => %w[spending_pace outflows_donut cashflow_sankey net_worth_chart upcoming_recurrings investment_summary],
+    "grow_wealth"    => %w[net_worth_chart spending_pace investment_summary outflows_donut cashflow_sankey upcoming_recurrings],
     "see_everything" => nil
   }.freeze
 

@@ -422,10 +422,6 @@ class Family < ApplicationRecord
     @any_investment_accounts = accounts.visible.where(accountable_type: %w[Investment Crypto]).exists?
   end
 
-  def any_active_recurrings?
-    return @any_active_recurrings if defined?(@any_active_recurrings)
-    @any_active_recurrings = recurring_transactions.active.exists?
-  end
 
   # Used for invalidating entry related aggregation queries
   def entries_cache_version

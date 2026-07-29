@@ -5,6 +5,8 @@ class AccountsController < ApplicationController
   before_action :set_manageable_account, only: %i[toggle_active destroy unlink confirm_unlink select_provider]
   include Periodable
 
+  layout "settings", only: :index
+
   def index
     @accessible_account_ids = Current.user.accessible_accounts.pluck(:id)
     @manual_accounts = family.accounts

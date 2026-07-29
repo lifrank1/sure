@@ -66,7 +66,7 @@ class TransactionsController < ApplicationController
                                          Date.current)
                                   .includes(:merchant)
 
-    load_recurring_management
+    load_recurring_management unless Current.family.recurring_transactions_disabled?
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.transactions"), nil ] ]
   end

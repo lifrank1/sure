@@ -62,11 +62,6 @@ class CategoriesController < ApplicationController
     redirect_back_or_to categories_path, notice: t(".success")
   end
 
-  def destroy_all
-    Current.family.categories.destroy_all
-    redirect_back_or_to categories_path, notice: t(".success")
-  end
-
   def bootstrap
     Current.family.categories.bootstrap!
 
@@ -89,7 +84,7 @@ class CategoriesController < ApplicationController
     merger = Category::Merger.new(family: Current.family, target_category: target, source_categories: sources)
     return redirect_to merge_categories_path, alert: t(".no_categories_selected") unless merger.merge!
 
-    redirect_to categories_path, notice: t(".success", count: merger.merged_count)
+    redirect_to budgets_path, notice: t(".success", count: merger.merged_count)
   rescue Category::Merger::UnauthorizedCategoryError => e
     redirect_to merge_categories_path, alert: e.message
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotDestroyed => e
@@ -123,16 +118,6 @@ class CategoriesController < ApplicationController
       params.permit(:target_id, source_ids: [])
     end
 
-    def category_ids_with_transactions(categories)
-      category_ids = categories.map(&:id)
-      return {} if category_ids.empty?
-
-      Current.family.transactions
-                    .where(category_id: category_ids)
-                    .distinct
-                    .pluck(:category_id)
-                    .index_with(true)
-    end
 
     def record_error_message(error)
       record = error.respond_to?(:record) ? error.record : nil
