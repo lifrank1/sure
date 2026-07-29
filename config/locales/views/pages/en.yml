@@ -43,6 +43,21 @@ en:
         subtitle: Banks, cards, and brokerages sync automatically — takes about a minute.
         cta: Connect account
         dismiss: Dismiss
+      first_sync_waiting:
+        syncing_title: "Importing your accounts…"
+        syncing_subtitle: "This usually takes about a minute — the page will refresh on its own."
+        linked_title: "Connection linked — accounts on the way"
+        linked_subtitle: "The first import may still be finishing, or your connection needs one more setup step."
+        check_connections: "Check connections"
+      connection_alert:
+        dead_title:
+          one: "A bank connection needs to be reconnected"
+          other: "%{count} bank connections need to be reconnected"
+        dead_subtitle: "— %{names} stopped syncing until you sign in again."
+        fix_connection: "Fix connection"
+        stale_title: "Your account data may be out of date"
+        stale_subtitle: "— no successful sync in %{time}."
+        sync_now: "Sync now"
       upcoming_recurrings:
         title: Next two weeks
       welcome: "Welcome back, %{name}"

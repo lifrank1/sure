@@ -200,13 +200,19 @@ end %>
           <div class="flex items-center gap-2">
             <%# Persistent sync status: one place to see whether the numbers are
                 current, reused on every page (visibility of system status). %>
-            <% if Current.family.syncing? %>
+            <% if Current.family.syncing_anywhere? %>
               <span class="hidden sm:inline-flex items-center gap-1.5 h-9 px-2.5 text-xs font-medium text-secondary"
                     title="<%= t("layouts.application.sync_status.syncing", default: "Syncing your accounts…") %>">
                 <%= icon("refresh-cw", size: "sm", class: "animate-spin") %>
                 <%= t("layouts.application.sync_status.syncing_label", default: "Syncing…") %>
               </span>
-            <% elsif (synced_at = Current.family.last_synced_at).present? %>
+            <%# latest_sync_completed_at is touched by ANY completing sync in
+                the family tree (item, account, or family) — unlike
+                last_synced_at, which only tracks family-level syncs and goes
+                stale for webhook/item-driven families. Guarded on accounts
+                existing because the column has a DB default of the family's
+                creation time. %>
+            <% elsif Current.family.any_visible_accounts? && (synced_at = Current.family.latest_sync_completed_at).present? %>
               <%= link_to accounts_path,
                     class: "hidden sm:inline-flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-xs font-medium text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors focus-ring",
                     title: t("layouts.application.sync_status.updated_at", default: "Last updated %{time}", time: synced_at.strftime("%b %-d, %-l:%M %p")) do %>

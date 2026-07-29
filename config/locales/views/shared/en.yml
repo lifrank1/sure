@@ -12,6 +12,8 @@ en:
     sync_toast:
       message: "New data available"
       refresh: "Refresh"
+      failed_message: "Some accounts didn't sync"
+      check_connections: "Check connections"
     confirm_modal:
       accept: Confirm
       body_html: "<p>You will not be able to undo this decision</p>"

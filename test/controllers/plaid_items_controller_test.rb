@@ -78,8 +78,8 @@ class PlaidItemsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_equal "Account linked successfully.  Please wait for accounts to sync.", flash[:notice]
-    assert_redirected_to accounts_path
+    assert_equal "Account linked — importing your data now.", flash[:notice]
+    assert_redirected_to root_path
   end
 
   test "destroy" do

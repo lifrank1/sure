@@ -1,0 +1,42 @@
+<%# locals: (health:) %>
+<%# Dead-connection / stale-data banner (2b). Dead wins over stale: a
+    connection the bank has invalidated can only be fixed by reconnecting,
+    so don't dilute it with a "sync now" that cannot help. %>
+<% if health.dead_items.any? %>
+  <div class="mb-4 px-4 py-3 rounded-xl border border-destructive bg-destructive/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+    <div class="flex items-center gap-2 grow min-w-0">
+      <%= icon("alert-triangle", size: "sm", color: "destructive") %>
+      <p class="text-sm text-primary truncate">
+        <span class="font-medium"><%= t(".dead_title", count: health.dead_items.size) %></span>
+        <span class="text-secondary"><%= t(".dead_subtitle", names: health.dead_items.map(&:name).compact.join(", "), default: "— %{names} stopped syncing until you sign in again.") %></span>
+      </p>
+    </div>
+    <div class="shrink-0">
+      <%= render DS::Link.new(
+        text: t(".fix_connection", default: "Fix connection"),
+        variant: "primary",
+        size: "sm",
+        href: accounts_path
+      ) %>
+    </div>
+  </div>
+<% elsif health.stale? %>
+  <div class="mb-4 px-4 py-3 rounded-xl border border-warning bg-warning/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+    <div class="flex items-center gap-2 grow min-w-0">
+      <%= icon("clock", size: "sm", color: "warning") %>
+      <p class="text-sm text-primary truncate">
+        <span class="font-medium"><%= t(".stale_title", default: "Your account data may be out of date") %></span>
+        <span class="text-secondary"><%= t(".stale_subtitle", time: time_ago_in_words(health.stale_since), default: "— no successful sync in %{time}.") %></span>
+      </p>
+    </div>
+    <div class="shrink-0">
+      <%= render DS::Button.new(
+        text: t(".sync_now", default: "Sync now"),
+        variant: :primary,
+        size: "sm",
+        href: sync_all_accounts_path,
+        method: :post
+      ) %>
+    </div>
+  </div>
+<% end %>

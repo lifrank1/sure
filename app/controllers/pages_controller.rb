@@ -104,6 +104,11 @@ class PagesController < ApplicationController
     @uncategorized_count = uncategorized.count
     @uncategorized_total = Money.new(uncategorized.sum("ABS(entries.amount)"), family_currency)
 
+    # Connection health drives three surfaces (SIMPLIFICATION_PLAN 2a/2b):
+    # the first-sync waiting card, the dead-connection/stale banner, and
+    # connect-prompt suppression once a provider is already linked.
+    @connection_health = Family::ConnectionHealth.new(Current.family)
+    @first_sync_waiting = @connection_health.awaiting_first_sync?
     @show_connect_prompt = show_connect_prompt?
 
     @dashboard_sections = build_dashboard_sections
@@ -213,6 +218,9 @@ class PagesController < ApplicationController
     def show_connect_prompt?
       return false if Current.user.getting_started_dismissed?
       return false unless Current.user.admin?
+      # A linked provider means the user already connected — the first-sync
+      # waiting card owns this state, not a second "connect" nudge.
+      return false if @connection_health&.provider_items?
 
       !Current.family.accounts.visible.exists?
     end

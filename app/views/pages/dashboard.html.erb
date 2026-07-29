@@ -30,6 +30,13 @@
   <%= render "pages/dashboard/connect_prompt" %>
 <% end %>
 
+<%# Dead-connection / stale-data banner (2b). Admin-only: reconnecting is an
+    admin action. Suppressed during the first-sync window — the waiting card
+    below owns that state. %>
+<% if !@first_sync_waiting && Current.user.admin? && @connection_health.needs_attention? %>
+  <%= render "pages/dashboard/connection_alert", health: @connection_health %>
+<% end %>
+
 <% if @uncategorized_count.to_i > 0 %>
   <div class="mb-4 px-4 py-3 rounded-xl border border-warning bg-warning/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
     <div class="flex items-center gap-2 grow min-w-0">
@@ -179,7 +186,11 @@
     <% end %>
   <% else %>
     <section>
-      <%= render "pages/dashboard/no_accounts_graph_placeholder" %>
+      <% if @first_sync_waiting %>
+        <%= render "pages/dashboard/first_sync_waiting", health: @connection_health %>
+      <% else %>
+        <%= render "pages/dashboard/no_accounts_graph_placeholder" %>
+      <% end %>
     </section>
   <% end %>
   </div>

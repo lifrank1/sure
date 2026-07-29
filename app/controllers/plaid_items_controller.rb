@@ -36,7 +36,10 @@ class PlaidItemsController < ApplicationController
       region: plaid_item_params[:region]
     )
 
-    redirect_to accounts_path, notice: t(".success")
+    # Land on the dashboard, where the first-sync waiting card takes over —
+    # not the accounts console (SIMPLIFICATION_PLAN 2a). The item's first
+    # sync is already queued; accounts materialize mid-sync.
+    redirect_to root_path, notice: t(".success")
   end
 
   def destroy

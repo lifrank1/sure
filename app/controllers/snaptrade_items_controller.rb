@@ -141,7 +141,9 @@ class SnaptradeItemsController < ApplicationController
       if return_to == "setup_accounts"
         redirect_to setup_accounts_snaptrade_item_path(snaptrade_item, accountable_type: accountable_type.presence), notice: t(".success")
       else
-        redirect_to accounts_path, notice: t(".success")
+        # Dashboard, not the accounts console — the first-sync waiting card
+        # owns the "just linked" state (SIMPLIFICATION_PLAN 2a).
+        redirect_to root_path, notice: t(".success")
       end
     else
       clear_snaptrade_resume_context

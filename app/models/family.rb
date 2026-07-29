@@ -400,6 +400,16 @@ class Family < ApplicationRecord
     entries.order(:date).first&.date || Date.current
   end
 
+  # Anything syncing anywhere in the family tree — the family itself, its
+  # accounts, or any provider item. Syncable#syncing? checks only the
+  # family's OWN Sync rows and misses first provider syncs entirely (a fresh
+  # Plaid link syncs the item, never the family). Visible-scoped: crashed
+  # jobs stop reporting after 5 minutes.
+  def syncing_anywhere?
+    return @syncing_anywhere if defined?(@syncing_anywhere)
+    @syncing_anywhere = Sync.for_family(self).visible.exists?
+  end
+
   # Used for invalidating family / balance sheet related aggregation queries
   def build_cache_key(key, invalidate_on_data_updates: false)
     # Our data sync process updates this timestamp whenever any family account successfully completes a data update.
@@ -420,6 +430,11 @@ class Family < ApplicationRecord
   def any_investment_accounts?
     return @any_investment_accounts if defined?(@any_investment_accounts)
     @any_investment_accounts = accounts.visible.where(accountable_type: %w[Investment Crypto]).exists?
+  end
+
+  def any_visible_accounts?
+    return @any_visible_accounts if defined?(@any_visible_accounts)
+    @any_visible_accounts = accounts.visible.exists?
   end
 
 

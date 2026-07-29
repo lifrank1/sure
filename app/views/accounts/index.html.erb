@@ -7,7 +7,7 @@
           as_button: true,
           size: "sm",
           href: sync_all_accounts_path,
-          disabled: Current.family.syncing?,
+          disabled: Current.family.syncing_anywhere?,
           frame: :_top
         ) %>
     <%= render DS::Link.new(

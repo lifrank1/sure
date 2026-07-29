@@ -1,0 +1,35 @@
+<%# locals: (health:) %>
+<%# First-run window: a provider is linked but its sync hasn't materialized
+    accounts yet (2a). While the sync runs we show a spinner; completion
+    broadcasts the sync toast, whose controller morph-refreshes the page —
+    the card resolves itself with no polling. If nothing is running (wedged
+    sync, or a provider like SimpleFin that needs a manual account-setup
+    step), point at the accounts page instead of spinning forever. %>
+<%# The id is load-bearing: sync_toast_controller's failed branch looks for
+    it to force a morph refresh (a failed first sync is otherwise the one
+    path that never re-renders this card). %>
+<div id="first-sync-waiting" class="h-[300px] lg:h-[340px] bg-container shadow-border-xs rounded-xl py-4 flex flex-col items-center justify-center">
+  <div class="space-y-3 text-center flex flex-col items-center px-6">
+    <% if health.syncing? %>
+      <%# poll-refresh is the no-broadcast escape hatch: if the stream never
+          delivers (wedged sync, dropped connection), the page still
+          re-renders and this card resolves to a terminal variant. %>
+      <div data-controller="poll-refresh" data-poll-refresh-interval-value="45000"></div>
+      <%= icon("refresh-cw", size: "lg", class: "animate-spin text-secondary") %>
+      <p class="text-sm font-medium text-primary"><%= t(".syncing_title", default: "Importing your accounts…") %></p>
+      <p class="text-secondary text-sm"><%= t(".syncing_subtitle", default: "This usually takes about a minute — the page will refresh on its own.") %></p>
+    <% else %>
+      <%= render DS::FilledIcon.new(
+        variant: :container,
+        icon: "landmark",
+      ) %>
+      <p class="text-sm font-medium text-primary"><%= t(".linked_title", default: "Connection linked — accounts on the way") %></p>
+      <p class="text-secondary text-sm"><%= t(".linked_subtitle", default: "The first import may still be finishing, or your connection needs one more setup step.") %></p>
+      <%= render DS::Link.new(
+        text: t(".check_connections", default: "Check connections"),
+        icon: "arrow-right",
+        href: accounts_path
+      ) %>
+    <% end %>
+  </div>
+</div>

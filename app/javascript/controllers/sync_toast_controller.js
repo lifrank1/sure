@@ -12,14 +12,53 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static values = {
     autoRefreshDelay: { type: Number, default: 2000 },
+    failed: { type: Boolean, default: false },
   };
 
   connect() {
+    if (this.failedValue) {
+      this.#connectFailed();
+      return;
+    }
     if (this.#dialogOpen()) {
       this.#deferUntilDialogCloses();
       return;
     }
     this.#arm();
+  }
+
+  // Failure variant: informational, never auto-refreshes (a morph would wipe
+  // the message moments later), capped at roughly once per day — a dead
+  // connection fails again on every nightly/login sync, and repeating the
+  // same warning daily is the dashboard banner's job, not the toast's.
+  #connectFailed() {
+    // The first-sync waiting card promises "the page will refresh on its
+    // own", and a FAILED first sync is otherwise the one path that never
+    // re-renders it. Morph so the card resolves to its check-connections
+    // variant (plus the connection banner) instead of spinning forever.
+    if (document.getElementById("first-sync-waiting")) {
+      this.refresh();
+      return;
+    }
+    if (this.#failureSuppressed()) {
+      // Hide, never remove: this element IS the #sync-toast broadcast slot.
+      // Removing it makes every later broadcast_replace_to a silent no-op —
+      // including the success toast whose morph-refresh other UI relies on.
+      this.element.style.display = "none";
+      return;
+    }
+    if (this.#dialogOpen()) {
+      this.#deferUntilDialogCloses();
+      return;
+    }
+    this.#markFailureShown();
+  }
+
+  // Close button for both variants. Hides rather than removes so the
+  // #sync-toast broadcast slot survives for the rest of the page session.
+  dismiss() {
+    clearTimeout(this._timer);
+    this.element.style.display = "none";
   }
 
   disconnect() {
@@ -96,11 +135,49 @@ export default class extends Controller {
 
   #reveal() {
     this.element.style.display = "";
+    if (this.failedValue) {
+      // Mark at the moment the toast is actually seen (a deferred toast may
+      // never be revealed if it's replaced first) — and never auto-refresh.
+      this.#markFailureShown();
+      return;
+    }
     this.#arm();
   }
 
   #dialogOpen() {
     return !!document.querySelector("dialog[open]");
+  }
+
+  // A single failing sync cycle broadcasts the toast several times within
+  // seconds (each finalizing item re-broadcasts through the family event), so
+  // the once-per-day cap uses a timestamp with a grace window: replacements
+  // inside the window re-show (same cycle), repeats hours later are
+  // suppressed. Without this, leg #2 of the first cycle would see "already
+  // shown today" and the warning would flash for milliseconds and vanish.
+  static FAILURE_GRACE_MS = 10 * 60 * 1000;
+
+  // localStorage over sessionStorage so the cap holds across tabs; guarded
+  // because storage access can throw (private mode, disabled storage).
+  #failureSuppressed() {
+    try {
+      const ts = Number(localStorage.getItem("syncFailureToastShownAt"));
+      if (!ts) return false;
+      const sameDay =
+        new Date(ts).toDateString() === new Date().toDateString();
+      const withinGrace =
+        Date.now() - ts < this.constructor.FAILURE_GRACE_MS;
+      return sameDay && !withinGrace;
+    } catch {
+      return false;
+    }
+  }
+
+  #markFailureShown() {
+    try {
+      localStorage.setItem("syncFailureToastShownAt", String(Date.now()));
+    } catch {
+      // Storage unavailable — worst case the toast repeats.
+    }
   }
 
   #userIsInteracting() {
