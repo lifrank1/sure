@@ -9,17 +9,12 @@ else
   [
     { name: t(".nav.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
     { name: t(".nav.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
-    # Accounts stays 3rd in the ARRAY so the mobile bottom-bar order is
-    # byte-identical to before (the bar renders in array order); more: true
-    # only moves it into the desktop "More" group.
-    { name: t(".nav.accounts"), path: accounts_path, icon: "landmark", icon_custom: false, active: page_active?(accounts_path), more: true },
     { name: t(".nav.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
     { name: t(".nav.compare"), path: comparisons_path, icon: "users-round", icon_custom: false, active: page_active?(comparisons_path), desktop_only: true },
-    # Progressive disclosure: remaining power surfaces live in the collapsed
-    # desktop "More" group; the mobile slide-out keeps the full flat list.
-    # Investments/Recurring hide entirely until the family has such data —
-    # index-only probes, memoized on Family for the request.
-    (Current.family&.any_investment_accounts? ? { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true, more: true } : nil),
+    # SIMPLIFICATION_PLAN 1e end state: four core surfaces. Accounts moved
+    # to Settings; Investments is the one data-gated extra (hidden until
+    # the family has investment accounts — index-only probe, memoized).
+    (Current.family&.any_investment_accounts? ? { name: t(".nav.investments"), path: investment_portfolio_path, icon: "trending-up", icon_custom: false, active: page_active?(investment_portfolio_path), desktop_only: true } : nil),
     preview_gated_nav_item({ name: t(".nav.goals"), path: goals_path, icon: "piggy-bank", icon_custom: false, active: page_active?(goals_path) }),
     (ai_chat_ui_enabled? ? { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true } : nil)
   ].compact
@@ -113,10 +108,10 @@ end %>
           <%= render "users/user_menu", user: Current.user, placement: "bottom-end", offset: 12, intro_mode: intro_mode %>
         </div>
 
-        <%# Primary navigation (icon + label rows). Power surfaces collapse
-            into a "More" disclosure; it opens itself when the current page
-            lives inside it, otherwise remembers the user's last choice
-            (localStorage via nav-more). %>
+        <%# Primary navigation (icon + label rows). The More disclosure
+            below only renders when items carry more: true — none do since
+            SIMPLIFICATION_PLAN 1e reached the four-surface end state; the
+            machinery stays for future overflow. %>
         <% core_nav_items = desktop_nav_items.reject { |item| item[:more] } %>
         <% more_nav_items = desktop_nav_items.select { |item| item[:more] } %>
         <ul class="space-y-0.5 mb-4 shrink-0">
