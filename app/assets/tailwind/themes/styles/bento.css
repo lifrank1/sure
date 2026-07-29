@@ -101,7 +101,10 @@
 /* ── shell ──────────────────────────────────────────────────────────────────── */
 /* The rail is part of the ground, so its divider goes away and the nav pills
    float on it instead. */
-[data-ui-style="bento"] [data-app-layout-target="leftSidebar"] {
+/* :not(.w-0) — the collapse class is `w-0 overflow-hidden`, and with
+   border-box sizing, width:0 plus horizontal padding still occupies the
+   padding, leaving a dead gutter when the rail is hidden. */
+[data-ui-style="bento"] [data-app-layout-target="leftSidebar"]:not(.w-0) {
   border-right-color: transparent;
   padding-inline: 0.25rem;
 }

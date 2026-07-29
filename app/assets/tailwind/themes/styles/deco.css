@@ -41,9 +41,12 @@
     repeating-linear-gradient(45deg, var(--deco-metal-mid) 0 1px, transparent 1px 7px);
   /* Lit from above: a veil that brightens the top of a filled control. */
   --deco-sheen: linear-gradient(to bottom, color-mix(in oklab, var(--color-white) 22%, transparent) 0%, transparent 58%);
-  /* The ring in every shadow-border-* becomes a gold hairline, metal-washing the
-     ~150 surfaces this file doesn't frame individually. */
-  --color-alpha-black-50: color-mix(in oklab, var(--color-yellow-600) 55%, transparent);
+  /* The gold hairline is applied to the shadow-border-* utilities below rather
+     than through --color-alpha-black-50: that token also backs
+     `border-subdued` and the generated bg-/ring-alpha-black-50 utilities, so
+     overloading it gilded icon wells and kbd chips whose glyph colors assume a
+     5% tint. */
+  --deco-ring: color-mix(in oklab, var(--color-yellow-600) 55%, transparent);
 }
 [data-ui-style="deco"][data-theme="dark"] {
   /* --color-black is the page ground in dark, so black shadows vanish. */
@@ -55,7 +58,7 @@
   --deco-hair: color-mix(in oklab, var(--color-yellow-400) 48%, var(--color-white));
   /* A white veil over a light fill is invisible; shade the bottom instead. */
   --deco-sheen: linear-gradient(to bottom, transparent 42%, color-mix(in oklab, var(--color-black) 20%, transparent) 100%);
-  --color-alpha-white-50: color-mix(in oklab, var(--color-yellow-400) 50%, transparent);
+  --deco-ring: color-mix(in oklab, var(--color-yellow-400) 50%, transparent);
 }
 /* `rounded-full` is calc(infinity * 1px), not a token. Square the pills and round
    icon buttons; avatars and status dots stay circular. */
@@ -217,3 +220,12 @@
       var(--shadow-md);
   }
 }
+
+/* Card ring: the gold hairline restated on the utilities that actually draw
+   card chrome, instead of overloading --color-alpha-black-50 (see the token
+   block above for why). */
+[data-ui-style="deco"] .shadow-border-xs { box-shadow: var(--shadow-xs), 0 0 0 1px var(--deco-ring); }
+[data-ui-style="deco"] .shadow-border-sm { box-shadow: var(--shadow-sm), 0 0 0 1px var(--deco-ring); }
+[data-ui-style="deco"] .shadow-border-md { box-shadow: var(--shadow-md), 0 0 0 1px var(--deco-ring); }
+[data-ui-style="deco"] .shadow-border-lg { box-shadow: var(--shadow-lg), 0 0 0 1px var(--deco-ring); }
+[data-ui-style="deco"] .shadow-border-xl { box-shadow: var(--shadow-xl), 0 0 0 1px var(--deco-ring); }

@@ -106,7 +106,10 @@
 [data-ui-style="clay"] :is(div, section):has(> table) { border-radius: 1.125rem; }
 
 /* ── shell: one continuous slab of ground ──────────────────────────────────── */
-[data-ui-style="clay"] [data-app-layout-target="leftSidebar"] {
+/* :not(.w-0) — the collapse class is `w-0 overflow-hidden`, and with
+   border-box sizing, width:0 plus horizontal padding still occupies the
+   padding, leaving a dead gutter when the rail is hidden. */
+[data-ui-style="clay"] [data-app-layout-target="leftSidebar"]:not(.w-0) {
   border-right-color: transparent;
   padding-inline: 0.375rem;
 }

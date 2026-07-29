@@ -25,11 +25,26 @@
   --shadow-lg: 8px 8px 0px 0px var(--color-black);
   --shadow-xl: 10px 10px 0px 0px var(--color-black);
 
-  /* shadow-border-* draws `0 0 0 1px var(--color-alpha-black-50)` — push that
-     token to full ink so all 154 card surfaces gain a hard outline. */
-  --color-alpha-black-50: var(--color-black);
   --brutal-rule: 2px solid var(--color-black);
 }
+
+/* The card ring is restated on the shadow-border-* utilities rather than by
+   pushing --color-alpha-black-50 to full ink. That token is NOT private to
+   card chrome: `border-subdued` and the generated `bg-alpha-black-50` /
+   `ring-alpha-black-50` utilities read it too, so inking it turned the
+   icon wells and kbd hint chips on the new-account screen into solid
+   near-black blocks with gray-500 glyphs on top (~2.5:1). */
+[data-ui-style="brutal"] .shadow-border-xs { box-shadow: var(--shadow-xs), 0 0 0 2px var(--color-black); }
+[data-ui-style="brutal"] .shadow-border-sm { box-shadow: var(--shadow-sm), 0 0 0 2px var(--color-black); }
+[data-ui-style="brutal"] .shadow-border-md { box-shadow: var(--shadow-md), 0 0 0 2px var(--color-black); }
+[data-ui-style="brutal"] .shadow-border-lg { box-shadow: var(--shadow-lg), 0 0 0 2px var(--color-black); }
+[data-ui-style="brutal"] .shadow-border-xl { box-shadow: var(--shadow-xl), 0 0 0 2px var(--color-black); }
+
+[data-ui-style="brutal"][data-theme="dark"] .shadow-border-xs { box-shadow: var(--shadow-xs), 0 0 0 2px var(--color-white); }
+[data-ui-style="brutal"][data-theme="dark"] .shadow-border-sm { box-shadow: var(--shadow-sm), 0 0 0 2px var(--color-white); }
+[data-ui-style="brutal"][data-theme="dark"] .shadow-border-md { box-shadow: var(--shadow-md), 0 0 0 2px var(--color-white); }
+[data-ui-style="brutal"][data-theme="dark"] .shadow-border-lg { box-shadow: var(--shadow-lg), 0 0 0 2px var(--color-white); }
+[data-ui-style="brutal"][data-theme="dark"] .shadow-border-xl { box-shadow: var(--shadow-xl), 0 0 0 2px var(--color-white); }
 
 [data-ui-style="brutal"][data-theme="dark"] {
   --shadow-xs: 3px 3px 0px 0px var(--color-white);
@@ -37,7 +52,6 @@
   --shadow-md: 6px 6px 0px 0px var(--color-white);
   --shadow-lg: 8px 8px 0px 0px var(--color-white);
   --shadow-xl: 10px 10px 0px 0px var(--color-white);
-  --color-alpha-white-50: var(--color-white);
   --brutal-rule: 2px solid var(--color-white);
 }
 
