@@ -459,3 +459,23 @@ Fast-follows:
       compressions behind pointer:fine + min-width:64rem; no skin touches the
       bottom nav) but not visually — the Chrome automation could not resize the
       viewport below 1440px
+
+
+### Railway gotcha found while shipping this: pushes revive the worker
+
+`git push` triggers a deploy on **every** service whose source is this repo —
+including the `worker` service that was intentionally stopped once Sidekiq moved
+into the web process (embedded mode). Twice now a push has silently restarted it,
+quietly restoring the ~$4.50/month always-on Rails boot the memory work removed.
+
+Symptom to watch for: `railway status --json` shows `worker` with an active
+RUNNING deployment. Interim fix: `railway down --service worker --yes`.
+
+Durable fix (needs the Railway dashboard, one click): either delete the `worker`
+service outright, or disconnect its GitHub source so pushes stop redeploying it.
+Deleting is the honest end state — the service is redundant now — but export its
+variables first if it might ever come back.
+
+Also note: after a push, `web` did not always pick up the newest commit on its
+own; `railway redeploy --service web --yes` was needed. Verify the running commit
+with `railway status --json` rather than assuming the push deployed.
