@@ -27,6 +27,16 @@ export default class extends Controller {
   };
 
   connect() {
+    // A Turbo restore visit (back/forward) replays a CACHED body, whose values
+    // are whatever the look was when that snapshot was taken — applying them
+    // blindly reverts a look the user changed since. localStorage holds the
+    // newest choice (written on every apply, including saves, which re-render
+    // with fresh server values), so it wins. Same shape as theme_controller's
+    // localStorage.theme.
+    const stored = this.#readStored();
+    Object.keys(this.constructor.ATTRS).forEach((axis) => {
+      if (stored[axis]) this[`${axis}Value`] = stored[axis];
+    });
     this.#applyAll();
   }
 
@@ -52,10 +62,30 @@ export default class extends Controller {
     this[`${axis}Value`] = value;
   }
 
+  #readStored() {
+    try {
+      return JSON.parse(localStorage.getItem("look") || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  #store(axis, value) {
+    try {
+      localStorage.setItem(
+        "look",
+        JSON.stringify({ ...this.#readStored(), [axis]: value }),
+      );
+    } catch {
+      // Storage unavailable — the server-rendered attributes still apply.
+    }
+  }
+
   #apply(axis) {
     const value = this[`${axis}Value`];
     if (!value) return;
     document.documentElement.setAttribute(this.constructor.ATTRS[axis], value);
+    this.#store(axis, value);
     // Charts read tokens at render time; tell them to re-read (the existing
     // theme:change consumers already listen for exactly this).
     document.documentElement.dispatchEvent(

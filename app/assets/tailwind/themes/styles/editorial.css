@@ -109,8 +109,12 @@
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--ed-hair);
 }
-/* Eyebrow / department label; the guard below keeps caps out of the figures. */
-[data-ui-style="editorial"] #main h2 {
+/* Eyebrow / department label; the guard below keeps caps out of the figures.
+   Scoped to WIDGET titles, not every h2 in #main: the account page's title is
+   an h2 with no h1 above it (accounts/show/_header.html.erb), so a blanket
+   rule shrank the real page heading to a 12px uppercase label. */
+[data-ui-style="editorial"] #main section.bg-container h2,
+[data-ui-style="editorial"] #main [data-dashboard-section-target] h2 {
   font-family: var(--font-display);
   font-size: 0.75rem;
   line-height: 1.4;

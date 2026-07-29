@@ -8,37 +8,41 @@
      data-look-palette-value="<%= @user.ui_palette %>"
      data-look-typeface-value="<%= @user.ui_typeface %>"
      data-look-style-value="<%= @user.ui_style %>">
+  <%# The action buttons MUST stay outside the picker form: `method: :post`
+      renders a button_to, i.e. its own <form>, and HTML forbids nested forms —
+      the parser closes the outer one at the nested tag, which previously left
+      all 30 radios outside the form so no choice was ever saved. %>
+  <%= settings_section title: t(".look_title"), subtitle: t(".look_subtitle") do %>
+    <div class="p-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <%= render DS::Button.new(
+              text: t(".look_randomize"),
+              variant: :secondary,
+              size: "sm",
+              icon: "dices",
+              href: randomize_settings_appearance_path,
+              method: :post,
+              frame: :_top
+            ) %>
+        <%= render DS::Button.new(
+              text: t(".look_reset"),
+              variant: :ghost,
+              size: "sm",
+              icon: "rotate-ccw",
+              href: reset_settings_appearance_path,
+              method: :post,
+              frame: :_top
+            ) %>
+        <p class="text-xs text-secondary">
+          <%= t(".look_combination_count", count: UiTheme::PALETTES.size * UiTheme::TYPEFACES.size * UiTheme::STYLES.size) %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+
   <%= form_with model: @user, id: "look_form",
         data: { controller: "auto-submit-form", auto_submit_form_trigger_event_value: "change" } do |form| %>
     <%= form.hidden_field :redirect_to, value: "appearance" %>
-
-    <%= settings_section title: t(".look_title"), subtitle: t(".look_subtitle") do %>
-      <div class="p-3 space-y-2">
-        <div class="flex flex-wrap items-center gap-2">
-          <%= render DS::Button.new(
-                text: t(".look_randomize"),
-                variant: :secondary,
-                size: "sm",
-                icon: "dices",
-                href: randomize_settings_appearance_path,
-                method: :post,
-                frame: :_top
-              ) %>
-          <%= render DS::Button.new(
-                text: t(".look_reset"),
-                variant: :ghost,
-                size: "sm",
-                icon: "rotate-ccw",
-                href: reset_settings_appearance_path,
-                method: :post,
-                frame: :_top
-              ) %>
-          <p class="text-xs text-secondary">
-            <%= t(".look_combination_count", count: UiTheme::PALETTES.size * UiTheme::TYPEFACES.size * UiTheme::STYLES.size) %>
-          </p>
-        </div>
-      </div>
-    <% end %>
 
     <%= settings_section title: t(".palette_title"), subtitle: t(".palette_subtitle") do %>
       <div class="p-3">

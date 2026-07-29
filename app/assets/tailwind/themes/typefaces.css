@@ -326,9 +326,12 @@
     }
   }
 
-  /* Optical size correction, applied to the root font size so every rem-based
-     size in the app scales together. */
-  [data-typeface] body {
+  /* Optical size correction. This MUST sit on the root element, not body:
+     `rem` resolves against <html>, and every Tailwind text-* utility emits a
+     rem font-size — so scaling body was inert for all of them. On the root,
+     `1rem` refers to the initial 16px, so 0.96 yields 15.36px and every
+     rem-based size in the app follows. */
+  html[data-typeface] {
     font-size: calc(1rem * var(--type-scale));
   }
 

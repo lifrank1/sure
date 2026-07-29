@@ -41,13 +41,20 @@
   /* The 1px ring inside every shadow-border-* becomes a highlight rim rather
      than a dark hairline — a dark outline would fight the soft mass. The edge
      is still fully defined, just by the shadow pair instead of a stroke. */
-  --color-alpha-black-50: color-mix(in oklab, var(--color-white) 55%, transparent);
+  /* Kept as a faint DARK tint rather than inverted to white: this token also
+     backs .border-subdued, .border/.bg/.ring-alpha-black-50 (table row rules,
+     control borders), so a white value erases those against a light container.
+     At 6% it reads as no stroke on the soft mass but keeps every rule drawn. */
+  --color-alpha-black-50: color-mix(in oklab, var(--color-black) 6%, transparent);
 
-  /* ── ground: two full steps below the cards, so the lumps really sit on it ── */
-  --color-surface: var(--color-gray-200);
-  --color-surface-hover: var(--color-gray-300);
-  --color-surface-inset: var(--color-gray-300);
-  --color-surface-inset-hover: var(--color-gray-300);
+  /* ── ground: below the cards, so the lumps really sit on it ──
+     Capped at gray-100/200: text-secondary and text-subdued resolve to
+     gray-500 in light mode, which falls to 4.18:1 on gray-200 and 3.32:1 on
+     gray-300 — below AA. The recession is worth one step, not legibility. */
+  --color-surface: var(--color-gray-100);
+  --color-surface-hover: var(--color-gray-200);
+  --color-surface-inset: var(--color-gray-100);
+  --color-surface-inset-hover: var(--color-gray-200);
   --color-container-inset: var(--color-gray-100);
   --color-container-inset-hover: var(--color-gray-200);
 }

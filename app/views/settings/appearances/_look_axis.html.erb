@@ -11,7 +11,11 @@
     <%= form.label :"ui_#{axis}_#{option.id}",
           class: "group cursor-pointer rounded-xl p-3 bg-container shadow-border-xs transition-all
                   hover:bg-container-hover has-[input:checked]:shadow-border-md
-                  has-[input:checked]:outline has-[input:checked]:outline-2 has-[input:checked]:outline-primary" do %>
+                  has-[input:checked]:outline has-[input:checked]:outline-2
+                  has-[input:checked]:outline-[color:var(--color-nav-indicator)]
+                  has-[input:focus-visible]:outline has-[input:focus-visible]:outline-2
+                  has-[input:focus-visible]:outline-offset-2
+                  has-[input:focus-visible]:outline-[color:var(--color-focus-ring)]" do %>
       <%= form.radio_button :"ui_#{axis}", option.id,
             checked: current == option.id,
             class: "sr-only",

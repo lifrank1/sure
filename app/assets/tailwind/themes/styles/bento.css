@@ -54,8 +54,12 @@
      Hover/inset rungs move with it so nav hover stays visible against it. */
   --color-surface: var(--color-gray-100);
   --color-surface-hover: var(--color-gray-200);
-  --color-surface-inset: var(--color-gray-200);
-  --color-surface-inset-hover: var(--color-gray-300);
+  /* Inset wells stay at gray-100: text-secondary is gray-500 in light mode,
+     which measures 4.18:1 on gray-200 and 3.32:1 on gray-300 — under AA for
+     the `text-xs text-secondary bg-surface-inset` blocks used on the
+     transaction detail and preferences pages. */
+  --color-surface-inset: var(--color-gray-100);
+  --color-surface-inset-hover: var(--color-gray-200);
 }
 
 /* Dark twin. These semantic aliases are set unlayered above, which beats the

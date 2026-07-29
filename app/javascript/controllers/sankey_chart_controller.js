@@ -2,7 +2,11 @@ import { Controller } from "@hotwired/stimulus";
 import * as d3 from "d3";
 import { sankey } from "d3-sankey";
 import { CHART_TOOLTIP_CLASSES } from "utils/chart_tooltip";
-import { resolveToken, isTokenRef } from "utils/theme_tokens";
+import {
+  resolveToken,
+  isTokenRef,
+  observeLookChanges,
+} from "utils/theme_tokens";
 import { sankeyNodeHasChildren, zoomSankeyData } from "utils/sankey_zoom";
 import {
   buildCategoryTransactionsUrl,
@@ -42,6 +46,12 @@ export default class extends Controller {
     this.#createTooltip();
     this.#syncZoomControls();
     this.#draw();
+    // Node/link fills are resolved to concrete colors at draw time (d3 needs
+    // real values for opacity math), so a palette, skin or light/dark change
+    // has to trigger a redraw or the chart keeps the old palette's colors.
+    this.lookObserver = observeLookChanges(() => {
+      if (this.connected) this.#draw();
+    });
   }
 
   dataValueChanged() {
@@ -54,6 +64,7 @@ export default class extends Controller {
 
   disconnect() {
     this.connected = false;
+    this.lookObserver?.disconnect();
     this.resizeObserver?.disconnect();
     clearTimeout(this.drawTimeout);
     this.tooltip?.remove();

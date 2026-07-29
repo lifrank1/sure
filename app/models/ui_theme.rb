@@ -42,12 +42,12 @@ class UiTheme
     Option.new(
       id: "phosphor", name: "Phosphor",
       blurb: "CRT terminal. Amber-green glow on carbon. Best paired with the Terminal skin.",
-      meta: { paper: "#0D1110", ink: "#B8FFB0", accent: "#FFB000", positive: "#48FF7B", ground_dark: "#050A07" }
+      meta: { paper: "#F2F7F0", ink: "#0F1A12", accent: "#0E7C5A", positive: "#1E7C46", ground_dark: "#050A07" }
     ),
     Option.new(
       id: "tokyo", name: "Tokyo Night",
       blurb: "Indigo midnight with magenta and cyan neon. High contrast, unapologetically synthetic.",
-      meta: { paper: "#12132B", ink: "#E6E9FF", accent: "#F062A0", positive: "#3DDBB0", ground_dark: "#0C0D1F" }
+      meta: { paper: "#F7F6FD", ink: "#1B1A3A", accent: "#5B45D9", positive: "#0E8F73", ground_dark: "#0C0D1F" }
     ),
     Option.new(
       id: "botanic", name: "Botanic",

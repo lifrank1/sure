@@ -60,3 +60,23 @@
 @import "./styles/aurora.css";
 @import "./styles/deco.css";
 @import "./styles/clay.css";
+
+/* ── FOCUS SAFETY NET ────────────────────────────────────────────────────────
+ * Declared AFTER every skin import (and it must stay after — @import is only
+ * valid before other rules) so no skin can leave an interactive element
+ * without a visible focus indicator.
+ *
+ * This exists because several of the app's focus affordances are box-shadows
+ * rather than outlines: the dashboard widget carries `focus:outline-none` +
+ * `focus-visible:ring-2`, and `.form-field` deliberately does not adopt
+ * `.focus-ring`, relying on `focus-within:ring-4`. Any skin that rewrites
+ * box-shadow silently deletes them. `outline` is an independent property, so
+ * this survives every skin's shadow work, and --color-focus-ring already has
+ * a light/dark twin in the design system.
+ */
+[data-ui-style] section[tabindex="0"]:focus-visible,
+[data-ui-style] .form-field:focus-within,
+[data-ui-style] label:has(input.sr-only:focus-visible) {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
